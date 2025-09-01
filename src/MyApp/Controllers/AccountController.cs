@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MyApp.Data;
 using MyApp.Models;
 using System.Security.Claims;
 
@@ -9,26 +12,56 @@ namespace MyApp.Controllers;
 
 public class AccountController : Controller
 {
-    private static readonly Dictionary<string, string> Users = new(StringComparer.OrdinalIgnoreCase)
+    private readonly ApplicationDbContext _db;
+    private readonly PasswordHasher<User> _hasher = new();
+
+    public AccountController(ApplicationDbContext db)
     {
-        ["alice@example.com"] = "Pa$$w0rd",
-        ["bob@example.com"] = "123456"
-    };
+        _db = db;
+    }
+
+    [HttpGet, AllowAnonymous]
+    public IActionResult Register()
+    {
+        return View(new RegisterViewModel());
+    }
+
+    [HttpPost, AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Register(RegisterViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var emailNorm = model.Email.Trim();
+        var exists = await _db.Users.AnyAsync(u => u.Email == emailNorm);
+        if (exists)
+        { 
+            ModelState.AddModelError(nameof(model.Email), "Email is already registered.");
+            return View(model);
+        }
+
+        var user = new User { Email = emailNorm };
+        user.PasswordHash = _hasher.HashPassword(user, model.Password);
+
+        _db.Users.Add(user);
+        await _db.SaveChangesAsync();
+
+        await SignInAsync(user, isPersistent: true);
+        return RedirectToAction("Index", "Secret");
+    }
 
     [HttpGet]
     [AllowAnonymous]
     public IActionResult Login(string? returnUrl = null)
     {
-        if (User.Identity?.IsAuthenticated == true)
-            return RedirectToLocal(returnUrl ?? "/Secret");
-
         ViewData["ReturnUrl"] = returnUrl;
         return View(new LoginViewModel());
     }
 
-    [HttpPost]
-    [AllowAnonymous]
-    [ValidateAntiForgeryToken]
+    [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
@@ -37,32 +70,23 @@ public class AccountController : Controller
             return View(model);
         }
 
-        if(!Users.TryGetValue(model.Email, out var stored) || stored != model.Password)
+        var email = model.Email.Trim();
+        var user = await _db.Users.SingleOrDefaultAsync(u => u.Email == email);
+        if(user == null)
         {
             ModelState.AddModelError(string.Empty, "Invalid email or password.");
             return View(model);
         }
 
-        var claims = new List<Claim>
+        var result = _hasher.VerifyHashedPassword (user, user.PasswordHash, model.Password);
+        if (result == PasswordVerificationResult.Failed)
         {
-            new Claim(ClaimTypes.NameIdentifier, model.Email),
-            new Claim(ClaimTypes.Name, model.Email),
-            new Claim(ClaimTypes.Email, model.Email),
-            new Claim(ClaimTypes.Role, "User")
-        };
-        
-        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var principal = new ClaimsPrincipal(identity);
+            ModelState.AddModelError(string.Empty, "Invalid email or password.");
+            return View(model);
+        }
 
-        var props = new AuthenticationProperties
-        {
-            IsPersistent = model.RememberMe,
-            ExpiresUtc = model.RememberMe ? DateTimeOffset.UtcNow.AddDays(7) : DateTimeOffset.UtcNow.AddMinutes(30)
-        };
-
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
-
-        return RedirectToLocal(returnUrl ?? Url.Action("Index", "Home")!);
+        await SignInAsync(user, model.RememberMe);
+        return Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) :RedirectToAction("Index", "Secret");
     }
 
     [HttpPost]
@@ -75,6 +99,28 @@ public class AccountController : Controller
 
     [AllowAnonymous]
     public IActionResult Denied() => Content("Access Denied");
+
+    private async Task SignInAsync(User user, bool isPersistent)
+    {
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Email),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, "User")
+        };
+
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+
+        var props = new AuthenticationProperties
+        {
+            IsPersistent = isPersistent,
+            ExpiresUtc = isPersistent ? DateTimeOffset.UtcNow.AddDays(7) : DateTimeOffset.UtcNow.AddMinutes(30)
+        };
+
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
+    }
 
     private IActionResult RedirectToLocal(string returnUrl)
         => Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : RedirectToAction("Index", "Home");
