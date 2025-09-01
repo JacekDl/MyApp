@@ -65,6 +65,17 @@ public class AccountController : Controller
         return RedirectToLocal(returnUrl ?? Url.Action("Index", "Home")!);
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return RedirectToAction("Index", "Home");
+    }
+
+    [AllowAnonymous]
+    public IActionResult Denied() => Content("Access Denied");
+
     private IActionResult RedirectToLocal(string returnUrl)
         => Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : RedirectToAction("Index", "Home");
     
