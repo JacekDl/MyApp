@@ -12,5 +12,8 @@ public class User
     [Required]
     public string PasswordHash { get; set; } = string.Empty;
 
+    [Required, MaxLength(32)]
+    public string Role { get; set; } = "User";
+
     public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
 }
