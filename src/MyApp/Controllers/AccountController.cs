@@ -6,18 +6,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Data;
 using MyApp.Models;
+using MyApp.Services;
 using System.Security.Claims;
 
 namespace MyApp.Controllers;
 
 public class AccountController : Controller
 {
-    private readonly ApplicationDbContext _db;
-    private readonly PasswordHasher<User> _hasher = new();
+    private readonly IUserService _users;
 
-    public AccountController(ApplicationDbContext db)
+    public AccountController(IUserService users)
     {
-        _db = db;
+        _users = users;
     }
 
     [HttpGet, AllowAnonymous]
@@ -26,8 +26,7 @@ public class AccountController : Controller
         return View(new RegisterViewModel());
     }
 
-    [HttpPost, AllowAnonymous]
-    [ValidateAntiForgeryToken]
+    [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
         if (!ModelState.IsValid)
@@ -35,26 +34,19 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var emailNorm = model.Email.Trim();
-        var exists = await _db.Users.AnyAsync(u => u.Email == emailNorm);
-        if (exists)
-        { 
-            ModelState.AddModelError(nameof(model.Email), "Email is already registered.");
+        var (ok, error, user) = await _users.RegisterAsync(model.Email, model.Password, role: "User");
+
+        if (!ok)
+        {
+            ModelState.AddModelError(nameof(model.Email), error!);
             return View(model);
         }
 
-        var user = new User { Email = emailNorm };
-        user.PasswordHash = _hasher.HashPassword(user, model.Password);
-
-        _db.Users.Add(user);
-        await _db.SaveChangesAsync();
-
-        await SignInAsync(user, isPersistent: true);
-        return RedirectToAction("Index", "Secret");
+        await SignInAsync(user!, isPersistent: true); 
+        return RedirectToAction("Index", "Secret"); //Redirect here to different Actions depending on Role (User vs. Admin)
     }
 
-    [HttpGet]
-    [AllowAnonymous]
+    [HttpGet, AllowAnonymous]
     public IActionResult Login(string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
@@ -70,27 +62,18 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var email = model.Email.Trim();
-        var user = await _db.Users.SingleOrDefaultAsync(u => u.Email == email);
-        if(user == null)
-        {
-            ModelState.AddModelError(string.Empty, "Invalid email or password.");
-            return View(model);
-        }
-
-        var result = _hasher.VerifyHashedPassword (user, user.PasswordHash, model.Password);
-        if (result == PasswordVerificationResult.Failed)
+        var user = await _users.ValidateCredentialsAsync(model.Email, model.Password);
+        if (user == null)
         {
             ModelState.AddModelError(string.Empty, "Invalid email or password.");
             return View(model);
         }
 
         await SignInAsync(user, model.RememberMe);
-        return Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) :RedirectToAction("Index", "Secret");
+        return Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : RedirectToAction("Index", "Secret"); //Redirect here to different Actions depending on Role (User vs. Admin)
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -120,9 +103,5 @@ public class AccountController : Controller
         };
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
-    }
-
-    private IActionResult RedirectToLocal(string returnUrl)
-        => Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : RedirectToAction("Index", "Home");
-    
+    }  
 }
