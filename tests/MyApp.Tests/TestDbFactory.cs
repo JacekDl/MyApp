@@ -1,6 +1,6 @@
 ﻿namespace MyApp.Tests;
 
-public class UnitTest1
+public class TestDbFactory
 {
     [Fact]
     public void Test1()
