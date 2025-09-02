@@ -23,13 +23,11 @@
     </div>
 
     <div class="form-check mb-3">
-        <label asp-for="RememberMe" class="form-check-input"></label>
         <input asp-for="RememberMe" class="form-check-input" />
+        <label asp-for="RememberMe" class="form-check-label"></label>
     </div>
 
-    <button type="submit" class="btn btn-primary">
-        Sign in
-    </button>
+    <button type="submit" class="btn btn-primary">Sign in</button>
 </form>
 
 @section Scripts {
