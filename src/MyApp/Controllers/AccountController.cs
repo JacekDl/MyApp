@@ -40,7 +40,7 @@ public class AccountController : Controller
         }
 
         await SignInAsync(result.Value!, isPersistent: true); 
-        return RedirectToAction("Index", "Secret"); //Redirect here to different Actions depending on Role (User vs. Admin)
+        return RedirectAfterSignIn(result.Value!);
     }
 
     [HttpGet, AllowAnonymous]
@@ -67,7 +67,11 @@ public class AccountController : Controller
         }
 
         await SignInAsync(user, model.RememberMe);
-        return Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : RedirectToAction("Index", "Secret"); //Redirect here to different Actions depending on Role (User vs. Admin)
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+        return RedirectAfterSignIn(user);
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -79,6 +83,15 @@ public class AccountController : Controller
 
     [AllowAnonymous]
     public IActionResult Denied() => Content("Access Denied");
+
+    private IActionResult RedirectAfterSignIn(User user)
+    {
+        // Simple role-based redirect (adjust as needed)
+        if (User.IsInRole("Admin") || string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
+            return RedirectToAction("Index", "Admin");
+
+        return RedirectToAction("Index", "Secret");
+    }
 
     private async Task SignInAsync(User user, bool isPersistent)
     {
