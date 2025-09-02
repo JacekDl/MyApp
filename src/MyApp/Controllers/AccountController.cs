@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MyApp.Data;
 using MyApp.Models;
 using MyApp.Services;
 using System.Security.Claims;
@@ -34,15 +31,15 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var (ok, error, user) = await _users.RegisterAsync(model.Email, model.Password, role: "User");
+        var result = await _users.RegisterAsync(model.Email, model.Password, role: "User");
 
-        if (!ok)
+        if (!result.Succeeded)
         {
-            ModelState.AddModelError(nameof(model.Email), error!);
+            ModelState.AddModelError(nameof(model.Email), result.Error!);
             return View(model);
         }
 
-        await SignInAsync(user!, isPersistent: true); 
+        await SignInAsync(result.Value!, isPersistent: true); 
         return RedirectToAction("Index", "Secret"); //Redirect here to different Actions depending on Role (User vs. Admin)
     }
 

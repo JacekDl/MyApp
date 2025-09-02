@@ -17,11 +17,12 @@ public class UserService : IUserService
     }
 
 
-    public async Task<(bool Ok, string? Error, User? User)> RegisterAsync(string email, string password, string role = "User")
+    public async Task<OperationResult<User>> RegisterAsync(string email, string password, string role = "User")
     {
         var normalized = email.Trim();
         if (await _db.Users.AnyAsync(u => u.Email == normalized))
-            return (false, "Email is already registered", null);
+            return OperationResult<User>.Failure("Email is already registered.");
+
 
         var user = new User { Email = normalized, Role = role };
         user.PasswordHash = _hasher.HashPassword(user, password);
@@ -29,7 +30,7 @@ public class UserService : IUserService
         _db.Users.Add(user);
         await _db.SaveChangesAsync();
 
-        return (true, null, user);
+        return OperationResult<User>.Success(user);
     }
 
     public async Task<User?> ValidateCredentialsAsync(string email, string password)
