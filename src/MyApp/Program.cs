@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Data;
+using MyApp.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +35,22 @@ builder.Services.AddAuthorization(options =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Database.EnsureCreatedAsync();
+
+    var adminEmail = "admin@example.com";
+    if (!await db.Users.AnyAsync(u => u.Email == adminEmail))
+    {
+        var hasher = new PasswordHasher<User>();
+        var admin = new User { Email = adminEmail, Role = "Admin" };
+        admin.PasswordHash = hasher.HashPassword(admin, "Admin#12345");
+        db.Users.Add(admin);
+        await db.SaveChangesAsync();
+    }
+}
 
 if (!app.Environment.IsDevelopment())
 {
