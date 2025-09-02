@@ -1,0 +1,12 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>Welcome, @User.Identity?.Name! You have administrator access.</p>
+
+<ul>
+    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+    <li><a asp-controller="Secret" asp-action="Index">Secret</a></li>
+</ul>
