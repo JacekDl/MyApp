@@ -10,6 +10,14 @@ public class HomeController : Controller
     [AllowAnonymous]
     public IActionResult Index()
     {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            if (User.IsInRole("Admin"))
+            {
+                return RedirectToAction("Index", "Admin");
+            }
+            return RedirectToAction("Reviews", "UserRole");
+        }
         return View();
     }
 
