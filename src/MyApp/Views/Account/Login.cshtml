@@ -10,6 +10,17 @@
     @Html.AntiForgeryToken()
     <input type="hidden" name="returnUrl" value="@returnUrl" />
 
+    @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors?.Count > 0)
+    {
+        var errorMessage = ViewData.ModelState[string.Empty]?.Errors?.FirstOrDefault()?.ErrorMessage;
+        if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="text-danger mb-3">
+                @errorMessage
+            </div>
+        }
+    }
+
     <div class="mb-3">
         <label asp-for="Email" class="form-label"></label>
         <input asp-for="Email" class="form-control" />
