@@ -1,12 +1,40 @@
-﻿@{
+﻿@model IReadOnlyList<MyApp.Models.UserListItem>
+
+@{
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1 class="mb-3">@ViewData["Title"]</h1>
 
 <p>Welcome, @User.Identity?.Name! You have administrator access.</p>
 
-<ul>
-    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
-    <li><a asp-controller="Secret" asp-action="Index">Secret</a></li>
-</ul>
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">No users found</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm table-striped align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var user in Model)
+                {
+                    <tr>
+                        <td>@user.Id</td>
+                        <td>@user.Email</td>
+                        <td>@user.Role</td>
+                        <td>@user.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
