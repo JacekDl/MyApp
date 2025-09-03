@@ -35,5 +35,10 @@ namespace MyApp.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        public IActionResult Reviews()
+        {
+            return View();
+        }
     }
 }
