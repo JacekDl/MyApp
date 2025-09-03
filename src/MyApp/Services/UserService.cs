@@ -49,4 +49,18 @@ public class UserService : IUserService
         return user;
     }
 
+    public async Task<IReadOnlyList<UserListItem>> GetUsersAsync()
+    {
+        return await _db.Users
+            .AsNoTracking()
+            .OrderByDescending(u => u.CreatedUtc)
+            .Select(u => new UserListItem
+            {
+                Id = u.Id,
+                Email = u.Email,
+                Role = u.Role,
+                CreatedUtc = u.CreatedUtc
+            })
+            .ToListAsync();      
+    }
 }
