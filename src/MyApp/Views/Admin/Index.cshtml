@@ -8,6 +8,16 @@
 
 <p>Welcome, @User.Identity?.Name! You have administrator access.</p>
 
+@if(TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if(TempData["Info"] != null)
+{
+    <div class="alert alert-success">@TempData["Info"]</div>
+}
+
 @if (Model.Count == 0)
 {
     <div class="alert alert-info">No users found</div>
@@ -22,6 +32,7 @@ else
                     <th scope="col">Email</th>
                     <th scope="col">Role</th>
                     <th scope="col">Created</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
@@ -32,6 +43,18 @@ else
                         <td>@user.Email</td>
                         <td>@user.Role</td>
                         <td>@user.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>
+                            @if (!string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <form asp-action="RemoveUser" method="post" asp-route-id="@user.Id" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Are you sure you want to remove this user?');">
+                                        Remove
+                                    </button>
+                                </form>
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>

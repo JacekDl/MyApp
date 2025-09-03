@@ -11,4 +11,6 @@ public interface IUserService
     Task<User?> GetByEmailAsync(string email);
 
     Task<IReadOnlyList<UserListItem>> GetUsersAsync();
+
+    Task<OperationResult> RemoveUserAsync(int id);
 }

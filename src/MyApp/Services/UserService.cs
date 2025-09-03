@@ -63,4 +63,23 @@ public class UserService : IUserService
             })
             .ToListAsync();      
     }
+
+    public async Task<OperationResult> RemoveUserAsync(int id)
+    {
+        var user = await _db.Users.FindAsync(id);
+        if (user is null)
+        {
+            return OperationResult.Failure("User not found.");
+        }
+
+        if (string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
+        {
+            return OperationResult.Failure("Cannot remove an Admin user.");
+        }
+
+        _db.Users.Remove(user);
+        await _db.SaveChangesAsync();
+
+        return OperationResult.Success();
+    }
 }

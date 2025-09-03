@@ -19,5 +19,21 @@ namespace MyApp.Controllers
             var model = await _users.GetUsersAsync();
             return View(model);
         }
+
+        public async Task<IActionResult> RemoveUser(int id)
+        {
+            var result = await _users.RemoveUserAsync(id);
+
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = result.Error;
+            }
+            else
+            {
+                TempData["Info"] = "User removed";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
