@@ -74,7 +74,6 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .AllowAnonymous();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
