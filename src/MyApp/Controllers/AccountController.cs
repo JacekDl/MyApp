@@ -90,7 +90,7 @@ public class AccountController : Controller
         if (User.IsInRole("Admin") || string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
             return RedirectToAction("Index", "Admin");
 
-        return RedirectToAction("Index", "Secret");
+        return RedirectToAction("Reviews", "UserRole");
     }
 
     private async Task SignInAsync(User user, bool isPersistent)
