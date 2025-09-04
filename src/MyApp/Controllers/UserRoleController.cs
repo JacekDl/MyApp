@@ -1,13 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QuestPDF.Helpers;
-using QuestPDF.Fluent;
+using MyApp.Services;
+using System.Threading.Tasks;
 
 namespace MyApp.Controllers;
 
 [Authorize(Roles = "User")]
 public class UserRoleController : Controller
 {
+    private readonly IReviewPdfService _pdfService;
+
+    public UserRoleController(IReviewPdfService pdfService)
+    {
+        _pdfService = pdfService;
+    }
+
     [HttpGet]
     public IActionResult Reviews()
     {
@@ -15,23 +22,9 @@ public class UserRoleController : Controller
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult Reviews(string userText)
+    public async Task<IActionResult> Reviews(string userText, CancellationToken ct)
     {
-        byte[] pdfBytes = Document.Create(container =>
-        {
-            container.Page(page =>
-            {
-                page.Size(PageSizes.A4);
-                page.Margin(40);
-
-                page.Header().Text("User Review").Bold().FontSize(20);
-                page.Content().Column(col =>
-                {
-                    col.Spacing(10);
-                    col.Item().Text(userText).FontSize(14);
-                });
-            });
-        }).GeneratePdf();
+        var pdfBytes = await _pdfService.GenerateReviewPdfAsync(userText, ct);
 
         Response.Headers["Content-Disposition"] = "inline; filename=review.pdf";
         return File(pdfBytes, "application/pdf");
