@@ -166,6 +166,35 @@ public class AccountController : Controller
         return RedirectToAction(nameof(Details));
     }
 
+    [Authorize, HttpGet]
+    public IActionResult ChangePassword()
+    {
+        return View(new ChangePasswordViewModel());
+    }
+
+    [Authorize, HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var CurrentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var result = await _users.ChangePasswordAsync(CurrentUserId, model.CurrentPassword, model.NewPassword);
+
+        if (!result.Succeeded)
+        {
+            ModelState.AddModelError(string.Empty, result.Error!);
+            return View(model);
+        }
+
+        TempData["Info"]  = "Password changed.";
+        return RedirectToAction(nameof(Details));
+
+
+    }
+
     [AllowAnonymous]
     public IActionResult Denied() => Content("Access Denied");
 

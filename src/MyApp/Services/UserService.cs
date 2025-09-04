@@ -174,8 +174,23 @@ public class UserService : IUserService
 
     }
 
-    public Task<OperationResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+    public async Task<OperationResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
     {
-        throw new NotImplementedException();
+        var user = await _db.Users.SingleOrDefaultAsync(u => u.Id == userId);
+        if (user is null)
+        {
+            return OperationResult.Failure("User not found.");
+        }
+
+        var verify = _hasher.VerifyHashedPassword(user, user.PasswordHash, currentPassword ?? string.Empty);
+        if (verify == PasswordVerificationResult.Failed)
+        {
+            return OperationResult.Failure("Current password is incorrect.");
+        }
+
+        user.PasswordHash = _hasher.HashPassword(user, newPassword);
+        await _db.SaveChangesAsync();
+
+        return OperationResult.Success();
     }
 }
