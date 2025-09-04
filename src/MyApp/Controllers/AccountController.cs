@@ -81,6 +81,18 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Home");
     }
 
+    [Authorize,HttpGet]
+    public async Task<IActionResult> Details()
+    {
+        var CurrentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _users.GetByIdAsync(CurrentUserId);
+        if (user is null) return NotFound();
+
+        ViewBag.Email = user.Email;
+        ViewBag.CreatedUtc = user.CreatedUtc;
+        return View();
+    }
+
     [AllowAnonymous]
     public IActionResult Denied() => Content("Access Denied");
 

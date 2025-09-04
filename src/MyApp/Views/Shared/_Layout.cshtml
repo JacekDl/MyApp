@@ -23,7 +23,7 @@
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
                             <li class="nav-item">
-                                <span class="nav-link">Hello, @User.Identity.Name!</span>
+                                <a class="nav-link" asp-controller="Account" asp-action="Details">Details</a>
                             </li>
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">

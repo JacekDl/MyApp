@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Account Details";
+    var email = (string)ViewBag.Email;
+    var created = (DateTime)ViewBag.CreatedUtc;
+}
+
+<h1 class="mb-3">@ViewData["Title"]</h1>
+
+@if(TempData["Info"] is string info)
+{
+    <div class="alert alert-success">@info</div>
+}
+
+<div class="card mb-4">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">@email</dd>
+            <dt class="col-sm-3">Name</dt>
+            <dd class="col-sm-9"></dd>
+            <dt class="col-sm-3">Pharmacy</dt>
+            <dd class="col-sm-9"></dd>
+            <dt class="col-sm-3">City</dt>
+            <dd class="col-sm-9"></dd>
+            <dt class="col-sm-3">Created</dt>
+            <dd class="col-sm-9">@created.ToString("yyyy-MM-dd HH:mm")</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="d-grip gap-2 d-md-flex">
+    <a class="btn btn-outline-primary" asp-action="ChangeEmail">Change Email</a>
+    <a class="btn btn-outline-primary" asp-action="ChangePassword">Change Password</a>
+    <a class="btn btn-outline-primary" asp-action="EditProfile">Add / Edit Profile Data</a>
+</div>

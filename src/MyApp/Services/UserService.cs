@@ -82,4 +82,11 @@ public class UserService : IUserService
 
         return OperationResult.Success();
     }
+
+    public async Task<User?> GetByIdAsync(int id)
+    {
+        return await _db.Users
+            .AsNoTracking()
+            .SingleOrDefaultAsync(u => u.Id == id);
+    }
 }
