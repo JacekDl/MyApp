@@ -1,0 +1,39 @@
+﻿@model MyApp.Models.EditProfileViewModel
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<h1 class="mb-3">@ViewData["Title"]</h1>
+
+<form asp-action="EditProfile" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PharmacyName" class="form-label"></label>
+        <input asp-for="PharmacyName" class="form-control" />
+        <span asp-validation-for="PharmacyName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PharmacyCity" class="form-label"></label>
+        <input asp-for="PharmacyCity" class="form-control" />
+        <span asp-validation-for="PharmacyCity" class="text-danger"></span>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a class="btn btn-link" asp-action="Details">Cancel</a>
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

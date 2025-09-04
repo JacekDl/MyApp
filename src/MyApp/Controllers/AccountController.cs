@@ -89,14 +89,53 @@ public class AccountController : Controller
         if (user is null) return NotFound();
 
         ViewBag.Email = user.Email;
+        ViewBag.Name = user.Name;
+        ViewBag.PharmacyName = user.PharmacyName;
+        ViewBag.PharmacyCity = user.PharmacyCity;
         ViewBag.CreatedUtc = user.CreatedUtc;
         return View();
+    }
+
+    [Authorize, HttpGet]
+    public async Task<IActionResult> EditProfile()
+    {
+        var CurrentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _users.GetByIdAsync(CurrentUserId);
+        if (user is null) return NotFound();
+
+        return View (new EditProfileViewModel
+        {
+            Name = user.Name,
+            PharmacyName = user.PharmacyName,
+            PharmacyCity = user.PharmacyCity
+        });
+    }
+
+    [Authorize, HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditProfile(EditProfileViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var CurrentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var result = await _users.UpdateProfileAsync(CurrentUserId, model.Name, model.PharmacyName, model.PharmacyCity);
+
+        if (!result.Succeeded)
+        {
+            ModelState.AddModelError(string.Empty, result.Error!);
+            return View(model);
+        }
+
+        TempData["Info"] = "Profile updated.";
+        return RedirectToAction(nameof(Details));
     }
 
     [AllowAnonymous]
     public IActionResult Denied() => Content("Access Denied");
 
-    private IActionResult RedirectAfterSignIn(User user)
+    private RedirectToActionResult RedirectAfterSignIn(User user)
     {
         // Simple role-based redirect (adjust as needed)
         if (User.IsInRole("Admin") || string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))

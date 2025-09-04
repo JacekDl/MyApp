@@ -89,4 +89,55 @@ public class UserService : IUserService
             .AsNoTracking()
             .SingleOrDefaultAsync(u => u.Id == id);
     }
+
+    public async Task<OperationResult> UpdateProfileAsync(int userId, string? name, string? pharmacyName, string? pharmacyCity)
+    {
+        var user = await _db.Users.SingleOrDefaultAsync(u => u.Id == userId);
+        if (user is null)
+        {
+            return OperationResult.Failure("User not found.");
+        }
+
+        name = string.IsNullOrWhiteSpace(name) ? null : name.Trim();
+        pharmacyName = string.IsNullOrWhiteSpace(pharmacyName) ? null : pharmacyName.Trim();
+        pharmacyCity = string.IsNullOrWhiteSpace(pharmacyCity) ? null : pharmacyCity.Trim();
+
+        var changed = false;
+
+        if (user.Name != name)
+        {
+            user.Name = name;
+            changed = true;
+        }
+
+        if (user.PharmacyName != pharmacyName)
+        {
+            user.PharmacyName = pharmacyName;
+            changed = true;
+        }
+
+        if(user.PharmacyCity != pharmacyCity)
+        {
+            user.PharmacyCity = pharmacyCity;
+            changed = true;
+        }
+
+        if (!changed)
+        {
+            return OperationResult.Success();
+        }
+
+        await _db.SaveChangesAsync();
+        return OperationResult.Success();
+    }
+
+    public Task<OperationResult> UpdateEmailAsync(int userId, string newEmail, string currentPassword)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<OperationResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+    {
+        throw new NotImplementedException();
+    }
 }
