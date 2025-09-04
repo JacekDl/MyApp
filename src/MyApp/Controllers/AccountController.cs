@@ -132,6 +132,40 @@ public class AccountController : Controller
         return RedirectToAction(nameof(Details));
     }
 
+    [Authorize, HttpGet]
+    public async Task<IActionResult> ChangeEmail()
+    {
+        var CurrentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _users.GetByIdAsync(CurrentUserId);
+        if (user is null)
+        {
+            return NotFound();
+        }
+
+        var model = new ChangeEmailViewModel { Email = user.Email };
+        return View(model);
+    }
+
+    [Authorize, HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangeEmail(ChangeEmailViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var CurrentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var result = await _users.UpdateEmailAsync(CurrentUserId, model.Email, model.CurrentPassword);
+        if (!result.Succeeded)
+        {
+            ModelState.AddModelError(string.Empty, result.Error!);
+            return View(model);
+        }
+
+        TempData["Info"] = "Email updated.";
+        return RedirectToAction(nameof(Details));
+    }
+
     [AllowAnonymous]
     public IActionResult Denied() => Content("Access Denied");
 

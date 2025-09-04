@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MyApp.Data;
 using MyApp.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyApp.Services;
 
@@ -131,9 +132,46 @@ public class UserService : IUserService
         return OperationResult.Success();
     }
 
-    public Task<OperationResult> UpdateEmailAsync(int userId, string newEmail, string currentPassword)
+    public async Task<OperationResult> UpdateEmailAsync(int userId, string newEmail, string currentPassword)
     {
-        throw new NotImplementedException();
+        var user = await _db.Users.SingleOrDefaultAsync(u => u.Id == userId);
+        if (user is null)
+        {
+            return OperationResult.Failure("User not found.");
+        }
+
+        newEmail = (newEmail ?? string.Empty).Trim();
+
+        var emailAttr = new EmailAddressAttribute();
+        if (!emailAttr.IsValid(newEmail))
+        {
+            return OperationResult.Failure("Please enter a valid email address.");
+        }
+
+        if (string.Equals(user.Email, newEmail, StringComparison.OrdinalIgnoreCase))
+        {
+            return OperationResult.Success();
+        }
+
+        var verify = _hasher.VerifyHashedPassword(user, user.PasswordHash, currentPassword ?? string.Empty);
+        if (verify == PasswordVerificationResult.Failed)
+        {
+            return OperationResult.Failure("Current password is incorrect.");
+        }
+
+        var exists = await _db.Users
+            .AsNoTracking()
+            .AnyAsync(u => u.Id != userId && u.Email.ToLower() == newEmail.ToLower());
+
+        if (exists)
+        {
+            return OperationResult.Failure("The new email is already in use.");
+        }
+
+        user.Email = newEmail;
+        await _db.SaveChangesAsync();
+        return OperationResult.Success();
+
     }
 
     public Task<OperationResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
