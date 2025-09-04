@@ -1,8 +1,22 @@
 ﻿@{
-    ViewData["Title"] = "User Role - Reviews";
+    ViewData["Title"] = "Reviews";
 }
 
 <partial name="~/Views/Shared/_UserRoleNav.cshtml" />
 
-<h1 class="mb-3">@ViewData["Title"]</h1>
-<div class="alert alert-info">Reviews management not active.</div>
+<h2>Create PDF from your text</h2>
+
+<form asp-action="Reviews" asp-asp-controller="UserRole" method="post" target="_blank">
+    @Html.AntiForgeryToken()
+    <div class="mb-3">
+        <label for="userText" class="form-label">Enter text to include in PDF</label>
+        <textarea id="userText" name="userText" class="form-control" rows="6"
+            placeholder="Type anything here..."></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Generate PDF</button>
+
+    <p class="text-muted mt-2">
+        The PDF will open in a new tab.
+    </p>
+</form>
