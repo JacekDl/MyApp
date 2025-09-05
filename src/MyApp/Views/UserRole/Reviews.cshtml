@@ -1,4 +1,6 @@
-﻿@{
+﻿@model MyApp.Models.ReviewCreateViewModel
+
+@{
     ViewData["Title"] = "Reviews";
 }
 
@@ -9,9 +11,8 @@
 <form asp-action="Reviews" asp-asp-controller="UserRole" method="post" target="_blank">
     @Html.AntiForgeryToken()
     <div class="mb-3">
-        <label for="userText" class="form-label">Enter text to include in PDF</label>
-        <textarea id="userText" name="userText" class="form-control" rows="6"
-            placeholder="Type anything here..."></textarea>
+        <label asp-for="Advice" class="form-label">Enter text to include in PDF</label>
+        <textarea asp-for="Advice" class="form-control" rows="6" placeholder="Type anything here..."></textarea>
     </div>
 
     <button type="submit" class="btn btn-primary">Generate PDF</button>

@@ -1,6 +1,8 @@
-﻿namespace MyApp.Services;
+﻿using MyApp.Models;
+
+namespace MyApp.Services;
 
 public interface IReviewPdfService
 {
-    Task<byte[]> GenerateReviewPdfAsync(string userText, CancellationToken ct = default);
+    Task<byte[]> GenerateReviewPdfAsync(Review review, CancellationToken ct = default);
 }
