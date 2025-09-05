@@ -64,4 +64,13 @@ public class ReviewService : IReviewService
         await _db.SaveChangesAsync(ct);
         return true;
     }
+
+    public async Task<IReadOnlyList<Review>> GetByCreatorAsync(int userId, CancellationToken ct = default)
+    {
+        return await _db.Reviews
+            .AsNoTracking()
+            .Where(r => r.CreatedByUserId == userId)
+            .OrderByDescending(r => r.DateCreated)
+            .ToListAsync(ct);
+    }
 }

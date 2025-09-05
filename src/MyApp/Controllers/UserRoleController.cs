@@ -6,6 +6,7 @@ using MyApp.Models;
 using MyApp.Services;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace MyApp.Controllers;
 
@@ -86,8 +87,26 @@ public class UserRoleController : Controller
 
 
     #endregion
-    public IActionResult Tokens()
+
+    #region List of User's Reviews
+    [HttpGet]
+    public async Task<IActionResult> Tokens(CancellationToken ct)
     {
-        return View();
+        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var reviews = await _reviewService.GetByCreatorAsync(currentUserId, ct);
+        var model = reviews.Select(r => new TokenItemViewModel
+        {
+            Id = r.Id,
+            Number = r.Number,
+            Advice = r.Advice,
+            DateCreated = r.DateCreated,
+            Completed = r.Completed,
+            ReviewText = r.ReviewText ?? string.Empty
+        }).ToList();
+
+        return View(model);
     }
 }
+
+#endregion

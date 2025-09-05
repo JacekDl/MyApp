@@ -1,8 +1,44 @@
-﻿@{
-    ViewData["Title"] = "User Role - Tokens";
+﻿@model IEnumerable<MyApp.Models.TokenItemViewModel> 
+
+@{
+    ViewData["Title"] = "Your reviews";
 }
+
+
+<h1 class="mb-3">@ViewData["Title"]</h1>
 
 <partial name="~/Views/Shared/_UserRoleNav.cshtml" />
 
-<h1 class="mb-3">@ViewData["Title"]</h1>
-<div class="alert alert-info">Tokens management not active.</div>
+@if (!Model.Any())
+{
+    <div class="alert alert-info">You haven't generated any reviews yet.'</div>
+}
+else
+{
+    <table class="table table-stripped align-middle">
+        <thead>
+            <tr>
+                <th>Created</th>
+                <th>Number</th>
+                <th>Advice</th>
+                <th>Review</th>
+                <th>Completed</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach(var rev in Model)
+        {
+            <tr>
+                <td>@rev.DateCreated.ToString("u")</td>
+                <td>@rev.Number</td>
+                <td>@rev.Advice</td>
+                <td>@rev.ReviewText</td>
+                <td>@(rev.Completed ? "Yes" : "No")</td>
+            </tr>        
+
+        }
+        </tbody>
+    </table>
+}
+
+
