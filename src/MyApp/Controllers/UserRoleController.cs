@@ -20,6 +20,7 @@ public class UserRoleController : Controller
         _db = db;
     }
 
+    #region Generate Review
     [HttpGet]
     public IActionResult Reviews()
     {
@@ -62,6 +63,54 @@ public class UserRoleController : Controller
         return new string(chars);
     }
 
+    #endregion
+
+    #region Public Edit Review
+    [AllowAnonymous]
+    [HttpGet("/r/{number}")]
+    public async Task<IActionResult> PublicEdit(string number, CancellationToken ct)
+    { 
+        var review = await _db.Reviews
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Number == number, ct);
+
+        if (review == null)
+        {
+            return NotFound();
+        }
+
+        ViewBag.Advice = review.Advice;
+        var model = new PublicReviewEditViewModel
+        {
+            Number = review.Number,
+            ReviewText = review.ReviewText ?? string.Empty
+        };
+        return View(model);
+    }
+
+    [AllowAnonymous, HttpPost("/r/{number}"), ValidateAntiForgeryToken]
+    public async Task<IActionResult> PublicEdit(string number, PublicReviewEditViewModel model, CancellationToken ct)
+    {
+        if (number != model.Number)
+        {
+            return BadRequest();
+        }
+
+        var entity = await _db.Reviews.FirstOrDefaultAsync(r => r.Number == number, ct);
+        if (entity is null)
+        {
+            return NotFound();
+        }
+
+        entity.ReviewText = model.ReviewText;
+        await _db.SaveChangesAsync(ct);
+
+        TempData["Saved"] = true;
+        return RedirectToAction(nameof(PublicEdit), new { number });
+    }
+
+
+    #endregion
     public IActionResult Tokens()
     {
         return View();
