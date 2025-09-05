@@ -17,4 +17,7 @@ public class Review
     public string? ReviewText { get; set; }
 
     public bool Completed { get; set; }
+
+    public int CreatedByUserId { get; set; }
+    public User? CreatedByUser { get; set; }
 }

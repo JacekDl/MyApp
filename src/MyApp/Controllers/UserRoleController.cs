@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MyApp.Data;
 using MyApp.Models;
 using MyApp.Services;
+using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace MyApp.Controllers;
@@ -35,7 +36,9 @@ public class UserRoleController : Controller
             return View(model);
         }
 
-        var review = await _reviewService.CreateAsync(model.Advice, ct);
+        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var review = await _reviewService.CreateAsync(currentUserId, model.Advice, ct);
         var pdfBytes = await _pdfService.GenerateReviewPdfAsync(review, ct);
 
         Response.Headers["Content-Disposition"] = "inline; filename=review.pdf";

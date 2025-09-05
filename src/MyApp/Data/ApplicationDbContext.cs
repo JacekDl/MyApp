@@ -28,6 +28,12 @@ public class ApplicationDbContext : DbContext
             .Property(r => r.DateCreated)
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Review>()
+            .HasOne(r => r.CreatedByUser)
+            .WithMany()
+            .HasForeignKey(r => r.CreatedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 
 }

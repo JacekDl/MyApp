@@ -14,7 +14,7 @@ public class ReviewService : IReviewService
         _db = db;
     }
 
-    public async Task<Review> CreateAsync(string? advice, CancellationToken ct = default)
+    public async Task<Review> CreateAsync(int userId, string? advice, CancellationToken ct = default)
     {
         string number;
         do
@@ -23,7 +23,14 @@ public class ReviewService : IReviewService
         }
         while(_db.Reviews.Any(r => r.Number == number));
 
-        var entity = new Review { Advice = advice!, Number = number, Completed = false };
+        var entity = new Review
+        {
+            Advice = advice!,
+            Number = number,
+            Completed = false,
+            CreatedByUserId = userId
+        };
+
         _db.Reviews.Add(entity);
 
         await _db.SaveChangesAsync(ct);
