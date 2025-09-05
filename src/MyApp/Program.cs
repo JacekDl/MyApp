@@ -41,6 +41,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddScoped<IUserService,  UserService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddSingleton<IReviewPdfService, ReviewPdfService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
 var app = builder.Build();
 

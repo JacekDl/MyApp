@@ -12,12 +12,12 @@ namespace MyApp.Controllers;
 public class UserRoleController : Controller
 {
     private readonly IReviewPdfService _pdfService;
-    private readonly ApplicationDbContext _db;
+    private readonly IReviewService _reviewService;
 
-    public UserRoleController(IReviewPdfService pdfService, ApplicationDbContext db)
+    public UserRoleController(IReviewPdfService pdfService, IReviewService reviewService)
     {
         _pdfService = pdfService;
-        _db = db;
+        _reviewService = reviewService;
     }
 
     #region Generate Review
@@ -30,49 +30,24 @@ public class UserRoleController : Controller
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Reviews(ReviewCreateViewModel model, CancellationToken ct)
     {
-        string number;
-        do
+        if(!ModelState.IsValid)
         {
-            number = GenerateDigits(10);
+            return View(model);
         }
-        while (await _db.Reviews.AnyAsync(r => r.Number == number, ct));
 
-        var review = new Review
-        {
-            Advice = model.Advice,
-            Number = number,
-            Completed = false
-        };
-
-        _db.Reviews.Add(review);
-        await _db.SaveChangesAsync(ct);
-
+        var review = await _reviewService.CreateAsync(model.Advice, ct);
         var pdfBytes = await _pdfService.GenerateReviewPdfAsync(review, ct);
 
         Response.Headers["Content-Disposition"] = "inline; filename=review.pdf";
         return File(pdfBytes, "application/pdf");
     }
-
-    private static string GenerateDigits(int digits = 10)
-    {
-        var chars = new char[digits];
-        for (int i = 0; i < digits; i++)
-        {
-            chars[i] = (char)('0' + RandomNumberGenerator.GetInt32(0, 10));
-        }
-        return new string(chars);
-    }
-
     #endregion
 
     #region Public Edit Review
-    [AllowAnonymous]
-    [HttpGet("/r/{number}")]
+    [AllowAnonymous, HttpGet("/r/{number}")]
     public async Task<IActionResult> PublicEdit(string number, CancellationToken ct)
     { 
-        var review = await _db.Reviews
-            .AsNoTracking()
-            .FirstOrDefaultAsync(r => r.Number == number, ct);
+        var review = await _reviewService.GetPublicAsync(number, ct);
 
         if (review == null)
         {
@@ -96,14 +71,11 @@ public class UserRoleController : Controller
             return BadRequest();
         }
 
-        var entity = await _db.Reviews.FirstOrDefaultAsync(r => r.Number == number, ct);
-        if (entity is null)
+        var ok = await _reviewService.UpdatePublicAsync(number, model.ReviewText, ct);
+        if (!ok)
         {
             return NotFound();
         }
-
-        entity.ReviewText = model.ReviewText;
-        await _db.SaveChangesAsync(ct);
 
         TempData["Saved"] = true;
         return RedirectToAction(nameof(PublicEdit), new { number });
