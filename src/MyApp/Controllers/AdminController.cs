@@ -14,12 +14,16 @@ public class AdminController : Controller
         _users = users;
     }
 
-    public async Task<IActionResult> Index()
+    #region ViewUsers
+    public async Task<IActionResult> ViewUsers()
     {
         var model = await _users.GetUsersAsync();
         return View(model);
     }
 
+    #endregion
+
+    #region RemoveUser
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> RemoveUser(int id)
     {
@@ -34,11 +38,14 @@ public class AdminController : Controller
             TempData["Info"] = "User removed";
         }
 
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(ViewUsers));
     }
+    #endregion
 
-    public IActionResult Reviews()
+    #region ViewReviews
+    public IActionResult ViewReviews()
     {
         return View();
     }
+    #endregion
 }

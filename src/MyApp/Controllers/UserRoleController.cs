@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MyApp.Data;
 using MyApp.Models;
 using MyApp.Services;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
 
 namespace MyApp.Controllers;
 
@@ -22,7 +18,7 @@ public class UserRoleController : Controller
         _reviewService = reviewService;
     }
 
-    #region Generate Review
+    #region GenerateReview
     [HttpGet]
     public IActionResult Reviews()
     {
@@ -47,7 +43,7 @@ public class UserRoleController : Controller
     }
     #endregion
 
-    #region Public Edit Review
+    #region PublicEditReview
     [AllowAnonymous, HttpGet("/r/{number}")]
     public async Task<IActionResult> PublicEdit(string number, CancellationToken ct)
     { 
@@ -88,7 +84,7 @@ public class UserRoleController : Controller
 
     #endregion
 
-    #region List of User's Reviews
+    #region ListUsersReviews
     [HttpGet]
     public async Task<IActionResult> Tokens(CancellationToken ct)
     {

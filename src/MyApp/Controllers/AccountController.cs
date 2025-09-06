@@ -17,6 +17,7 @@ public class AccountController : Controller
         _users = users;
     }
 
+    #region RegisterUser
     [HttpGet, AllowAnonymous]
     public IActionResult Register()
     {
@@ -42,7 +43,40 @@ public class AccountController : Controller
         await SignInAsync(result.Value!, isPersistent: true); 
         return RedirectAfterSignIn(result.Value!);
     }
+    #endregion
 
+    private RedirectToActionResult RedirectAfterSignIn(User user)
+    {
+        // Simple role-based redirect (adjust as needed)
+        if (User.IsInRole("Admin") || string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
+            return RedirectToAction("Index", "Admin");
+
+        return RedirectToAction("Reviews", "UserRole");
+    }
+
+    private async Task SignInAsync(User user, bool isPersistent)
+    {
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Email),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, user.Role)
+        };
+
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+
+        var props = new AuthenticationProperties
+        {
+            IsPersistent = isPersistent,
+            ExpiresUtc = isPersistent ? DateTimeOffset.UtcNow.AddDays(7) : DateTimeOffset.UtcNow.AddMinutes(30)
+        };
+
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
+    }
+
+    #region LoginUser
     [HttpGet, AllowAnonymous]
     public IActionResult Login(string? returnUrl = null)
     {
@@ -73,7 +107,9 @@ public class AccountController : Controller
         }
         return RedirectAfterSignIn(user);
     }
+    #endregion
 
+    #region LogoutUser
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
@@ -95,7 +131,9 @@ public class AccountController : Controller
         ViewBag.CreatedUtc = user.CreatedUtc;
         return View();
     }
+    #endregion
 
+    #region EditUserProfile
     [Authorize, HttpGet]
     public async Task<IActionResult> EditProfile()
     {
@@ -131,7 +169,9 @@ public class AccountController : Controller
         TempData["Info"] = "Profile updated.";
         return RedirectToAction(nameof(Details));
     }
+    #endregion
 
+    #region ChangeUserEmail
     [Authorize, HttpGet]
     public async Task<IActionResult> ChangeEmail()
     {
@@ -165,7 +205,9 @@ public class AccountController : Controller
         TempData["Info"] = "Email updated.";
         return RedirectToAction(nameof(Details));
     }
+    #endregion
 
+    #region ChangeUserPassword
     [Authorize, HttpGet]
     public IActionResult ChangePassword()
     {
@@ -194,38 +236,5 @@ public class AccountController : Controller
 
 
     }
-
-    [AllowAnonymous]
-    public IActionResult Denied() => Content("Access Denied");
-
-    private RedirectToActionResult RedirectAfterSignIn(User user)
-    {
-        // Simple role-based redirect (adjust as needed)
-        if (User.IsInRole("Admin") || string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
-            return RedirectToAction("Index", "Admin");
-
-        return RedirectToAction("Reviews", "UserRole");
-    }
-
-    private async Task SignInAsync(User user, bool isPersistent)
-    {
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Email),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role)
-        };
-
-        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var principal = new ClaimsPrincipal(identity);
-
-        var props = new AuthenticationProperties
-        {
-            IsPersistent = isPersistent,
-            ExpiresUtc = isPersistent ? DateTimeOffset.UtcNow.AddDays(7) : DateTimeOffset.UtcNow.AddMinutes(30)
-        };
-
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
-    }  
+    #endregion
 }
