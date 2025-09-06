@@ -14,7 +14,7 @@ public class HomeController : Controller
         {
             if (User.IsInRole("Admin"))
             {
-                return RedirectToAction("Index", "Admin");
+                return RedirectToAction("ViewUsers", "Admin");
             }
             return RedirectToAction("Reviews", "UserRole");
         }

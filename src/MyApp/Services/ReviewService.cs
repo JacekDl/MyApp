@@ -55,12 +55,14 @@ public class ReviewService : IReviewService
     public async Task<bool> UpdatePublicAsync(string number, string? reviewText, CancellationToken ct = default)
     {
         var entity = await _db.Reviews.FirstOrDefaultAsync(r => r.Number == number, ct);
+        
         if (entity is null)
         {
             return false;
         }
 
         entity.ReviewText = reviewText;
+        entity.Completed = true;
         await _db.SaveChangesAsync(ct);
         return true;
     }
