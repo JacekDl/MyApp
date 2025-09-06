@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreGeneratedDocument;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Services;
+using System.Threading.Tasks;
 
 namespace MyApp.Controllers;
 
@@ -8,10 +10,12 @@ namespace MyApp.Controllers;
 public class AdminController : Controller
 {
     private readonly IUserService _users;
+    private readonly IReviewService _reviews;
 
-    public AdminController(IUserService users)
+    public AdminController(IUserService users, IReviewService reviews)
     {
         _users = users;
+        _reviews = reviews;
     }
 
     #region ViewUsers
@@ -43,9 +47,10 @@ public class AdminController : Controller
     #endregion
 
     #region ViewReviews
-    public IActionResult ViewReviews()
+    public async Task<IActionResult> Reviews()
     {
-        return View();
+        var model = await _reviews.GetReviewsAsync();
+        return View(model);
     }
     #endregion
-}
+}       

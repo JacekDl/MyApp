@@ -49,7 +49,7 @@ public class AccountController : Controller
     {
         // Simple role-based redirect (adjust as needed)
         if (User.IsInRole("Admin") || string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
-            return RedirectToAction("Index", "Admin");
+            return RedirectToAction("ViewUsers", "Admin");
 
         return RedirectToAction("Reviews", "UserRole");
     }

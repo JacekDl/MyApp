@@ -75,4 +75,21 @@ public class ReviewService : IReviewService
             .OrderByDescending(r => r.DateCreated)
             .ToListAsync(ct);
     }
+
+    public async Task<IReadOnlyList<ReviewListItem>> GetReviewsAsync()
+    {
+        return await _db.Reviews
+            .AsNoTracking()
+            .OrderByDescending(r => r.DateCreated)
+            .Select(r => new ReviewListItem
+            {
+                Id = r.Id,
+                CreatedByUserId = r.CreatedByUserId,
+                DateCreated = r.DateCreated,
+                Advice = r.Advice,
+                ReviewText = r.ReviewText!,
+                Completed = r.Completed
+            })
+            .ToListAsync();
+    }
 }
