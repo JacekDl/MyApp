@@ -17,7 +17,6 @@ public class UserService : IUserService
         _hasher = hasher;
     }
 
-
     public async Task<OperationResult<User>> RegisterAsync(string email, string password, string role = "User")
     {
         var normalized = email.Trim();
