@@ -19,7 +19,7 @@ public class UserService : IUserService
 
     public async Task<OperationResult<User>> RegisterAsync(string email, string password, string role = "User")
     {
-        var normalized = email.Trim();
+        var normalized = email.Trim().ToLower();
         if (await _db.Users.AnyAsync(u => u.Email == normalized))
             return OperationResult<User>.Failure("Email is already registered.");
 
