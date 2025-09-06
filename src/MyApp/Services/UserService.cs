@@ -35,7 +35,7 @@ public class UserService : IUserService
 
     public async Task<User?> ValidateCredentialsAsync(string email, string password)
     {
-        var normalized = email.Trim();
+        var normalized = email.Trim().ToLower();
         var user = await _db.Users.SingleOrDefaultAsync(u => u.Email == normalized);
         if (user is null) return null;
 
