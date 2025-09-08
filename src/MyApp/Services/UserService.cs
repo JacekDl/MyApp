@@ -139,7 +139,7 @@ public class UserService : IUserService
             return OperationResult.Failure("User not found.");
         }
 
-        newEmail = (newEmail ?? string.Empty).Trim();
+        newEmail = (newEmail ?? string.Empty).Trim().ToLower();
 
         var emailAttr = new EmailAddressAttribute();
         if (!emailAttr.IsValid(newEmail))
@@ -149,7 +149,7 @@ public class UserService : IUserService
 
         if (string.Equals(user.Email, newEmail, StringComparison.OrdinalIgnoreCase))
         {
-            return OperationResult.Success();
+            return OperationResult.Failure("Email address is the same as the old one.");
         }
 
         var verify = _hasher.VerifyHashedPassword(user, user.PasswordHash, currentPassword ?? string.Empty);
