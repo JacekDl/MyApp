@@ -86,11 +86,11 @@ public class UserRoleController : Controller
 
     #region ListUsersReviews
     [HttpGet]
-    public async Task<IActionResult> Tokens(CancellationToken ct)
+    public async Task<IActionResult> Tokens(string? searchTxt, CancellationToken ct)
     {
         var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var reviews = await _reviewService.GetByCreatorAsync(currentUserId, ct);
+        var reviews = await _reviewService.GetByCreatorAsync(currentUserId, searchTxt, ct);
         var model = reviews.Select(r => new TokenItemViewModel
         {
             Id = r.Id,

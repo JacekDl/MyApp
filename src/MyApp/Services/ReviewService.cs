@@ -67,11 +67,21 @@ public class ReviewService : IReviewService
         return true;
     }
 
-    public async Task<IReadOnlyList<Review>> GetByCreatorAsync(int userId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Review>> GetByCreatorAsync(int userId, string? searchTxt, CancellationToken ct = default)
     {
-        return await _db.Reviews
+        var query = _db.Reviews
             .AsNoTracking()
-            .Where(r => r.CreatedByUserId == userId)
+            .Where(r => r.CreatedByUserId == userId);
+
+        if(!string.IsNullOrWhiteSpace(searchTxt))
+        {
+            var pattern = $"%{searchTxt.Trim()}%";
+            query = query.Where(r =>
+                EF.Functions.Like(r.Advice ?? string.Empty, pattern) ||
+                EF.Functions.Like(r.ReviewText ?? string.Empty, pattern));
+        };
+
+        return await query
             .OrderByDescending(r => r.DateCreated)
             .ToListAsync(ct);
     }
