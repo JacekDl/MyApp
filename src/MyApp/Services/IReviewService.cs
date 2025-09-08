@@ -10,5 +10,5 @@ public interface IReviewService
     Task<bool> UpdatePublicAsync(string number, string? reviewText, CancellationToken ct = default);
 
     Task<IReadOnlyList<Review>> GetByCreatorAsync(int userId, string? searchTxt, bool? completed, CancellationToken ct = default);
-    Task<IReadOnlyList<ReviewListItem>> GetReviewsAsync();
+    Task<IReadOnlyList<ReviewListItem>> GetReviewsAsync(string? searchTxt, string? userId, bool? completed, CancellationToken ct);
 }

@@ -16,8 +16,8 @@
         <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Search in Advice or Review text" />
         <select name="completed" class="form-select">
             <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">All</option>
-            <option value="true" selected=@(completed == "true" ? "selected" : "")>Completed</option>
-            <option value="false" selected=@(completed == "false" ? "selected" : "")>Not Completed</option>
+            <option value="true" selected=@(completed == "true" ? "selected" : null)>Completed</option>
+            <option value="false" selected=@(completed == "false" ? "selected" : null)>Not Completed</option>
         </select><button type="submit" class="btn btn-primary">Search</button>
         <a asp-action="Tokens" class="btn btn-outline-secondary">Clear</a>
     </form>

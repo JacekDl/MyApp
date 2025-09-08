@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Reviews";
+    var searchTxt = (string?)ViewBag.Query ?? "";
+    var userId = (string?)ViewBag.UserId ?? "";
+    var completed = (string?)ViewBag.Completed ?? "";
 }
 
 <partial name="~/Views/Shared/_AdminNav.cshtml" />
@@ -18,7 +21,21 @@
     <div class="alert alert-success">@TempData["Info"]</div>
 }
 
-@if (Model.Count == 0)
+<div class="mb-3">
+    <form method="get" asp-action="Reviews" class="d-flex gap-2">
+        <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Search in Advice or Review text" />
+        <input type="text" name="userId" value="@userId" class="form-control" placeholder="Search for User" />
+        <select name="completed" class="form-select">
+            <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">All</option>
+            <option value="true" selected=@(completed == "true" ? "selected" : null)>Completed</option>
+            <option value="false" selected=@(completed == "false" ? "selected" : null)>Not Completed</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a asp-action="Reviews" class="btn btn-outline-secondary">Clear</a>
+    </form>
+</div>
+
+@if (!Model.Any())
 {
     <div class="alert alert-info">No reviews found</div>
 }
@@ -28,11 +45,11 @@ else
         <table class="table table-sm table-striped align-middle">
             <thead>
                 <tr>
-                    <th scope="col">Id</th>
+                    <th scope="col">Date Created</th>
                     <th scope="col">UserId</th>
                     <th scope="col">Advice</th>
                     <th scope="col">Review</th>
-                    <th scope="col">Date Created</th>
+                    <th scope="col">Completed</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -40,11 +57,11 @@ else
             @foreach (var user in Model)
             {
                 <tr>
-                    <td>@user.Id</td>
+                    <td>@user.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
                     <td>@user.CreatedByUserId</td>
                     <td>@user.Advice</td>
                     <td>@user.ReviewText</td>
-                    <td>@user.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@(user.Completed ? "Yes" : "No")</td>
                     <td>
                         <form asp-action="RemoveReview" method="post" asp-route-id="@user.Id" style="display:inline">
                             @Html.AntiForgeryToken()

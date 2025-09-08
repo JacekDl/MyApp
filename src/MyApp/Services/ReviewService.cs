@@ -91,10 +91,50 @@ public class ReviewService : IReviewService
             .ToListAsync(ct);
     }
 
-    public async Task<IReadOnlyList<ReviewListItem>> GetReviewsAsync()
+    //public async Task<IReadOnlyList<ReviewListItem>> GetReviewsAsync()
+    //{
+    //    return await _db.Reviews
+    //        .AsNoTracking()
+    //        .OrderByDescending(r => r.DateCreated)
+    //        .Select(r => new ReviewListItem
+    //        {
+    //            Id = r.Id,
+    //            CreatedByUserId = r.CreatedByUserId,
+    //            DateCreated = r.DateCreated,
+    //            Advice = r.Advice,
+    //            ReviewText = r.ReviewText!,
+    //            Completed = r.Completed
+    //        })
+    //        .ToListAsync();
+    //}
+
+    public async Task<IReadOnlyList<ReviewListItem>> GetReviewsAsync(string? searchTxt, string? userId, bool? completed, CancellationToken ct)
     {
-        return await _db.Reviews
-            .AsNoTracking()
+        var query = _db.Reviews
+            .AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(searchTxt))
+        {
+            var pattern = $"%{searchTxt.Trim()}%";
+            query = query.Where(r =>
+                EF.Functions.Like(r.Advice ?? string.Empty, pattern) ||
+                EF.Functions.Like(r.ReviewText ?? string.Empty, pattern));
+        };
+
+        if (!string.IsNullOrWhiteSpace(userId))
+        {
+            if(int.TryParse(userId, out var uid))
+            {
+                query = query.Where(r => r.CreatedByUserId == uid);
+            }
+        }
+
+        if (completed.HasValue)
+        {
+            query = query.Where(r => r.Completed == completed.Value);
+        };
+
+        return await query
             .OrderByDescending(r => r.DateCreated)
             .Select(r => new ReviewListItem
             {
@@ -105,6 +145,6 @@ public class ReviewService : IReviewService
                 ReviewText = r.ReviewText!,
                 Completed = r.Completed
             })
-            .ToListAsync();
+            .ToListAsync(ct);
     }
 }

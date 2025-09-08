@@ -47,9 +47,14 @@ public class AdminController : Controller
     #endregion
 
     #region ViewReviews
-    public async Task<IActionResult> Reviews()
+    public async Task<IActionResult> Reviews(string? searchTxt, string? userId, bool? completed, CancellationToken ct) 
     {
-        var model = await _reviews.GetReviewsAsync();
+        var model = await _reviews.GetReviewsAsync(searchTxt, userId, completed, ct);
+
+        ViewBag.Query = searchTxt;
+        ViewBag.Completed = completed?.ToString().ToLowerInvariant();
+        ViewBag.UserId = userId;
+
         return View(model);
     }
     #endregion
