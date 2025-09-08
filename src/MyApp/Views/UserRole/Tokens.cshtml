@@ -41,7 +41,7 @@ else
         @foreach(var rev in Model)
         {
             <tr>
-                <td>@rev.DateCreated.ToString("u")</td>
+                <td>@rev.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
                 <td>@rev.Number</td>
                 <td>@rev.Advice</td>
                 <td>@rev.ReviewText</td>
