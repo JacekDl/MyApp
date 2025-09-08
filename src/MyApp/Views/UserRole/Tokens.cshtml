@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Your reviews";
     var searchTxt = (string?)ViewBag.Query ?? "";
+    var completed = (string?)ViewBag.Completed ?? "";
 }
 
 
@@ -13,12 +14,14 @@
 <div class="mb-3">
     <form method="get" asp-action="Tokens" class="d-flex gap-2">
         <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Search in Advice or Review text" />
-        <button type="submit" class="btn btn-primary">Search</button>
-    </form>
-    @if (!string.IsNullOrEmpty(searchTxt))
-    {
+        <select name="completed" class="form-select">
+            <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">All</option>
+            <option value="true" selected=@(completed == "true" ? "selected" : "")>Completed</option>
+            <option value="false" selected=@(completed == "false" ? "selected" : "")>Not Completed</option>
+        </select><button type="submit" class="btn btn-primary">Search</button>
         <a asp-action="Tokens" class="btn btn-outline-secondary">Clear</a>
-    }
+    </form>
+
 </div>
 
 @if (!Model.Any())

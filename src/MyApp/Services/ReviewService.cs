@@ -67,7 +67,7 @@ public class ReviewService : IReviewService
         return true;
     }
 
-    public async Task<IReadOnlyList<Review>> GetByCreatorAsync(int userId, string? searchTxt, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Review>> GetByCreatorAsync(int userId, string? searchTxt, bool? completed, CancellationToken ct = default)
     {
         var query = _db.Reviews
             .AsNoTracking()
@@ -80,6 +80,11 @@ public class ReviewService : IReviewService
                 EF.Functions.Like(r.Advice ?? string.Empty, pattern) ||
                 EF.Functions.Like(r.ReviewText ?? string.Empty, pattern));
         };
+
+        if(completed.HasValue)
+        {
+            query = query.Where(r => r.Completed == completed.Value);
+        }
 
         return await query
             .OrderByDescending(r => r.DateCreated)
