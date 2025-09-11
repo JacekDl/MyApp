@@ -1,4 +1,4 @@
-﻿namespace MyApp.Models;
+﻿namespace MyApp.ViewModels;
 
 public class PublicReviewEditViewModel
 {

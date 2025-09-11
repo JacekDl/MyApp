@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Models;
 using MyApp.Services;
+using MyApp.ViewModels;
 using System.Security.Claims;
 
 namespace MyApp.Controllers;
