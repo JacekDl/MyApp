@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MyApp.Data;
 using MyApp.Models;
+using MyApp.Domain;
 using System.ComponentModel.DataAnnotations;
 
 namespace MyApp.Services;

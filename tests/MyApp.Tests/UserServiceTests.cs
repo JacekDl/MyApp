@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using MyApp.Services;
-using MyApp.Models;
+using MyApp.Domain;
 using Xunit;
 
 namespace MyApp.Tests;

@@ -1,4 +1,4 @@
-﻿using MyApp.Models;
+﻿using MyApp.Domain;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 

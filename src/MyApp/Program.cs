@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Data;
-using MyApp.Models;
+using MyApp.Domain;
 using MyApp.Services;
 using QuestPDF.Infrastructure;
 

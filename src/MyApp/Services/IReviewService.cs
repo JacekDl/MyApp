@@ -1,4 +1,5 @@
-﻿using MyApp.Models;
+﻿using MyApp.Domain;
+using MyApp.Models;
 
 namespace MyApp.Services;
 
