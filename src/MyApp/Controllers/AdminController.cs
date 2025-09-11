@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Services;
 using System.Threading.Tasks;
+using MediatR;
+using MyApp.Application.Users.Queries;
 
 namespace MyApp.Controllers;
 
@@ -11,18 +13,26 @@ public class AdminController : Controller
 {
     private readonly IUserService _users;
     private readonly IReviewService _reviews;
+    private readonly IMediator _mediator;
 
-    public AdminController(IUserService users, IReviewService reviews)
+    public AdminController(IUserService users, IReviewService reviews, IMediator mediator)
     {
         _users = users;
         _reviews = reviews;
+        _mediator = mediator;
     }
 
     #region ViewUsers
+    //public async Task<IActionResult> ViewUsers()
+    //{
+    //    var model = await _users.GetUsersAsync();
+    //    return View(model);
+    //}
+
     public async Task<IActionResult> ViewUsers()
     {
-        var model = await _users.GetUsersAsync();
-        return View(model);
+        var dto = await _mediator.Send(new GetAllUsersQuery());
+        return View(dto);
     }
 
     #endregion

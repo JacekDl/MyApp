@@ -6,6 +6,9 @@ using MyApp.Infrastructure;
 using MyApp.Domain;
 using MyApp.Services;
 using QuestPDF.Infrastructure;
+using MediatR;
+using MyApp.Application.Abstractions;
+using MyApp.Application.Users.Queries;
 
 QuestPDF.Settings.License = LicenseType.Community;
 
@@ -15,6 +18,14 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(GetAllUsersHandler).Assembly);
+    cfg.LicenseKey = "FREE-LIMITED-KEY";
+});
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
