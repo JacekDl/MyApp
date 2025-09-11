@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MyApp.Data;
+using MyApp.Infrastructure;
 using MyApp.Models;
 using MyApp.Domain;
 using System.ComponentModel.DataAnnotations;

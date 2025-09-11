@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MyApp.Domain;
 
-namespace MyApp.Data;
+namespace MyApp.Infrastructure;
 
 public class ApplicationDbContext : DbContext
 {
@@ -35,5 +35,4 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(r => r.CreatedByUserId)
             .OnDelete(DeleteBehavior.Restrict);
     }
-
 }

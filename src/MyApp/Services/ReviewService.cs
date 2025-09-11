@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MyApp.Data;
+using MyApp.Infrastructure;
 using MyApp.Models;
 using MyApp.Domain;
 using System.Security.Cryptography;
@@ -10,10 +10,7 @@ public class ReviewService : IReviewService
 {
     private readonly ApplicationDbContext _db;
 
-    public ReviewService(ApplicationDbContext db)
-    {
-        _db = db;
-    }
+    public ReviewService(ApplicationDbContext db) => _db = db;
 
     public async Task<Review> CreateAsync(int userId, string? advice, CancellationToken ct = default)
     {

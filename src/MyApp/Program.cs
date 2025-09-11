@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MyApp.Data;
+using MyApp.Infrastructure;
 using MyApp.Domain;
 using MyApp.Services;
 using QuestPDF.Infrastructure;

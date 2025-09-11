@@ -15,7 +15,7 @@ public class UserServiceTests
 
     public sealed class TestContext : System.IDisposable
     {
-        public MyApp.Data.ApplicationDbContext Db { get; }
+        public MyApp.Infrastructure.ApplicationDbContext Db { get; }
         private readonly Microsoft.Data.Sqlite.SqliteConnection _conn;
 
         public TestContext()
