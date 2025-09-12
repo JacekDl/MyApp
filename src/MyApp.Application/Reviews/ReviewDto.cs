@@ -4,6 +4,7 @@ public record ReviewDto
 (
     int Id,
     int CreatedByUserId,
+    string Number,
     DateTime DateCreated,
     string Advice,
     string ReviewText,

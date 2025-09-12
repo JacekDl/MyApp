@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyApp.Application.Reviews.Queries;
 using MyApp.Models;
 using MyApp.Services;
 using MyApp.ViewModels;
@@ -12,11 +14,13 @@ public class UserRoleController : Controller
 {
     private readonly IReviewPdfService _pdfService;
     private readonly IReviewService _reviewService;
+    private readonly IMediator _mediator;
 
-    public UserRoleController(IReviewPdfService pdfService, IReviewService reviewService)
+    public UserRoleController(IReviewPdfService pdfService, IReviewService reviewService, IMediator mediator)
     {
         _pdfService = pdfService;
         _reviewService = reviewService;
+        _mediator = mediator;
     }
 
     #region GenerateReview
@@ -87,25 +91,35 @@ public class UserRoleController : Controller
 
     #region ListUsersReviews
     [HttpGet]
+    //public async Task<IActionResult> Tokens(string? searchTxt, bool? completed, CancellationToken ct)
+    //{
+    //    var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+    //    var reviews = await _reviewService.GetByCreatorAsync(currentUserId, searchTxt, completed, ct);
+    //    var model = reviews.Select(r => new TokenItemViewModel
+    //    {
+    //        Id = r.Id,
+    //        Number = r.Number,
+    //        Advice = r.Advice,
+    //        DateCreated = r.DateCreated,
+    //        Completed = r.Completed,
+    //        ReviewText = r.ReviewText ?? string.Empty
+    //    }).ToList();
+
+    //    ViewBag.Query = searchTxt;
+    //    ViewBag.Completed = completed?.ToString().ToLowerInvariant();
+
+    //    return View(model);
+    //}
+
     public async Task<IActionResult> Tokens(string? searchTxt, bool? completed, CancellationToken ct)
     {
         var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-        var reviews = await _reviewService.GetByCreatorAsync(currentUserId, searchTxt, completed, ct);
-        var model = reviews.Select(r => new TokenItemViewModel
-        {
-            Id = r.Id,
-            Number = r.Number,
-            Advice = r.Advice,
-            DateCreated = r.DateCreated,
-            Completed = r.Completed,
-            ReviewText = r.ReviewText ?? string.Empty
-        }).ToList();
+        var dto = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId.ToString(), completed));
 
         ViewBag.Query = searchTxt;
         ViewBag.Completed = completed?.ToString().ToLowerInvariant();
-
-        return View(model);
+        return View(dto);
     }
 }
 

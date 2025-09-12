@@ -21,6 +21,7 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, List<ReviewDto
             .Select(r => new ReviewDto(
                 r.Id,
                 r.CreatedByUserId,
+                r.Number,
                 r.DateCreated,
                 r.Advice,
                 r.ReviewText!,
