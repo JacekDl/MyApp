@@ -9,4 +9,4 @@ public class ReviewListItem
     public string Advice { get; init; } = string.Empty;
     public string ReviewText { get; init; } = string.Empty;
     public bool Completed { get; init; }
-    }
+}

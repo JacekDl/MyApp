@@ -9,6 +9,7 @@ using QuestPDF.Infrastructure;
 using MediatR;
 using MyApp.Application.Abstractions;
 using MyApp.Application.Users.Queries;
+using MyApp.Application.Reviews.Queries;
 
 QuestPDF.Settings.License = LicenseType.Community;
 
@@ -20,10 +21,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(GetAllUsersHandler).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(GetReviewsHandler).Assembly);
     cfg.LicenseKey = "FREE-LIMITED-KEY";
 });
 

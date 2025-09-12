@@ -5,6 +5,7 @@ using MyApp.Services;
 using System.Threading.Tasks;
 using MediatR;
 using MyApp.Application.Users.Queries;
+using MyApp.Application.Reviews.Queries;
 
 namespace MyApp.Controllers;
 
@@ -23,12 +24,6 @@ public class AdminController : Controller
     }
 
     #region ViewUsers
-    //public async Task<IActionResult> ViewUsers()
-    //{
-    //    var model = await _users.GetUsersAsync();
-    //    return View(model);
-    //}
-
     public async Task<IActionResult> ViewUsers()
     {
         var dto = await _mediator.Send(new GetAllUsersQuery());
@@ -57,15 +52,16 @@ public class AdminController : Controller
     #endregion
 
     #region ViewReviews
-    public async Task<IActionResult> Reviews(string? searchTxt, string? userId, bool? completed, CancellationToken ct) 
+
+    public async Task<IActionResult> Reviews(string? searchTxt, string? userId, bool? completed)
     {
-        var model = await _reviews.GetReviewsAsync(searchTxt, userId, completed, ct);
+        var dto = await _mediator.Send(new GetReviewsQuery(searchTxt, userId, completed));
 
         ViewBag.Query = searchTxt;
         ViewBag.Completed = completed?.ToString().ToLowerInvariant();
         ViewBag.UserId = userId;
 
-        return View(model);
+        return View(dto);
     }
     #endregion
 }       

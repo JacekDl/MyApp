@@ -89,23 +89,6 @@ public class ReviewService : IReviewService
             .ToListAsync(ct);
     }
 
-    //public async Task<IReadOnlyList<ReviewListItem>> GetReviewsAsync()
-    //{
-    //    return await _db.Reviews
-    //        .AsNoTracking()
-    //        .OrderByDescending(r => r.DateCreated)
-    //        .Select(r => new ReviewListItem
-    //        {
-    //            Id = r.Id,
-    //            CreatedByUserId = r.CreatedByUserId,
-    //            DateCreated = r.DateCreated,
-    //            Advice = r.Advice,
-    //            ReviewText = r.ReviewText!,
-    //            Completed = r.Completed
-    //        })
-    //        .ToListAsync();
-    //}
-
     public async Task<IReadOnlyList<ReviewListItem>> GetReviewsAsync(string? searchTxt, string? userId, bool? completed, CancellationToken ct)
     {
         var query = _db.Reviews
