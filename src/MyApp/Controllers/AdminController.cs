@@ -1,11 +1,10 @@
-﻿using AspNetCoreGeneratedDocument;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Services;
-using System.Threading.Tasks;
 using MediatR;
 using MyApp.Application.Users.Queries;
 using MyApp.Application.Reviews.Queries;
+using MyApp.Application.Users.Commands;
 
 namespace MyApp.Controllers;
 
@@ -34,11 +33,27 @@ public class AdminController : Controller
 
     #region RemoveUser
     [HttpPost, ValidateAntiForgeryToken]
+    //public async Task<IActionResult> RemoveUser(int id)
+    //{
+    //    var result = await _users.RemoveUserAsync(id);
+
+    //    if (!result.Succeeded)
+    //    {
+    //        TempData["Error"] = result.Error;
+    //    }
+    //    else
+    //    {
+    //        TempData["Info"] = "User removed";
+    //    }
+
+    //    return RedirectToAction(nameof(ViewUsers));
+    //}
+
     public async Task<IActionResult> RemoveUser(int id)
     {
-        var result = await _users.RemoveUserAsync(id);
+        var result = await _mediator.Send(new RemoveUserCommand(id));
 
-        if (!result.Succeeded)
+        if (!result.IsSuccess)
         {
             TempData["Error"] = result.Error;
         }

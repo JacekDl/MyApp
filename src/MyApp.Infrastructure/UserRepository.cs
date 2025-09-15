@@ -41,4 +41,10 @@ public class UserRepository : IUserRepository
         _db.Update(user);
         _db.SaveChangesAsync(ct);
     }
+
+    public void RemoveAsync(User user, CancellationToken ct)
+    {
+        _db.Remove(user);
+        _db.SaveChangesAsync();
+    }
 }

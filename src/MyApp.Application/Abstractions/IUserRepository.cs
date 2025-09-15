@@ -8,5 +8,6 @@ public interface IUserRepository
     Task<List<User>> GetAllAsync(CancellationToken ct);
     Task<User?> GetByEmailAsync(string normalized, CancellationToken ct);
     Task<User?> GetByIdAsync(int id, CancellationToken ct);
+    void RemoveAsync(User user, CancellationToken ct);
     void UpdateUser(User user, CancellationToken ct);
 }
