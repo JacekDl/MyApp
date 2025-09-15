@@ -9,6 +9,7 @@ using MyApp.ViewModels;
 using MediatR;
 using MyApp.Application.Users.Commands;
 using MyApp.Application.Users.Queries;
+using System.Net.WebSockets;
 
 namespace MyApp.Controllers;
 
@@ -237,26 +238,24 @@ public class AccountController : Controller
     }
 
     [Authorize, HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel vm)
     {
         if (!ModelState.IsValid)
         {
-            return View(model);
+            return View(vm);
         }
 
         var CurrentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var result = await _users.ChangePasswordAsync(CurrentUserId, model.CurrentPassword, model.NewPassword);
+        var result = await _mediator.Send(new UpdateUserPasswordCommand(CurrentUserId, vm.CurrentPassword, vm.NewPassword));
 
-        if (!result.Succeeded)
+        if (!result.IsSuccess)
         {
             ModelState.AddModelError(string.Empty, result.Error!);
-            return View(model);
+            return View(vm);
         }
 
-        TempData["Info"]  = "Password changed.";
+        TempData["Info"] = "Password changed.";
         return RedirectToAction(nameof(Details));
-
-
     }
     #endregion
 }
