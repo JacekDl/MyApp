@@ -98,7 +98,7 @@ public class AccountController : Controller
             return View(vm);
         }
 
-        var result = await _mediator.Send(new GetUserCommand(vm.Email, vm.Password));
+        var result = await _mediator.Send(new GetUserQuery(vm.Email, vm.Password));
 
         if (!result.IsSuccess)
         {

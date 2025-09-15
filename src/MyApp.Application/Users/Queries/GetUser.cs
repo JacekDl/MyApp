@@ -4,11 +4,11 @@ using MyApp.Application.Abstractions;
 using MyApp.Application.Common;
 using MyApp.Domain;
 
-namespace MyApp.Application.Users.Commands;
+namespace MyApp.Application.Users.Queries;
 
-public record GetUserCommand(string Email, string Password) : IRequest<Result<User>>;
+public record GetUserQuery(string Email, string Password) : IRequest<Result<User>>;
 
-public class GetUserHandler : IRequestHandler<GetUserCommand, Result<User>>
+public class GetUserHandler : IRequestHandler<GetUserQuery, Result<User>>
 {
     private readonly IUserRepository _repo;
     private readonly IPasswordHasher<User> _hasher;
@@ -18,7 +18,7 @@ public class GetUserHandler : IRequestHandler<GetUserCommand, Result<User>>
         _hasher = hasher;
     }
 
-    public async Task<Result<User>> Handle(GetUserCommand request, CancellationToken ct)
+    public async Task<Result<User>> Handle(GetUserQuery request, CancellationToken ct)
     {
         var normalized = request.Email.Trim().ToLower();
         var user = await _repo.GetByEmailAsync(normalized, ct);
