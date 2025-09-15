@@ -36,5 +36,9 @@ public class UserRepository : IUserRepository
         _db.SaveChangesAsync(ct);
     }
 
-
+    public void UpdateUser(User user, CancellationToken ct)
+    {
+        _db.Update(user);
+        _db.SaveChangesAsync(ct);
+    }
 }

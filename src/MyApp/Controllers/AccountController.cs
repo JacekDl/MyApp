@@ -143,39 +143,44 @@ public class AccountController : Controller
     }
     #endregion
 
-
-
     #region EditUserProfile
     [Authorize, HttpGet]
     public async Task<IActionResult> EditProfile()
     {
-        var CurrentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var user = await _users.GetByIdAsync(CurrentUserId);
-        if (user is null) return NotFound();
+        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        return View (new EditProfileViewModel
+        var result = await _mediator.Send(new GetUserByIdQuery(currentUserId));
+
+        if (!result.IsSuccess)
         {
-            Name = user.Name,
-            PharmacyName = user.PharmacyName,
-            PharmacyCity = user.PharmacyCity
-        });
+            ModelState.AddModelError(string.Empty, result.Error!);
+            return View();
+        }
+
+        var vm = new EditProfileViewModel
+        {
+            Name = result.Value!.Name,
+            PharmacyName = result.Value.PharmacyName,
+            PharmacyCity = result.Value.PharmacyCity
+        };
+        return View(vm);
     }
 
     [Authorize, HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditProfile(EditProfileViewModel model)
+    public async Task<IActionResult> EditProfile(EditProfileViewModel vm)
     {
         if (!ModelState.IsValid)
         {
-            return View(model);
+            return View(vm);
         }
 
-        var CurrentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var result = await _users.UpdateProfileAsync(CurrentUserId, model.Name, model.PharmacyName, model.PharmacyCity);
+        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var result = await _mediator.Send(new UpdateUserDetailsCommand(currentUserId, vm.Name, vm.PharmacyName, vm.PharmacyCity));
 
-        if (!result.Succeeded)
+        if (!result.IsSuccess)
         {
             ModelState.AddModelError(string.Empty, result.Error!);
-            return View(model);
+            return View(vm);
         }
 
         TempData["Info"] = "Profile updated.";
