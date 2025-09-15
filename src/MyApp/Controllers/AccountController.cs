@@ -192,31 +192,36 @@ public class AccountController : Controller
     [Authorize, HttpGet]
     public async Task<IActionResult> ChangeEmail()
     {
-        var CurrentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var user = await _users.GetByIdAsync(CurrentUserId);
-        if (user is null)
+        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var result = await _mediator.Send(new GetUserByIdQuery(currentUserId));
+        if (!result.IsSuccess)
         {
-            return NotFound();
+            ModelState.AddModelError(string.Empty, result.Error!);
+            return View();
         }
 
-        var model = new ChangeEmailViewModel { Email = user.Email };
-        return View(model);
+        var user = result.Value!;
+
+        var vm = new ChangeEmailViewModel { Email = user.Email };
+        return View(vm);
     }
 
     [Authorize, HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> ChangeEmail(ChangeEmailViewModel model)
+    public async Task<IActionResult> ChangeEmail(ChangeEmailViewModel vm)
     {
         if (!ModelState.IsValid)
         {
-            return View(model);
+            return View(vm);
         }
 
-        var CurrentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var result = await _users.UpdateEmailAsync(CurrentUserId, model.Email, model.CurrentPassword);
-        if (!result.Succeeded)
+        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var result = await _mediator.Send(new UpdateUserEmailCommand(currentUserId, vm.Email, vm.CurrentPassword));
+        if (!result.IsSuccess)
         {
             ModelState.AddModelError(string.Empty, result.Error!);
-            return View(model);
+            return View(vm);
         }
 
         TempData["Info"] = "Email updated.";
