@@ -13,6 +13,12 @@ public class ReviewRepository : IReviewRepository
         _db = db;
     }
 
+    public async Task CreateAsync(Review review, CancellationToken ct)
+    {
+        _db.Add(review);
+        await _db.SaveChangesAsync(ct);
+    }
+
     public async Task<List<Review>> GetReviews(string? searchString, string? userId, bool? completed, CancellationToken ct)
     {
         var query = _db.Reviews

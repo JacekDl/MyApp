@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyApp.Application.Reviews.Commands;
 using MyApp.Application.Reviews.Queries;
 using MyApp.Models;
 using MyApp.Services;
@@ -31,17 +32,36 @@ public class UserRoleController : Controller
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Reviews(ReviewCreateViewModel model, CancellationToken ct)
+    //public async Task<IActionResult> Reviews(ReviewCreateViewModel model, CancellationToken ct)
+    //{
+    //    if(!ModelState.IsValid)
+    //    {
+    //        return View(model);
+    //    }
+
+    //    var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+
+
+    //    var review = await _reviewService.CreateAsync(currentUserId, model.Advice, ct);
+    //    var pdfBytes = await _pdfService.GenerateReviewPdfAsync(review, ct);
+
+    //    Response.Headers["Content-Disposition"] = "inline; filename=review.pdf";
+    //    return File(pdfBytes, "application/pdf");
+    //}
+
+    public async Task<IActionResult> Reviews(ReviewCreateViewModel vm, CancellationToken ct)
     {
-        if(!ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            return View(model);
+            return View(vm);
         }
 
         var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var result = await _mediator.Send(new CreateReviewCommand(currentUserId, vm.Advice));
 
-        var review = await _reviewService.CreateAsync(currentUserId, model.Advice, ct);
-        var pdfBytes = await _pdfService.GenerateReviewPdfAsync(review, ct);
+
+        var pdfBytes = await _pdfService.GenerateReviewPdfAsync(result.Value!, ct);
 
         Response.Headers["Content-Disposition"] = "inline; filename=review.pdf";
         return File(pdfBytes, "application/pdf");

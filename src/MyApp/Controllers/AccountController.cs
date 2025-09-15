@@ -15,12 +15,10 @@ namespace MyApp.Controllers;
 
 public class AccountController : Controller
 {
-    private readonly IUserService _users;
     private readonly IMediator _mediator;
 
     public AccountController(IUserService users, IMediator mediator)
     {
-        _users = users;
         _mediator = mediator;
     }
 

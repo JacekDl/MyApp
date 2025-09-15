@@ -11,14 +11,10 @@ namespace MyApp.Controllers;
 [Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
-    private readonly IUserService _users;
-    private readonly IReviewService _reviews;
     private readonly IMediator _mediator;
 
     public AdminController(IUserService users, IReviewService reviews, IMediator mediator)
     {
-        _users = users;
-        _reviews = reviews;
         _mediator = mediator;
     }
 
@@ -33,22 +29,6 @@ public class AdminController : Controller
 
     #region RemoveUser
     [HttpPost, ValidateAntiForgeryToken]
-    //public async Task<IActionResult> RemoveUser(int id)
-    //{
-    //    var result = await _users.RemoveUserAsync(id);
-
-    //    if (!result.Succeeded)
-    //    {
-    //        TempData["Error"] = result.Error;
-    //    }
-    //    else
-    //    {
-    //        TempData["Info"] = "User removed";
-    //    }
-
-    //    return RedirectToAction(nameof(ViewUsers));
-    //}
-
     public async Task<IActionResult> RemoveUser(int id)
     {
         var result = await _mediator.Send(new RemoveUserCommand(id));

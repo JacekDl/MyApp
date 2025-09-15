@@ -20,4 +20,16 @@ public class Review
 
     public int CreatedByUserId { get; set; }
     public User? CreatedByUser { get; set; }
+
+    public static Review Create(int userId, string advice, string number)
+    {
+        return new Review
+        {
+            CreatedByUserId = userId,
+            Number = number,
+            Advice = advice.Trim(),
+            DateCreated = DateTime.UtcNow,
+            Completed = false
+        };
+    }
 }
