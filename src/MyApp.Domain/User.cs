@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Net.Http.Headers;
 
 namespace MyApp.Domain;
 
@@ -24,6 +25,16 @@ public class User
     [MaxLength(32)]
     public string? PharmacyCity { get; set; }
 
-
     public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
+
+    public static User Create(string email, string role = "User")
+    {
+        return new User
+        {
+            Email = email,
+            Role = role
+        };
+    }
+
+
 }

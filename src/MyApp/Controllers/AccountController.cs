@@ -6,16 +6,20 @@ using MyApp.Domain;
 using MyApp.Services;
 using System.Security.Claims;
 using MyApp.ViewModels;
+using MediatR;
+using MyApp.Application.Users.Commands;
 
 namespace MyApp.Controllers;
 
 public class AccountController : Controller
 {
     private readonly IUserService _users;
+    private readonly IMediator _mediator;
 
-    public AccountController(IUserService users)
+    public AccountController(IUserService users, IMediator mediator)
     {
         _users = users;
+        _mediator = mediator;
     }
 
     #region RegisterUser
@@ -26,29 +30,28 @@ public class AccountController : Controller
     }
 
     [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(RegisterViewModel model)
+    public async Task<IActionResult> Register(RegisterViewModel vm)
     {
         if (!ModelState.IsValid)
         {
-            return View(model);
+            return View(vm);
         }
 
-        var result = await _users.RegisterAsync(model.Email, model.Password, role: "User");
+        var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password));
 
-        if (!result.Succeeded)
+        if (!result.IsSuccess)
         {
-            ModelState.AddModelError(nameof(model.Email), result.Error!);
-            return View(model);
+            ModelState.AddModelError(nameof(vm.Email), result.Error!);
+            return View(vm);
         }
 
-        await SignInAsync(result.Value!, isPersistent: true); 
+        await SignInAsync(result.Value!, isPersistent: true);
         return RedirectAfterSignIn(result.Value!);
     }
     #endregion
 
     private RedirectToActionResult RedirectAfterSignIn(User user)
     {
-        // Simple role-based redirect (adjust as needed)
         if (User.IsInRole("Admin") || string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
             return RedirectToAction("ViewUsers", "Admin");
 

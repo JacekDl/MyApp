@@ -91,27 +91,6 @@ public class UserRoleController : Controller
 
     #region ListUsersReviews
     [HttpGet]
-    //public async Task<IActionResult> Tokens(string? searchTxt, bool? completed, CancellationToken ct)
-    //{
-    //    var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-    //    var reviews = await _reviewService.GetByCreatorAsync(currentUserId, searchTxt, completed, ct);
-    //    var model = reviews.Select(r => new TokenItemViewModel
-    //    {
-    //        Id = r.Id,
-    //        Number = r.Number,
-    //        Advice = r.Advice,
-    //        DateCreated = r.DateCreated,
-    //        Completed = r.Completed,
-    //        ReviewText = r.ReviewText ?? string.Empty
-    //    }).ToList();
-
-    //    ViewBag.Query = searchTxt;
-    //    ViewBag.Completed = completed?.ToString().ToLowerInvariant();
-
-    //    return View(model);
-    //}
-
     public async Task<IActionResult> Tokens(string? searchTxt, bool? completed, CancellationToken ct)
     {
         var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
