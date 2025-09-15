@@ -8,6 +8,7 @@ using System.Security.Claims;
 using MyApp.ViewModels;
 using MediatR;
 using MyApp.Application.Users.Commands;
+using System.Net.WebSockets;
 
 namespace MyApp.Controllers;
 
@@ -45,7 +46,7 @@ public class AccountController : Controller
             return View(vm);
         }
 
-        await SignInAsync(result.Value!, isPersistent: true);
+        await SignInAsync(result.Value!, isPersistent: false);
         return RedirectAfterSignIn(result.Value!);
     }
     #endregion
@@ -89,27 +90,28 @@ public class AccountController : Controller
     }
 
     [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
+    public async Task<IActionResult> Login(LoginViewModel vm, string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
         if (!ModelState.IsValid)
         {
-            return View(model);
+            return View(vm);
         }
 
-        var user = await _users.ValidateCredentialsAsync(model.Email, model.Password);
-        if (user == null)
+        var result = await _mediator.Send(new GetUserCommand(vm.Email, vm.Password));
+
+        if (!result.IsSuccess)
         {
-            ModelState.AddModelError(string.Empty, "Invalid email or password.");
-            return View(model);
+            ModelState.AddModelError(string.Empty, result.Error!);
+            return View(vm);
         }
 
-        await SignInAsync(user, model.RememberMe);
+        await SignInAsync(result.Value!, vm.RememberMe);
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
         {
             return Redirect(returnUrl);
         }
-        return RedirectAfterSignIn(user);
+        return RedirectAfterSignIn(result.Value!);
     }
     #endregion
 
