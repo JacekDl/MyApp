@@ -24,9 +24,17 @@ public class UserRepository : IUserRepository
             .SingleOrDefaultAsync(u => u.Email == email);
     }
 
+    public async Task<User?> GetByIdAsync(int id, CancellationToken ct)
+    {
+        return await _db.Users
+            .SingleOrDefaultAsync(u => u.Id == id, ct);
+    }
+
     public void CreateUser(User user, CancellationToken ct)
     {
         _db.Add(user);
         _db.SaveChangesAsync(ct);
     }
+
+
 }

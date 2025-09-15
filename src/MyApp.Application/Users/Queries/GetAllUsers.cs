@@ -23,6 +23,9 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, List<UserDto
                 u.Id,
                 u.Email,
                 u.Role,
+                u.Name!,
+                u.PharmacyName!,
+                u.PharmacyCity!,
                 u.CreatedUtc))
             .OrderByDescending(u => u.CreatedUtc)
             .ToList();

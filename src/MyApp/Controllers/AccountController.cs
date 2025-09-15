@@ -8,7 +8,7 @@ using System.Security.Claims;
 using MyApp.ViewModels;
 using MediatR;
 using MyApp.Application.Users.Commands;
-using System.Net.WebSockets;
+using MyApp.Application.Users.Queries;
 
 namespace MyApp.Controllers;
 
@@ -122,22 +122,28 @@ public class AccountController : Controller
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Index", "Home");
     }
+    #endregion
 
+    #region UserDetails
     [Authorize,HttpGet]
     public async Task<IActionResult> Details()
     {
-        var CurrentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var user = await _users.GetByIdAsync(CurrentUserId);
-        if (user is null) return NotFound();
+        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        ViewBag.Email = user.Email;
-        ViewBag.Name = user.Name;
-        ViewBag.PharmacyName = user.PharmacyName;
-        ViewBag.PharmacyCity = user.PharmacyCity;
-        ViewBag.CreatedUtc = user.CreatedUtc;
-        return View();
+        var result = await _mediator.Send(new GetUserByIdQuery(currentUserId));
+
+        if (!result.IsSuccess)
+        {
+            ModelState.AddModelError(string.Empty, result.Error!);
+            return View();
+        }
+
+        var dto = result.Value!;
+        return View(dto);
     }
     #endregion
+
+
 
     #region EditUserProfile
     [Authorize, HttpGet]

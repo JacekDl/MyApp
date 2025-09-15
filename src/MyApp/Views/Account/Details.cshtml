@@ -1,10 +1,12 @@
-﻿@{
+﻿@model MyApp.Application.Users.UserDto;
+
+@{
     ViewData["Title"] = "Account Details";
-    var email = (string)ViewBag.Email;
-    var name = (string)ViewBag.Name;
-    var pharmacy = (string)ViewBag.PharmacyName;
-    var city = (string)ViewBag.PharmacyCity;
-    var created = (DateTime)ViewBag.CreatedUtc;
+    // var email = (string)ViewBag.Email;
+    // var name = (string)ViewBag.Name;
+    // var pharmacy = (string)ViewBag.PharmacyName;
+    // var city = (string)ViewBag.PharmacyCity;
+    // var created = (DateTime)ViewBag.CreatedUtc;
 
 }
 
@@ -19,15 +21,15 @@
     <div class="card-body">
         <dl class="row mb-0">
             <dt class="col-sm-3">Email</dt>
-            <dd class="col-sm-9">@email</dd>
+            <dd class="col-sm-9">@Model.Email</dd>
             <dt class="col-sm-3">Name</dt>
-            <dd class="col-sm-9">@name</dd>
+            <dd class="col-sm-9">@Model.Name</dd>
             <dt class="col-sm-3">Pharmacy</dt>
-            <dd class="col-sm-9">@pharmacy</dd>
+            <dd class="col-sm-9">@Model.PharmacyName</dd>
             <dt class="col-sm-3">City</dt>
-            <dd class="col-sm-9">@city</dd>
+            <dd class="col-sm-9">@Model.PharmacyCity</dd>
             <dt class="col-sm-3">Created</dt>
-            <dd class="col-sm-9">@created.ToString("yyyy-MM-dd HH:mm")</dd>
+            <dd class="col-sm-9">@Model.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</dd>
         </dl>
     </div>
 </div>
