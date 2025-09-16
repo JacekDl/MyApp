@@ -13,7 +13,7 @@ public class AdminController : Controller
 {
     private readonly IMediator _mediator;
 
-    public AdminController(IUserService users, IReviewService reviews, IMediator mediator)
+    public AdminController(IUserService users, IMediator mediator)
     {
         _mediator = mediator;
     }

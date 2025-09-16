@@ -9,7 +9,6 @@ using QuestPDF.Infrastructure;
 using MediatR;
 using MyApp.Application.Abstractions;
 using MyApp.Application.Users.Queries;
-using MyApp.Application.Reviews.Queries;
 
 QuestPDF.Settings.License = LicenseType.Community;
 

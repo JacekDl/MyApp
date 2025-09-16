@@ -14,13 +14,11 @@ namespace MyApp.Controllers;
 public class UserRoleController : Controller
 {
     private readonly IReviewPdfService _pdfService;
-    private readonly IReviewService _reviewService;
     private readonly IMediator _mediator;
 
-    public UserRoleController(IReviewPdfService pdfService, IReviewService reviewService, IMediator mediator)
+    public UserRoleController(IReviewPdfService pdfService, IMediator mediator)
     {
         _pdfService = pdfService;
-        _reviewService = reviewService;
         _mediator = mediator;
     }
 
