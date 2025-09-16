@@ -44,12 +44,10 @@ builder.Services
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     });
 
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+builder.Services.AddAuthorizationBuilder()
+    .SetFallbackPolicy(new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
-        .Build();
-});
+        .Build());
 
 builder.Services.AddScoped<IUserService,  UserService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();

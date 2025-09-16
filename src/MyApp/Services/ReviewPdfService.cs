@@ -6,7 +6,7 @@ namespace MyApp.Services;
 
 public class ReviewPdfService : IReviewPdfService
 {
-    public Task<byte[]> GenerateReviewPdfAsync(Review review, CancellationToken ct = default)
+    public Task<byte[]> GenerateReviewPdf(Review review)
     {
         var pdfBytes = Document.Create(container =>
         {

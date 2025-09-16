@@ -9,19 +9,13 @@ using MyApp.Application.Users.Commands;
 namespace MyApp.Controllers;
 
 [Authorize(Roles = "Admin")]
-public class AdminController : Controller
+public class AdminController(IMediator mediator) : Controller
 {
-    private readonly IMediator _mediator;
-
-    public AdminController(IUserService users, IMediator mediator)
-    {
-        _mediator = mediator;
-    }
 
     #region ViewUsers
     public async Task<IActionResult> ViewUsers()
     {
-        var dto = await _mediator.Send(new GetAllUsersQuery());
+        var dto = await mediator.Send(new GetAllUsersQuery());
         return View(dto);
     }
 
@@ -31,7 +25,7 @@ public class AdminController : Controller
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> RemoveUser(int id)
     {
-        var result = await _mediator.Send(new RemoveUserCommand(id));
+        var result = await mediator.Send(new RemoveUserCommand(id));
 
         if (!result.IsSuccess)
         {
@@ -50,7 +44,7 @@ public class AdminController : Controller
 
     public async Task<IActionResult> Reviews(string? searchTxt, string? userId, bool? completed)
     {
-        var dto = await _mediator.Send(new GetReviewsQuery(searchTxt, userId, completed));
+        var dto = await mediator.Send(new GetReviewsQuery(searchTxt, userId, completed));
 
         ViewBag.Query = searchTxt;
         ViewBag.Completed = completed?.ToString().ToLowerInvariant();

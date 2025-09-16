@@ -6,40 +6,28 @@ using System.Security.Cryptography;
 
 namespace MyApp.Application.Reviews.Commands;
 
-public record CreateReviewCommand(int currentUserId, string Advice) : IRequest<Result<Review>>;
+public record CreateReviewCommand(int CurrentUserId, string Advice) : IRequest<Result<Review>>;
 
-public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, Result<Review>>
+public class CreateReviewHandler(IReviewRepository repo) : IRequestHandler<CreateReviewCommand, Result<Review>>
 {
-    private readonly IReviewRepository _repo;
-    public CreateReviewHandler(IReviewRepository repo)
-    {
-        _repo = repo;
-    }
     public async Task<Result<Review>> Handle(CreateReviewCommand request, CancellationToken ct)
     {
         string number = GenerateDigits();
-        var review = Review.Create(request.currentUserId, request.Advice, number);
+        var review = Review.Create(request.CurrentUserId, request.Advice, number);
        
-        await _repo.CreateAsync(review, ct);
+        await repo.CreateAsync(review, ct);
         return Result<Review>.Ok(review);
     }
-
-    //private static string GenerateDigits(int digits)
-    //{
-    //    var chars = new char[digits];
-    //    for (int i = 0; i < digits; i++)
-    //        chars[i] = (char)('0' + RandomNumberGenerator.GetInt32(0, 10));
-    //    return new string(chars);
-    //}
 
     private static string GenerateDigits(int bytes = 16)
     {
         byte[] buffer = new byte[bytes];
         RandomNumberGenerator.Fill(buffer);
-        return Convert.ToBase64String(buffer)
+        var token = Convert.ToBase64String(buffer)
             .Replace("+", "")
             .Replace("/", "")
-            .Replace("=", "")
-            .Substring(0, bytes);
+            .Replace("=", "") 
+            [..bytes];
+        return token;
     }
 }

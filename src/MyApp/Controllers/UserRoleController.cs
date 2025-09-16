@@ -11,16 +11,8 @@ using System.Security.Claims;
 namespace MyApp.Controllers;
 
 [Authorize(Roles = "User")]
-public class UserRoleController : Controller
+public class UserRoleController(IReviewPdfService pdfService, IMediator mediator) : Controller
 {
-    private readonly IReviewPdfService _pdfService;
-    private readonly IMediator _mediator;
-
-    public UserRoleController(IReviewPdfService pdfService, IMediator mediator)
-    {
-        _pdfService = pdfService;
-        _mediator = mediator;
-    }
 
     #region GenerateReview
     [HttpGet]
@@ -30,7 +22,7 @@ public class UserRoleController : Controller
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Reviews(ReviewCreateViewModel vm, CancellationToken ct)
+    public async Task<IActionResult> Reviews(ReviewCreateViewModel vm)
     {
         if (!ModelState.IsValid)
         {
@@ -38,12 +30,12 @@ public class UserRoleController : Controller
         }
 
         var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var result = await _mediator.Send(new CreateReviewCommand(currentUserId, vm.Advice));
+        var result = await mediator.Send(new CreateReviewCommand(currentUserId, vm.Advice));
 
 
-        var pdfBytes = await _pdfService.GenerateReviewPdfAsync(result.Value!, ct);
+        var pdfBytes = await pdfService.GenerateReviewPdf(result.Value!);
 
-        Response.Headers["Content-Disposition"] = "inline; filename=review.pdf";
+        Response.Headers.ContentDisposition = "inline; filename=review.pdf";
         return File(pdfBytes, "application/pdf");
     }
     #endregion
@@ -53,7 +45,7 @@ public class UserRoleController : Controller
     [AllowAnonymous, HttpGet("/r/{number}")]
     public async Task<IActionResult> PublicEdit(string number)
     {
-        var result = await _mediator.Send(new GetReviewQuery(number));
+        var result = await mediator.Send(new GetReviewQuery(number));
 
         if (!result.IsSuccess)
         {
@@ -79,7 +71,7 @@ public class UserRoleController : Controller
             return BadRequest();
         }
 
-        var result = await _mediator.Send(new UpdateReviewCommand(number, vm.ReviewText));
+        var result = await mediator.Send(new UpdateReviewCommand(number, vm.ReviewText));
 
         if (!result.IsSuccess)
         {
@@ -90,8 +82,8 @@ public class UserRoleController : Controller
         return RedirectToAction("CompleteEdit", new {number});
     }
 
-    [AllowAnonymous, HttpGet("/r/{number}/complete")]
-    public IActionResult CompleteEdit(string number)
+    [AllowAnonymous, HttpGet("/r/complete")]
+    public IActionResult CompleteEdit()
     {
         return View();
     }
@@ -104,7 +96,7 @@ public class UserRoleController : Controller
     public async Task<IActionResult> Tokens(string? searchTxt, bool? completed)
     {
         var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var dto = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId.ToString(), completed));
+        var dto = await mediator.Send(new GetReviewsQuery(searchTxt, currentUserId.ToString(), completed));
 
         ViewBag.Query = searchTxt;
         ViewBag.Completed = completed?.ToString().ToLowerInvariant();
