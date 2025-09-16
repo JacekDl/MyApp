@@ -19,6 +19,12 @@ public class ReviewRepository : IReviewRepository
         await _db.SaveChangesAsync(ct);
     }
 
+    public async Task<Review?> GetReviewAsync(string number, CancellationToken ct)
+    {
+        return await _db.Reviews
+            .SingleOrDefaultAsync(r => r.Number == number, ct);
+    }
+
     public async Task<List<Review>> GetReviews(string? searchString, string? userId, bool? completed, CancellationToken ct)
     {
         var query = _db.Reviews
@@ -45,10 +51,15 @@ public class ReviewRepository : IReviewRepository
         {
             query = query.Where(r => r.Completed == completed.Value);
         }
-        
+
         return await query
             .OrderByDescending(r => r.DateCreated)
             .ToListAsync(ct);
     }
-}
 
+    public async Task UpdateAsync(Review review, CancellationToken ct)
+    {
+        _db.Update(review);
+        await _db.SaveChangesAsync(ct);
+    }
+}

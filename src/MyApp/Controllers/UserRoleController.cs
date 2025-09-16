@@ -32,24 +32,6 @@ public class UserRoleController : Controller
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    //public async Task<IActionResult> Reviews(ReviewCreateViewModel model, CancellationToken ct)
-    //{
-    //    if(!ModelState.IsValid)
-    //    {
-    //        return View(model);
-    //    }
-
-    //    var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-
-
-    //    var review = await _reviewService.CreateAsync(currentUserId, model.Advice, ct);
-    //    var pdfBytes = await _pdfService.GenerateReviewPdfAsync(review, ct);
-
-    //    Response.Headers["Content-Disposition"] = "inline; filename=review.pdf";
-    //    return File(pdfBytes, "application/pdf");
-    //}
-
     public async Task<IActionResult> Reviews(ReviewCreateViewModel vm, CancellationToken ct)
     {
         if (!ModelState.IsValid)
@@ -69,41 +51,51 @@ public class UserRoleController : Controller
     #endregion
 
     #region PublicEditReview
-    [AllowAnonymous, HttpGet("/r/{number}")]
-    public async Task<IActionResult> PublicEdit(string number, CancellationToken ct)
-    { 
-        var review = await _reviewService.GetPublicAsync(number, ct);
 
-        if (review == null)
+    [AllowAnonymous, HttpGet("/r/{number}")]
+    public async Task<IActionResult> PublicEdit(string number)
+    {
+        var result = await _mediator.Send(new GetReviewQuery(number));
+
+        if (!result.IsSuccess)
         {
-            return NotFound();
+            return NotFound(); //View with error message can be implemented here.
         }
 
-        ViewBag.Advice = review.Advice;
-        var model = new PublicReviewEditViewModel
+        var review = result.Value!;
+        var vm = new PublicReviewEditViewModel
         {
+            Advice = review.Advice,
             Number = review.Number,
             ReviewText = review.ReviewText ?? string.Empty
         };
-        return View(model);
+        return View(vm);
     }
 
+
     [AllowAnonymous, HttpPost("/r/{number}"), ValidateAntiForgeryToken]
-    public async Task<IActionResult> PublicEdit(string number, PublicReviewEditViewModel model, CancellationToken ct)
+    public async Task<IActionResult> PublicEdit(string number, PublicReviewEditViewModel vm)
     {
-        if (number != model.Number)
+        if (number != vm.Number)
         {
             return BadRequest();
         }
 
-        var ok = await _reviewService.UpdatePublicAsync(number, model.ReviewText, ct);
-        if (!ok)
+        var result = await _mediator.Send(new UpdateReviewCommand(number, vm.ReviewText));
+
+        if (!result.IsSuccess)
         {
-            return NotFound();
+            return NotFound(); //TODO: View with error message can be implemented here.
         }
 
         TempData["Saved"] = true;
-        return RedirectToAction(nameof(PublicEdit), new { number });
+        return RedirectToAction("CompleteEdit", new {number});
+    }
+
+    [AllowAnonymous, HttpGet("/r/{number}/complete")]
+    public IActionResult CompleteEdit(string number)
+    {
+        return View();
     }
 
 
@@ -111,7 +103,7 @@ public class UserRoleController : Controller
 
     #region ListUsersReviews
     [HttpGet]
-    public async Task<IActionResult> Tokens(string? searchTxt, bool? completed, CancellationToken ct)
+    public async Task<IActionResult> Tokens(string? searchTxt, bool? completed)
     {
         var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var dto = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId.ToString(), completed));
