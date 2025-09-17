@@ -2,12 +2,12 @@
 @model ReviewCreateViewModel
 
 @{
-    ViewData["Title"] = "Reviews";
+    ViewData["Title"] = "Create Review";
 }
 
-<partial name="~/Views/Shared/_UserRoleNav.cshtml" />
+<h1 class="mb-3">@ViewData["Title"]</h1>
 
-<h2>Create PDF from your text</h2>
+<partial name="~/Views/Shared/_UserRoleNav.cshtml" />
 
 <form asp-action="Reviews" asp-asp-controller="UserRole" method="post" target="_blank">
     @Html.AntiForgeryToken()
