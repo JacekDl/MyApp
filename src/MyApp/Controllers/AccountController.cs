@@ -45,8 +45,29 @@ public class AccountController : Controller
             return View(vm);
         }
 
-        await SignInAsync(result.Value!, isPersistent: false);
-        return RedirectAfterSignIn(result.Value!);
+        var user = result.Value!;
+        var callbackBase = Url.Action(nameof(ConfirmEmail), "Account", null, Request.Scheme)!;
+        await _mediator.Send(new SendEmailConfirmationCommand(user.Id, user.Email, callbackBase));
+
+
+        TempData["Info"] = "We sent you a confirmation email. Please check your inbox.";
+        return RedirectToAction(nameof(ConfirmEmailSent));
+    }
+
+    [AllowAnonymous]
+    public IActionResult ConfirmEmailSent()
+    { 
+        return View(); 
+    }
+
+    [AllowAnonymous]
+    public async Task<IActionResult> ConfirmEmail(int userId, string token)
+    {
+        if (string.IsNullOrWhiteSpace(token)) return BadRequest();
+
+        var result = await _mediator.Send(new ConfirmEmailCommand(userId, token));
+        if (!result) return View("ConfirmEmailFailed");
+        return View("EmailConfirmed");
     }
     #endregion
 
@@ -102,6 +123,12 @@ public class AccountController : Controller
         if (!result.IsSuccess)
         {
             ModelState.AddModelError(string.Empty, result.Error!);
+            return View(vm);
+        }
+
+        if (!result.Value!.EmailConfirmed)
+        {
+            ModelState.AddModelError(string.Empty, "Please confirm your email before logging in.");
             return View(vm);
         }
 

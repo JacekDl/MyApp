@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Application.Reviews.Commands;
 using MyApp.Application.Reviews.Queries;
-using MyApp.Models;
 using MyApp.Services;
 using MyApp.ViewModels;
 using System.Security.Claims;

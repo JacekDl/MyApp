@@ -1,5 +1,4 @@
-﻿using MediatR;
-using MyApp.Domain;
+﻿using MyApp.Domain;
 
 namespace MyApp.Application.Abstractions;
 

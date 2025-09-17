@@ -50,6 +50,7 @@ builder.Services.AddAuthorizationBuilder()
 builder.Services.AddScoped<IUserService,  UserService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddSingleton<IReviewPdfService, ReviewPdfService>();
+builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
 
 var app = builder.Build();
 
