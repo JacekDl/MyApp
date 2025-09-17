@@ -7,20 +7,11 @@ namespace MyApp.Application.Users.Commands;
 
 public record SendEmailConfirmationCommand(int UserId, string Email, string CallbackUrl) : IRequest;
 
-public class SendEmailConfirmationHandler : IRequestHandler<SendEmailConfirmationCommand>
+public class SendEmailConfirmationHandler(IUserRepository repo, IEmailSender email) : IRequestHandler<SendEmailConfirmationCommand>
 {
-    private readonly IUserRepository _repo;
-    private readonly IEmailSender _email;
-
-    public SendEmailConfirmationHandler(IUserRepository repo, IEmailSender email)
-    {
-        _repo = repo;
-        _email = email;
-    }
-
     public async Task Handle(SendEmailConfirmationCommand request, CancellationToken ct)
     {
-        var user = await _repo.GetByIdAsync(request.UserId, ct);
+        var user = await repo.GetByIdAsync(request.UserId, ct);
         if (user is null)
         {
             throw new KeyNotFoundException($"User {request.UserId} not found.");
@@ -36,7 +27,7 @@ public class SendEmailConfirmationHandler : IRequestHandler<SendEmailConfirmatio
         user.EmailConfirmationCode = hash;
         user.EmailConfirmationTokenExpiresUtc = expires;
 
-        _repo.UpdateUser(user, ct);
+        repo.UpdateUser(user, ct);
 
         var url = $"{request.CallbackUrl}?userId={request.UserId}&token={token}";
         var body = $"""
@@ -45,6 +36,6 @@ public class SendEmailConfirmationHandler : IRequestHandler<SendEmailConfirmatio
         <p>This link expires in 24 hours.</p>
         """;
 
-        await _email.SendEmailAsync(request.Email, "Confirm your email", body, ct);
+        await email.SendEmailAsync(request.Email, "Confirm your email", body, ct);
     }
 }

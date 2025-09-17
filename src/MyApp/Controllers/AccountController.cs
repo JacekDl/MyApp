@@ -9,7 +9,6 @@ using MyApp.ViewModels;
 using MediatR;
 using MyApp.Application.Users.Commands;
 using MyApp.Application.Users.Queries;
-using System.Net.WebSockets;
 
 namespace MyApp.Controllers;
 
@@ -17,7 +16,7 @@ public class AccountController : Controller
 {
     private readonly IMediator _mediator;
 
-    public AccountController(IUserService users, IMediator mediator)
+    public AccountController(IMediator mediator)
     {
         _mediator = mediator;
     }

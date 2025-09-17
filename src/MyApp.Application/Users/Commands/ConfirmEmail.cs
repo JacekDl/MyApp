@@ -7,18 +7,11 @@ namespace MyApp.Application.Users.Commands;
 
 public record ConfirmEmailCommand(int UserId, string Token) : IRequest<bool>;
 
-public class ConfirmEmailHandler : IRequestHandler<ConfirmEmailCommand, bool>
+public class ConfirmEmailHandler(IUserRepository repo) : IRequestHandler<ConfirmEmailCommand, bool>
 {
-    private readonly IUserRepository _repo;
-
-    public ConfirmEmailHandler(IUserRepository repo)
-    {
-        _repo = repo;
-    }
-
     public async Task<bool> Handle(ConfirmEmailCommand request, CancellationToken ct)
     {
-        var user = await _repo.GetByIdAsync(request.UserId, ct);
+        var user = await repo.GetByIdAsync(request.UserId, ct);
 
         var tokenHash = EmailToken.Hash(request.Token);
 
@@ -46,7 +39,7 @@ public class ConfirmEmailHandler : IRequestHandler<ConfirmEmailCommand, bool>
         user.EmailConfirmationCode = null;
         user.EmailConfirmationTokenExpiresUtc = null;
 
-        _repo.UpdateUser(user, ct);
+        repo.UpdateUser(user, ct);
 
         return true;
     }
