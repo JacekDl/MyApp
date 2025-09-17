@@ -47,4 +47,14 @@ public class UserRepository : IUserRepository
         _db.Remove(user);
         _db.SaveChangesAsync(ct);
     }
+
+    public Task SetEmailConfirmationAsync(int userId, string tokenHash, DateTimeOffset expires, CancellationToken ct)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> ConfirmEmailAsync(int userId, string tokenHash, CancellationToken ct)
+    {
+        throw new NotImplementedException();
+    }
 }

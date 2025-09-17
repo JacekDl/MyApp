@@ -10,4 +10,7 @@ public interface IUserRepository
     Task<User?> GetByIdAsync(int id, CancellationToken ct);
     void RemoveAsync(User user, CancellationToken ct);
     void UpdateUser(User user, CancellationToken ct);
+
+    Task SetEmailConfirmationAsync(int userId, string tokenHash, DateTimeOffset expires, CancellationToken ct);
+    Task<bool> ConfirmEmailAsync(int userId, string tokenHash, CancellationToken ct);
 }

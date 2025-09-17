@@ -2,22 +2,25 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyApp.Infrastructure;
 
 #nullable disable
 
-namespace MyApp.Migrations
+namespace MyApp.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250917072752_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.8");
 
-            modelBuilder.Entity("MyApp.Models.Review", b =>
+            modelBuilder.Entity("MyApp.Domain.Review", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -56,7 +59,7 @@ namespace MyApp.Migrations
                     b.ToTable("Reviews");
                 });
 
-            modelBuilder.Entity("MyApp.Models.User", b =>
+            modelBuilder.Entity("MyApp.Domain.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -69,6 +72,15 @@ namespace MyApp.Migrations
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
+
+                    b.Property<string>("EmailConfirmationCode")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset?>("EmailConfirmationTokenExpiresUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .HasMaxLength(16)
@@ -99,9 +111,9 @@ namespace MyApp.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("MyApp.Models.Review", b =>
+            modelBuilder.Entity("MyApp.Domain.Review", b =>
                 {
-                    b.HasOne("MyApp.Models.User", "CreatedByUser")
+                    b.HasOne("MyApp.Domain.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)

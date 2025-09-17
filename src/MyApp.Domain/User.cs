@@ -16,6 +16,7 @@ public class User
     [Required, MaxLength(32)]
     public string Role { get; set; } = "User";
 
+
     [MaxLength(16)]
     public string? Name { get; set; }
 
@@ -24,6 +25,11 @@ public class User
 
     [MaxLength(32)]
     public string? PharmacyCity { get; set; }
+
+    public bool EmailConfirmed { get; set; } = false;
+    public string? EmailConfirmationCode { get; set; }
+    public DateTimeOffset? EmailConfirmationTokenExpiresUtc { get; set; }
+
 
     public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
 

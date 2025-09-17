@@ -2,25 +2,22 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyApp.Infrastructure;
 
 #nullable disable
 
-namespace MyApp.Migrations
+namespace MyApp.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250905070021_AddReviewEntity")]
-    partial class AddReviewEntity
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.8");
 
-            modelBuilder.Entity("MyApp.Models.Review", b =>
+            modelBuilder.Entity("MyApp.Domain.Review", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -31,6 +28,9 @@ namespace MyApp.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("Completed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CreatedByUserId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("DateCreated")
@@ -48,13 +48,15 @@ namespace MyApp.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedByUserId");
+
                     b.HasIndex("Number")
                         .IsUnique();
 
                     b.ToTable("Reviews");
                 });
 
-            modelBuilder.Entity("MyApp.Models.User", b =>
+            modelBuilder.Entity("MyApp.Domain.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -67,6 +69,15 @@ namespace MyApp.Migrations
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
+
+                    b.Property<string>("EmailConfirmationCode")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset?>("EmailConfirmationTokenExpiresUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .HasMaxLength(16)
@@ -95,6 +106,17 @@ namespace MyApp.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("MyApp.Domain.Review", b =>
+                {
+                    b.HasOne("MyApp.Domain.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
                 });
 #pragma warning restore 612, 618
         }
