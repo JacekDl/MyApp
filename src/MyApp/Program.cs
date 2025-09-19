@@ -22,7 +22,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddSingleton<IReviewPdfService, ReviewPdfService>();
 builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
 
