@@ -22,6 +22,7 @@ public class AdminController(IMediator mediator) : Controller
     #endregion
 
     #region RemoveUser
+
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> RemoveUser(string id)
     {
@@ -42,13 +43,14 @@ public class AdminController(IMediator mediator) : Controller
 
     #region ViewReviews
 
-    public async Task<IActionResult> Reviews(string? searchTxt, string? userId, bool? completed)
+    public async Task<IActionResult> Reviews(string? searchTxt, string? userId, bool? completed, string? userEmail)
     {
-        var dto = await mediator.Send(new GetReviewsQuery(searchTxt, userId, completed));
+        var dto = await mediator.Send(new GetReviewsQuery(searchTxt, userId, completed, userEmail));
 
         ViewBag.Query = searchTxt;
         ViewBag.Completed = completed?.ToString().ToLowerInvariant();
         ViewBag.UserId = userId;
+        ViewBag.UserEmail = userEmail;
 
         return View(dto);
     }

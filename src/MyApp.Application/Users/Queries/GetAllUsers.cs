@@ -1,5 +1,8 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using MyApp.Application.Abstractions;
+using MyApp.Domain;
 
 
 namespace MyApp.Application.Users.Queries;
@@ -8,26 +11,26 @@ public record GetAllUsersQuery() : IRequest<List<UserDto>>;
 
 public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, List<UserDto>>
 {
-    private readonly IUserRepository _repo;
+    private readonly UserManager<User> _userManager;
 
-    public GetAllUsersHandler(IUserRepository repo)
+    public GetAllUsersHandler(UserManager<User> userManager)
     {
-        _repo = repo;
+        _userManager = userManager;
     }
-
+    
     public async Task<List<UserDto>> Handle(GetAllUsersQuery request, CancellationToken ct)
     {
-        var list = await _repo.GetAllAsync(ct);
-        return list
+        return await _userManager.Users
+            .AsNoTracking()
+            .OrderByDescending(u => u.CreatedUtc)
             .Select(u => new UserDto(
                 u.Id,
                 u.Email ?? string.Empty,
                 u.Role,
-                u.UserName!,
-                u.PharmacyName!,
-                u.PharmacyCity!,
+                u.DisplayName ?? string.Empty,
+                u.PharmacyName ?? string.Empty,
+                u.PharmacyCity ?? string.Empty,
                 u.CreatedUtc))
-            .OrderByDescending(u => u.CreatedUtc)
-            .ToList();
+            .ToListAsync(ct);
     }
 }
