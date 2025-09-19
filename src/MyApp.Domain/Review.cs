@@ -6,7 +6,7 @@ public class Review
 {
     public int Id { get; set; }
 
-    public int CreatedByUserId { get; set; }
+    public string CreatedByUserId { get; set; }
     public User CreatedByUser { get; set; }
     public DateTime DateCreated { get; set; }
 
@@ -25,7 +25,7 @@ public class Review
 
 
 
-    public static Review Create(int userId, string advice, string number)
+    public static Review Create(string userId, string advice, string number)
     {
         return new Review
         {

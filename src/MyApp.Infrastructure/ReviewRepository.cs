@@ -41,10 +41,7 @@ public class ReviewRepository : IReviewRepository
 
         if (!string.IsNullOrWhiteSpace(userId))
         {
-            if (int.TryParse(userId, out var uid))
-            {
-                query = query.Where(r => r.CreatedByUserId == uid);
-            }
+            query = query.Where(r => r.CreatedByUserId == userId);
         }
 
         if (completed.HasValue)

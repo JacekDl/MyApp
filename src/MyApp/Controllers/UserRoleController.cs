@@ -28,7 +28,7 @@ public class UserRoleController(IReviewPdfService pdfService, IMediator mediator
             return View(vm);
         }
 
-        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await mediator.Send(new CreateReviewCommand(currentUserId, vm.Advice));
 
 

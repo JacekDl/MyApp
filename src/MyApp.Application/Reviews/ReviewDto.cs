@@ -3,7 +3,7 @@
 public record ReviewDto
 (
     int Id,
-    int CreatedByUserId,
+    string CreatedByUserId,
     string Number,
     DateTime DateCreated,
     string Advice,

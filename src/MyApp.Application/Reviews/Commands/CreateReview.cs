@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 
 namespace MyApp.Application.Reviews.Commands;
 
-public record CreateReviewCommand(int CurrentUserId, string Advice) : IRequest<Result<Review>>;
+public record CreateReviewCommand(string CurrentUserId, string Advice) : IRequest<Result<Review>>;
 
 public class CreateReviewHandler(IReviewRepository repo) : IRequestHandler<CreateReviewCommand, Result<Review>>
 {
