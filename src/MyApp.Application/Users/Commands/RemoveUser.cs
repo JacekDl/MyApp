@@ -4,7 +4,7 @@ using MyApp.Application.Common;
 
 namespace MyApp.Application.Users.Commands;
 
-public record RemoveUserCommand(int Id) : IRequest<Result<bool>>;
+public record RemoveUserCommand(string Id) : IRequest<Result<bool>>;
 
 public class RemoveUserHandler : IRequestHandler<RemoveUserCommand, Result<bool>>
 {

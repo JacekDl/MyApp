@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Infrastructure;
 using MyApp.Domain;
@@ -8,6 +9,7 @@ using MyApp.Services;
 using QuestPDF.Infrastructure;
 using MyApp.Application.Abstractions;
 using MyApp.Application.Users.Queries;
+
 
 QuestPDF.Settings.License = LicenseType.Community;
 
@@ -20,12 +22,23 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddSingleton<IReviewPdfService, ReviewPdfService>();
+builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
 
 
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(GetAllUsersHandler).Assembly);
 });
+
+builder.Services
+    .AddIdentity<User, IdentityRole>(options =>
+    {
+        options.SignIn.RequireConfirmedEmail = true;
+    })
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -47,26 +60,43 @@ builder.Services.AddAuthorizationBuilder()
         .RequireAuthenticatedUser()
         .Build());
 
-builder.Services.AddScoped<IUserService,  UserService>();
-builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddSingleton<IReviewPdfService, ReviewPdfService>();
-builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
+
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    await db.Database.EnsureCreatedAsync();
+    await db.Database.MigrateAsync();
 
-    var adminEmail = "admin@example.com";
-    if (!await db.Users.AnyAsync(u => u.Email == adminEmail))
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    const string adminRole = "Admin";
+    const string adminEmail = "admin@example.com";
+    const string adminPassword = "Admin#12345";
+
+    if (!await roleManager.RoleExistsAsync(adminRole))
     {
-        var hasher = new PasswordHasher<User>();
-        var admin = new User { Email = adminEmail, Role = "Admin" };
-        admin.PasswordHash = hasher.HashPassword(admin, "Admin#12345");
-        db.Users.Add(admin);
-        await db.SaveChangesAsync();
+        await roleManager.CreateAsync(new IdentityRole(adminRole));
+    }
+
+    var admin = await userManager.FindByEmailAsync(adminEmail);
+    if (admin is null)
+    {
+        admin = new User
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            Role = adminRole,
+            EmailConfirmed = true
+        };
+    }
+
+    var createResult = await userManager.CreateAsync(admin, adminPassword);
+    if (createResult.Succeeded)
+    {
+        await userManager.AddToRoleAsync(admin, adminRole);
     }
 }
 

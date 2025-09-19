@@ -5,7 +5,7 @@ using MyApp.Application.Common;
 
 namespace MyApp.Application.Users.Queries;
 
-public record GetUserByIdQuery(int Id) : IRequest<Result<UserDto>>;
+public record GetUserByIdQuery(string Id) : IRequest<Result<UserDto>>;
 
 public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, Result<UserDto>>
 {
@@ -24,9 +24,9 @@ public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, Result<UserD
 
         var userDto = new UserDto(
             user.Id,
-            user.Email,
+            user.Email ?? string.Empty,
             user.Role,
-            user.Name!,
+            user.UserName!,
             user.PharmacyName!,
             user.PharmacyCity!,
             user.CreatedUtc);

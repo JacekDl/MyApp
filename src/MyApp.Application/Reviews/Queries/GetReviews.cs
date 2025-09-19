@@ -24,7 +24,7 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, List<ReviewDto
                 r.Number,
                 r.DateCreated,
                 r.Advice,
-                r.ReviewText!,
+                r.Response!,
                 r.Completed
                 ))
             .ToList();

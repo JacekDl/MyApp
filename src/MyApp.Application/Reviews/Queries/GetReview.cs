@@ -32,7 +32,7 @@ public class GetReviewHandler : IRequestHandler<GetReviewQuery, Result<ReviewDto
             review.Number,
             review.DateCreated,
             review.Advice,
-            review.ReviewText!,
+            review.Response!,
             review.Completed
             );
 

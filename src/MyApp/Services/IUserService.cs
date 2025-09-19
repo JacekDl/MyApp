@@ -13,9 +13,9 @@ public interface IUserService
 
     Task<IReadOnlyList<UserListItem>> GetUsersAsync();
 
-    Task<OperationResult> RemoveUserAsync(int id);
-    Task<User?> GetByIdAsync(int currentUserId);
-    Task<OperationResult> UpdateProfileAsync(int currentUserId, string? name, string? pharmacyName, string? pharmacyCity);
-    Task<OperationResult> UpdateEmailAsync(int userId, string newEmail, string currentPassword);
-    Task<OperationResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
+    Task<OperationResult> RemoveUserAsync(string id);
+    Task<User?> GetByIdAsync(string currentUserId);
+    Task<OperationResult> UpdateProfileAsync(string currentUserId, string? name, string? pharmacyName, string? pharmacyCity);
+    Task<OperationResult> UpdateEmailAsync(string userId, string newEmail, string currentPassword);
+    Task<OperationResult> ChangePasswordAsync(string userId, string currentPassword, string newPassword);
 }

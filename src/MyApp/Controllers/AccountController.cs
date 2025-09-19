@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain;
-using MyApp.Services;
 using System.Security.Claims;
 using MyApp.ViewModels;
 using MediatR;
@@ -46,7 +45,7 @@ public class AccountController : Controller
 
         var user = result.Value!;
         var callbackBase = Url.Action(nameof(ConfirmEmail), "Account", null, Request.Scheme)!;
-        await _mediator.Send(new SendEmailConfirmationCommand(user.Id, user.Email, callbackBase));
+        await _mediator.Send(new SendEmailConfirmationCommand(user.Id, callbackBase));
 
 
         TempData["Info"] = "We sent you a confirmation email. Please check your inbox.";
@@ -60,7 +59,7 @@ public class AccountController : Controller
     }
 
     [AllowAnonymous]
-    public async Task<IActionResult> ConfirmEmail(int userId, string token)
+    public async Task<IActionResult> ConfirmEmail(string userId, string token)
     {
         if (string.IsNullOrWhiteSpace(token)) return BadRequest();
 
@@ -153,7 +152,7 @@ public class AccountController : Controller
     [Authorize,HttpGet]
     public async Task<IActionResult> Details()
     {
-        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         var result = await _mediator.Send(new GetUserByIdQuery(currentUserId));
 
@@ -172,7 +171,7 @@ public class AccountController : Controller
     [Authorize, HttpGet]
     public async Task<IActionResult> EditProfile()
     {
-        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         var result = await _mediator.Send(new GetUserByIdQuery(currentUserId));
 
@@ -184,7 +183,7 @@ public class AccountController : Controller
 
         var vm = new EditProfileViewModel
         {
-            Name = result.Value!.Name,
+            Name = result.Value!.UserName,
             PharmacyName = result.Value.PharmacyName,
             PharmacyCity = result.Value.PharmacyCity
         };
@@ -199,7 +198,7 @@ public class AccountController : Controller
             return View(vm);
         }
 
-        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await _mediator.Send(new UpdateUserDetailsCommand(currentUserId, vm.Name, vm.PharmacyName, vm.PharmacyCity));
 
         if (!result.IsSuccess)
@@ -217,7 +216,7 @@ public class AccountController : Controller
     [Authorize, HttpGet]
     public async Task<IActionResult> ChangeEmail()
     {
-        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         var result = await _mediator.Send(new GetUserByIdQuery(currentUserId));
         if (!result.IsSuccess)
@@ -240,7 +239,7 @@ public class AccountController : Controller
             return View(vm);
         }
 
-        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         var result = await _mediator.Send(new UpdateUserEmailCommand(currentUserId, vm.Email, vm.CurrentPassword));
         if (!result.IsSuccess)
@@ -269,7 +268,7 @@ public class AccountController : Controller
             return View(vm);
         }
 
-        var CurrentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var CurrentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await _mediator.Send(new UpdateUserPasswordCommand(CurrentUserId, vm.CurrentPassword, vm.NewPassword));
 
         if (!result.IsSuccess)

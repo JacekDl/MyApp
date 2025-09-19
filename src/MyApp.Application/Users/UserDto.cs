@@ -1,10 +1,10 @@
 ﻿namespace MyApp.Application.Users;
 
 public record UserDto(
-    int Id,
+    string Id,
     string Email,
     string Role,
-    string Name,
+    string UserName,
     string PharmacyName,
     string PharmacyCity,
     DateTime CreatedUtc

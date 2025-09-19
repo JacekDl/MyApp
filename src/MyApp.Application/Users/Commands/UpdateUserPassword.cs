@@ -6,7 +6,7 @@ using MyApp.Domain;
 
 namespace MyApp.Application.Users.Commands;
 
-public record UpdateUserPasswordCommand(int Id, string CurrentPassword, string NewPassword) : IRequest<Result<User>>;
+public record UpdateUserPasswordCommand(string Id, string CurrentPassword, string NewPassword) : IRequest<Result<User>>;
 
 public class UpdateUserPasswordHandler : IRequestHandler<UpdateUserPasswordCommand, Result<User>>
 {

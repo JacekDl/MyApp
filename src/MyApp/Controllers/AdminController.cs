@@ -23,7 +23,7 @@ public class AdminController(IMediator mediator) : Controller
 
     #region RemoveUser
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> RemoveUser(int id)
+    public async Task<IActionResult> RemoveUser(string id)
     {
         var result = await mediator.Send(new RemoveUserCommand(id));
 

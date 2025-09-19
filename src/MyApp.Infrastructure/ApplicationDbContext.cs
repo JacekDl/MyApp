@@ -1,15 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MyApp.Domain;
 
 namespace MyApp.Infrastructure;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : IdentityDbContext<User>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
 
-    public DbSet<User> Users => Set<User>();
+    public DbSet<User> ApplicationUsers => Set<User>();
     public DbSet<Review> Reviews => Set<Review>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -17,22 +18,26 @@ public class ApplicationDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<User>()
-            .HasIndex(u => u.Email)
-            .IsUnique();
+            .HasMany(u => u.Reviews)
+            .WithOne(p => p.CreatedByUser)
+            .HasForeignKey(p => p.CreatedByUserId);
 
-        modelBuilder.Entity<Review>()
-            .HasIndex(r => r.Number)
-            .IsUnique();
+        modelBuilder.Entity<Review>(r =>
+        {
+            r.HasKey(r => r.Id);
+            r.Property(e => e.Advice).IsRequired();
+        });
+            
 
         modelBuilder.Entity<Review>()
             .Property(r => r.DateCreated)
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .ValueGeneratedOnAdd();
 
-        modelBuilder.Entity<Review>()
-            .HasOne(r => r.CreatedByUser)
-            .WithMany()
-            .HasForeignKey(r => r.CreatedByUserId)
-            .OnDelete(DeleteBehavior.Restrict);
+        //modelBuilder.Entity<Review>()
+        //    .HasOne(r => r.CreatedByUser)
+        //    .WithMany()
+        //    .HasForeignKey(r => r.CreatedByUserId)
+        //    .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -6,20 +6,24 @@ public class Review
 {
     public int Id { get; set; }
 
+    public int CreatedByUserId { get; set; }
+    public User CreatedByUser { get; set; }
     public DateTime DateCreated { get; set; }
 
     [Required, MaxLength(128)]
     public string Number { get; set; } = default!;
 
+    // To create Review pharmacist must include some advice.
     [Required]
     public string Advice { get; set; } = default!;
 
-    public string? ReviewText { get; set; }
+    // Response is initially empty.
+    public string? Response { get; set; }
 
     public bool Completed { get; set; }
 
-    public int CreatedByUserId { get; set; }
-    public User? CreatedByUser { get; set; }
+
+
 
     public static Review Create(int userId, string advice, string number)
     {

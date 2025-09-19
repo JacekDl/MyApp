@@ -21,9 +21,9 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, List<UserDto
         return list
             .Select(u => new UserDto(
                 u.Id,
-                u.Email,
+                u.Email ?? string.Empty,
                 u.Role,
-                u.Name!,
+                u.UserName!,
                 u.PharmacyName!,
                 u.PharmacyCity!,
                 u.CreatedUtc))

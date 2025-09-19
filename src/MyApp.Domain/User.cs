@@ -1,24 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Net.Http.Headers;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyApp.Domain;
 
-public class User
+public class User : IdentityUser
 {
-    public int Id { get; set; }
-
-    [Required, EmailAddress, MaxLength(256)]
-    public string Email { get; set; } = string.Empty;
-
-    [Required]
-    public string PasswordHash { get; set; } = string.Empty;
-
     [Required, MaxLength(32)]
     public string Role { get; set; } = "User";
 
+    public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
 
-    [MaxLength(16)]
-    public string? Name { get; set; }
+    public DateTime LastLoginDateTime { get; set; }
+
+    [MaxLength(32)]
+    public string? DisplayName { get; set; }
 
     [MaxLength(32)]
     public string? PharmacyName { get; set; }
@@ -26,21 +21,15 @@ public class User
     [MaxLength(32)]
     public string? PharmacyCity { get; set; }
 
-    public bool EmailConfirmed { get; set; } = false;
-    public string? EmailConfirmationCode { get; set; }
-    public DateTimeOffset? EmailConfirmationTokenExpiresUtc { get; set; }
-
-
-    public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
+    public List<Review>? Reviews { get; set; }
 
     public static User Create(string email, string role = "User")
     {
         return new User
         {
+            UserName = email,
             Email = email,
             Role = role
         };
     }
-
-
 }

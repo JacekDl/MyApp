@@ -21,14 +21,14 @@ public class UserService : IUserService
     public async Task<OperationResult<User>> RegisterAsync(string email, string password, string role = "User")
     {
         var normalized = email.Trim().ToLower();
-        if (await _db.Users.AnyAsync(u => u.Email == normalized))
+        if (await _db.ApplicationUsers.AnyAsync(u => u.Email == normalized))
             return OperationResult<User>.Failure("Email is already registered.");
 
 
         var user = new User { Email = normalized, Role = role };
         user.PasswordHash = _hasher.HashPassword(user, password);
 
-        _db.Users.Add(user);
+        _db.ApplicationUsers.Add(user);
         await _db.SaveChangesAsync();
 
         return OperationResult<User>.Success(user);
@@ -37,7 +37,7 @@ public class UserService : IUserService
     public async Task<User?> ValidateCredentialsAsync(string email, string password)
     {
         var normalized = email.Trim().ToLower();
-        var user = await _db.Users.SingleOrDefaultAsync(u => u.Email == normalized);
+        var user = await _db.ApplicationUsers.SingleOrDefaultAsync(u => u.Email == normalized);
         if (user is null) return null;
 
         var result = _hasher.VerifyHashedPassword(user, user.PasswordHash, password);
@@ -46,13 +46,13 @@ public class UserService : IUserService
 
     public async Task<User?> GetByEmailAsync(string email)
     {
-        var user = await _db.Users.SingleOrDefaultAsync(u => u.Email == email.Trim());
+        var user = await _db.ApplicationUsers.SingleOrDefaultAsync(u => u.Email == email.Trim());
         return user;
     }
 
     public async Task<IReadOnlyList<UserListItem>> GetUsersAsync()
     {
-        return await _db.Users
+        return await _db.ApplicationUsers
             .AsNoTracking()
             .OrderByDescending(u => u.CreatedUtc)
             .Select(u => new UserListItem
@@ -65,9 +65,9 @@ public class UserService : IUserService
             .ToListAsync();      
     }
 
-    public async Task<OperationResult> RemoveUserAsync(int id)
+    public async Task<OperationResult> RemoveUserAsync(string id)
     {
-        var user = await _db.Users.FindAsync(id);
+        var user = await _db.ApplicationUsers.FindAsync(id);
         if (user is null)
         {
             return OperationResult.Failure("User not found.");
@@ -78,22 +78,22 @@ public class UserService : IUserService
             return OperationResult.Failure("Cannot remove an Admin user.");
         }
 
-        _db.Users.Remove(user);
+        _db.ApplicationUsers.Remove(user);
         await _db.SaveChangesAsync();
 
         return OperationResult.Success();
     }
 
-    public async Task<User?> GetByIdAsync(int id)
+    public async Task<User?> GetByIdAsync(string id)
     {
-        return await _db.Users
+        return await _db.ApplicationUsers
             .AsNoTracking()
             .SingleOrDefaultAsync(u => u.Id == id);
     }
 
-    public async Task<OperationResult> UpdateProfileAsync(int userId, string? name, string? pharmacyName, string? pharmacyCity)
+    public async Task<OperationResult> UpdateProfileAsync(string userId, string? name, string? pharmacyName, string? pharmacyCity)
     {
-        var user = await _db.Users.SingleOrDefaultAsync(u => u.Id == userId);
+        var user = await _db.ApplicationUsers.SingleOrDefaultAsync(u => u.Id == userId);
         if (user is null)
         {
             return OperationResult.Failure("User not found.");
@@ -105,9 +105,9 @@ public class UserService : IUserService
 
         var changed = false;
 
-        if (user.Name != name)
+        if (user.UserName != name)
         {
-            user.Name = name;
+            user.UserName = name;
             changed = true;
         }
 
@@ -132,9 +132,9 @@ public class UserService : IUserService
         return OperationResult.Success();
     }
 
-    public async Task<OperationResult> UpdateEmailAsync(int userId, string newEmail, string currentPassword)
+    public async Task<OperationResult> UpdateEmailAsync(string userId, string newEmail, string currentPassword)
     {
-        var user = await _db.Users.SingleOrDefaultAsync(u => u.Id == userId);
+        var user = await _db.ApplicationUsers.SingleOrDefaultAsync(u => u.Id == userId);
         if (user is null)
         {
             return OperationResult.Failure("User not found.");
@@ -159,7 +159,7 @@ public class UserService : IUserService
             return OperationResult.Failure("Current password is incorrect.");
         }
 
-        var exists = await _db.Users
+        var exists = await _db.ApplicationUsers
             .AsNoTracking()
             .AnyAsync(u => u.Id != userId && u.Email.ToLower() == newEmail.ToLower());
 
@@ -174,9 +174,9 @@ public class UserService : IUserService
 
     }
 
-    public async Task<OperationResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+    public async Task<OperationResult> ChangePasswordAsync(string userId, string currentPassword, string newPassword)
     {
-        var user = await _db.Users.SingleOrDefaultAsync(u => u.Id == userId);
+        var user = await _db.ApplicationUsers.SingleOrDefaultAsync(u => u.Id == userId);
         if (user is null)
         {
             return OperationResult.Failure("User not found.");

@@ -35,7 +35,7 @@ public class ReviewRepository : IReviewRepository
             var pattern = $"%{searchString.Trim()}%";
             query = query.Where(r =>
                 EF.Functions.Like(r.Advice ?? string.Empty, pattern) ||
-                EF.Functions.Like(r.ReviewText ?? string.Empty, pattern));
+                EF.Functions.Like(r.Response ?? string.Empty, pattern));
         }
         ;
 

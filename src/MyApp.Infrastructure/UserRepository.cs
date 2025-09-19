@@ -14,19 +14,19 @@ public class UserRepository : IUserRepository
     }
 
     public async Task<List<User>> GetAllAsync(CancellationToken ct) =>
-        await _db.Users
+        await _db.ApplicationUsers
         .OrderByDescending(u => u.CreatedUtc)
         .ToListAsync(ct);
 
     public async Task<User?> GetByEmailAsync(string email, CancellationToken ct)
     {
-        return await _db.Users
+        return await _db.ApplicationUsers
             .SingleOrDefaultAsync(u => u.Email == email);
     }
 
-    public async Task<User?> GetByIdAsync(int id, CancellationToken ct)
+    public async Task<User?> GetByIdAsync(string id, CancellationToken ct)
     {
-        return await _db.Users
+        return await _db.ApplicationUsers
             .SingleOrDefaultAsync(u => u.Id == id, ct);
     }
 

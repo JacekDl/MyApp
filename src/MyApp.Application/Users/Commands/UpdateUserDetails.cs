@@ -5,7 +5,7 @@ using MyApp.Domain;
 
 namespace MyApp.Application.Users.Commands;
 
-public record UpdateUserDetailsCommand(int Id, string? Name, string? PharmacyName, string? PharmacyCity) : IRequest<Result<User>>;
+public record UpdateUserDetailsCommand(string Id, string? Name, string? PharmacyName, string? PharmacyCity) : IRequest<Result<User>>;
 
 
 public class UpdateUserDetailsHandler : IRequestHandler<UpdateUserDetailsCommand, Result<User>>
@@ -21,7 +21,7 @@ public class UpdateUserDetailsHandler : IRequestHandler<UpdateUserDetailsCommand
         if (user is null)
             return Result<User>.Fail("User not found");
 
-        user.Name = request.Name?.Trim();
+        user.UserName = request.Name?.Trim();
         user.PharmacyName = request.PharmacyName?.Trim();
         user.PharmacyCity = request.PharmacyCity?.Trim();
         _repo.UpdateUser(user, ct);

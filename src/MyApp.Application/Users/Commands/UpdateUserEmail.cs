@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyApp.Application.Users.Commands;
 
-public record UpdateUserEmailCommand(int Id, string Email, string Password) : IRequest<Result<User>>;
+public record UpdateUserEmailCommand(string Id, string Email, string Password) : IRequest<Result<User>>;
 
 public class UpdateUserEmailHandler : IRequestHandler<UpdateUserEmailCommand, Result<User>>
 {

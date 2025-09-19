@@ -22,7 +22,7 @@ public class UpdateReviewHandler : IRequestHandler<UpdateReviewCommand, Result<b
             return Result<bool>.Fail("Review already completed yet");
         if (review.DateCreated.AddDays(60) < DateTime.UtcNow)
             return Result<bool>.Fail("Review expired");
-        review.ReviewText = request.reviewText;
+        review.Response = request.reviewText;
         review.Completed = true;
         await _repo.UpdateAsync(review, ct);
         return Result<bool>.Ok(true);
