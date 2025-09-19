@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Identity;
 using MyApp.Application.Abstractions;
 using MyApp.Application.Common;
 using MyApp.Domain;
@@ -6,16 +7,31 @@ using System.Security.Cryptography;
 
 namespace MyApp.Application.Reviews.Commands;
 
-public record CreateReviewCommand(string CurrentUserId, string Advice) : IRequest<Result<Review>>;
+public record CreateReviewCommand(string UserId, string Advice) : IRequest<Result<Review>>;
 
-public class CreateReviewHandler(IReviewRepository repo) : IRequestHandler<CreateReviewCommand, Result<Review>>
+public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, Result<Review>>
 {
+    private readonly UserManager<User> _userManager;
+    private readonly IReviewRepository _repo;
+
+
+    public CreateReviewHandler(UserManager<User> userManager, IReviewRepository repo)
+    {
+        _userManager = userManager;
+        _repo = repo;
+
+    }
+
     public async Task<Result<Review>> Handle(CreateReviewCommand request, CancellationToken ct)
     {
+        var user = await _userManager.FindByIdAsync(request.UserId);
+        if (user is null)
+            return Result<Review>.Fail("User not found.");
+
         string number = GenerateDigits();
-        var review = Review.Create(request.CurrentUserId, request.Advice, number);
+        var review = Review.Create(request.UserId, request.Advice, number);
        
-        await repo.CreateAsync(review, ct);
+        await _repo.CreateAsync(review, ct);
         return Result<Review>.Ok(review);
     }
 

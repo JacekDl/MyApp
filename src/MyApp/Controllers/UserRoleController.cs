@@ -31,6 +31,11 @@ public class UserRoleController(IReviewPdfService pdfService, IMediator mediator
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await mediator.Send(new CreateReviewCommand(currentUserId, vm.Advice));
 
+        if(!result.IsSuccess || result.Value is null)
+        {
+            ModelState.AddModelError("", result.Error ?? "Could not create review.");
+            return View(vm);
+        }
 
         var pdfBytes = await pdfService.GenerateReviewPdf(result.Value!);
 
@@ -94,8 +99,8 @@ public class UserRoleController(IReviewPdfService pdfService, IMediator mediator
     [HttpGet]
     public async Task<IActionResult> Tokens(string? searchTxt, bool? completed)
     {
-        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var dto = await mediator.Send(new GetReviewsQuery(searchTxt, currentUserId.ToString(), completed));
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var dto = await mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, completed));
 
         ViewBag.Query = searchTxt;
         ViewBag.Completed = completed?.ToString().ToLowerInvariant();

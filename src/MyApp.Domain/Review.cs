@@ -22,9 +22,6 @@ public class Review
 
     public bool Completed { get; set; }
 
-
-
-
     public static Review Create(string userId, string advice, string number)
     {
         return new Review

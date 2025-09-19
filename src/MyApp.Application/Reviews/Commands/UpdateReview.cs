@@ -4,7 +4,7 @@ using MyApp.Application.Common;
 
 namespace MyApp.Application.Reviews.Commands;
 
-public record UpdateReviewCommand(string number, string reviewText) : IRequest<Result<bool>>;
+public record UpdateReviewCommand(string Number, string ReviewText) : IRequest<Result<bool>>;
 
 public class UpdateReviewHandler : IRequestHandler<UpdateReviewCommand, Result<bool>>
 {
@@ -17,12 +17,12 @@ public class UpdateReviewHandler : IRequestHandler<UpdateReviewCommand, Result<b
     {
         var review = await _repo.GetReviewAsync(request.number, ct);
         if (review is null)
-            return Result<bool>.Fail("Review not found");
+            return Result<bool>.Fail("Review not found.");
         if (review.Completed)
-            return Result<bool>.Fail("Review already completed yet");
+            return Result<bool>.Fail("Review already completed.");
         if (review.DateCreated.AddDays(60) < DateTime.UtcNow)
             return Result<bool>.Fail("Review expired");
-        review.Response = request.reviewText;
+        review.Response = request.ReviewText.Trim();
         review.Completed = true;
         await _repo.UpdateAsync(review, ct);
         return Result<bool>.Ok(true);

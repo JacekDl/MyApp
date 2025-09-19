@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Infrastructure;
 using MyApp.Domain;
@@ -40,27 +38,25 @@ builder.Services
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services
-    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Account/Login";
-        options.LogoutPath = "/Account/Logout";
-        options.AccessDeniedPath = "/Account/AccessDenied";
-        options.Cookie.Name = "MyAppAuthCookie";
-        options.SlidingExpiration = true;
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SameSite = SameSiteMode.Strict;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    });
+//builder.Services
+//    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+//    .AddCookie(options =>
+//    {
+//        options.LoginPath = "/Account/Login";
+//        options.LogoutPath = "/Account/Logout";
+//        options.AccessDeniedPath = "/Account/AccessDenied";
+//        options.Cookie.Name = "MyAppAuthCookie";
+//        options.SlidingExpiration = true;
+//        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+//        options.Cookie.HttpOnly = true;
+//        options.Cookie.SameSite = SameSiteMode.Strict;
+//        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+//    });
 
 builder.Services.AddAuthorizationBuilder()
     .SetFallbackPolicy(new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
         .Build());
-
-
 
 var app = builder.Build();
 
@@ -105,8 +101,6 @@ using (var scope = app.Services.CreateScope())
             await userManager.AddToRoleAsync(admin, adminRole);
         }
     }
-
-    
 }
 
 if (!app.Environment.IsDevelopment())
