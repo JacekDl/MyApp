@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MyApp.Domain;
 using System.Security.Claims;
 using MyApp.ViewModels;
 using MediatR;
@@ -69,36 +66,6 @@ public class AccountController : Controller
     }
     #endregion
 
-    private RedirectToActionResult RedirectAfterSignIn(User user)
-    {
-        if (User.IsInRole("Admin") || string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
-            return RedirectToAction("ViewUsers", "Admin");
-
-        return RedirectToAction("Reviews", "UserRole");
-    }
-
-    private async Task SignInAsync(User user, bool isPersistent)
-    {
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Email),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role)
-        };
-
-        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var principal = new ClaimsPrincipal(identity);
-
-        var props = new AuthenticationProperties
-        {
-            IsPersistent = isPersistent,
-            ExpiresUtc = isPersistent ? DateTimeOffset.UtcNow.AddDays(7) : DateTimeOffset.UtcNow.AddMinutes(30)
-        };
-
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
-    }
-
     #region LoginUser
     [HttpGet, AllowAnonymous]
     public IActionResult Login(string? returnUrl = null)
@@ -116,36 +83,39 @@ public class AccountController : Controller
             return View(vm);
         }
 
-        var result = await _mediator.Send(new GetUserQuery(vm.Email, vm.Password));
+        var result = await _mediator.Send(new LoginCommand(vm.Email, vm.Password, vm.RememberMe));
 
-        if (!result.IsSuccess)
+        switch(result.Status)
         {
-            ModelState.AddModelError(string.Empty, result.Error!);
-            return View(vm);
+            case LoginStatus.Succeeded:
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                    return Redirect(returnUrl);
+                if (string.Equals(result.Role, "Admin", StringComparison.OrdinalIgnoreCase))
+                    return RedirectToAction("ViewUsers", "Admin");
+                return RedirectToAction("Reviews", "UserRole");
+
+            case LoginStatus.NotAllowed:
+            case LoginStatus.LockedOut:
+            case LoginStatus.WrongCredentials:
+                ModelState.AddModelError(string.Empty, result.Message ?? "Login failed.");
+                return View(vm);
         }
 
-        if (!result.Value!.EmailConfirmed)
-        {
-            ModelState.AddModelError(string.Empty, "Please confirm your email before logging in.");
-            return View(vm);
-        }
-
-        await SignInAsync(result.Value!, vm.RememberMe);
-        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-        {
-            return Redirect(returnUrl);
-        }
-        return RedirectAfterSignIn(result.Value!);
+        ModelState.AddModelError(string.Empty, "Login failed.");
+        return View(vm);
     }
+
     #endregion
 
     #region LogoutUser
+
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await _mediator.Send(new LogoutCommand());
         return RedirectToAction("Index", "Home");
     }
+
     #endregion
 
     #region UserDetails
