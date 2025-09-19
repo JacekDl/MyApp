@@ -10,27 +10,29 @@ public record UpdateUserPasswordCommand(string Id, string CurrentPassword, strin
 
 public class UpdateUserPasswordHandler : IRequestHandler<UpdateUserPasswordCommand, Result<User>>
 {
-    private readonly IUserRepository _repo;
-    private readonly IPasswordHasher<User> _hasher;
+    private readonly UserManager<User> _userManager;
+    private readonly SignInManager<User> _signInManager;
 
-    public UpdateUserPasswordHandler(IUserRepository repo, IPasswordHasher<User> hasher)
+    public UpdateUserPasswordHandler(UserManager<User> userManager, SignInManager<User> signInManager)
     {
-        _repo = repo;
-        _hasher = hasher;
+        _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     public async Task<Result<User>> Handle(UpdateUserPasswordCommand request, CancellationToken ct)
     {
-        var user = await _repo.GetByIdAsync(request.Id, ct);
+        var user = await _userManager.FindByIdAsync(request.Id);
         if (user is null)
             return Result<User>.Fail("User not found");
 
-        var result = _hasher.VerifyHashedPassword(user, user.PasswordHash, request.CurrentPassword);
-        if (result == PasswordVerificationResult.Failed)
+        var change = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+        if (!change.Succeeded)
+        {
+            var message = string.Join("; ", change.Errors.Select(e => $"{e.Code}: {e.Description}"));
             return Result<User>.Fail("Wrong password");
+        }
 
-        user.PasswordHash = _hasher.HashPassword(user, request.NewPassword);
-        _repo.UpdateUser(user, ct);
+        await _signInManager.RefreshSignInAsync(user);
         return Result<User>.Ok(user);
     }
 }

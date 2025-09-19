@@ -5,7 +5,7 @@ namespace MyApp.ViewModels;
 public class EditProfileViewModel
 {
     [MaxLength(16)]
-    public string? Name { get; set; }
+    public string? DisplayName { get; set; }
 
     [MaxLength(32)]
     public string? PharmacyName { get; set; }

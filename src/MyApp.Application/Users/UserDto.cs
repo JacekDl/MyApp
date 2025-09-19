@@ -4,7 +4,7 @@ public record UserDto(
     string Id,
     string Email,
     string Role,
-    string UserName,
+    string DisplayName,
     string PharmacyName,
     string PharmacyCity,
     DateTime CreatedUtc

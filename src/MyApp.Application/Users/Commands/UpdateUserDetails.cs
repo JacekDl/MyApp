@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Identity;
 using MyApp.Application.Abstractions;
 using MyApp.Application.Common;
 using MyApp.Domain;
@@ -10,21 +11,33 @@ public record UpdateUserDetailsCommand(string Id, string? Name, string? Pharmacy
 
 public class UpdateUserDetailsHandler : IRequestHandler<UpdateUserDetailsCommand, Result<User>>
 {
-    private readonly IUserRepository _repo;
-    public UpdateUserDetailsHandler(IUserRepository repo)
+    private readonly UserManager<User> _userManager;
+    private readonly SignInManager<User> _signInManager;
+
+    public UpdateUserDetailsHandler(UserManager<User> userManager, SignInManager<User> signInManager)
     {
-        _repo = repo;
+        _userManager = userManager;
+        _signInManager = signInManager;
     }
     public async Task<Result<User>> Handle(UpdateUserDetailsCommand request, CancellationToken ct)
     {
-        var user = await _repo.GetByIdAsync(request.Id, ct);
+        var user = await _userManager.FindByIdAsync(request.Id);
         if (user is null)
             return Result<User>.Fail("User not found");
 
-        user.UserName = request.Name?.Trim();
+        if (!string.IsNullOrWhiteSpace(request.Name))
+            user.DisplayName = request.Name.Trim();
+
         user.PharmacyName = request.PharmacyName?.Trim();
         user.PharmacyCity = request.PharmacyCity?.Trim();
-        _repo.UpdateUser(user, ct);
+
+        var update = await _userManager.UpdateAsync(user);
+        if (!update.Succeeded)
+        {
+            var message = string.Join("; ", update.Errors.Select(e => $"{e.Code}: {e.Description}"));
+            return Result<User>.Fail(message);
+        }
+
         return Result<User>.Ok(user);
     }
 }
