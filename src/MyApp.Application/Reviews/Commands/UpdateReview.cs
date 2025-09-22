@@ -1,6 +1,7 @@
 ﻿using MediatR;
-using MyApp.Application.Abstractions;
+using Microsoft.EntityFrameworkCore;
 using MyApp.Application.Common;
+using MyApp.Application.Data;
 
 namespace MyApp.Application.Reviews.Commands;
 
@@ -8,14 +9,14 @@ public record UpdateReviewCommand(string Number, string ReviewText) : IRequest<R
 
 public class UpdateReviewHandler : IRequestHandler<UpdateReviewCommand, Result<bool>>
 {
-    private readonly IReviewRepository _repo;
-    public UpdateReviewHandler(IReviewRepository repo)
+    private readonly ApplicationDbContext _db;
+    public UpdateReviewHandler(ApplicationDbContext db)
     {
-        _repo = repo;
+        _db = db;
     }
     public async Task<Result<bool>> Handle(UpdateReviewCommand request, CancellationToken ct)
     {
-        var review = await _repo.GetReviewAsync(request.Number, ct);
+        var review = await _db.Reviews.SingleOrDefaultAsync(r => r.Number == request.Number, ct);
         if (review is null)
             return Result<bool>.Fail("Review not found.");
         if (review.Completed)
@@ -24,7 +25,8 @@ public class UpdateReviewHandler : IRequestHandler<UpdateReviewCommand, Result<b
             return Result<bool>.Fail("Review expired");
         review.Response = request.ReviewText.Trim();
         review.Completed = true;
-        await _repo.UpdateAsync(review, ct);
+        _db.Update(review);
+        await _db.SaveChangesAsync(ct);
         return Result<bool>.Ok(true);
     }
 }
