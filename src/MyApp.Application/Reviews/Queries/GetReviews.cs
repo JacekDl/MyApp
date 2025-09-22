@@ -1,33 +1,58 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using MyApp.Application.Abstractions;
+using MyApp.Application.Data;
 using MyApp.Domain;
 
 namespace MyApp.Application.Reviews.Queries;
 
-public record GetReviewsQuery(string? searchTxt, string? userId, bool? completed, string? userEmail = null) : IRequest<List<ReviewDto>>;
+public record GetReviewsQuery(string? SearchTxt, string? UserId, bool? Completed, string? UserEmail = null) : IRequest<List<ReviewDto>>;
 
 public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, List<ReviewDto>>
 {
-    private readonly IReviewRepository _repo;
     private readonly UserManager<User> _userManager;
+    private readonly ApplicationDbContext _db;
 
-    public GetReviewsHandler(UserManager<User> userManager, IReviewRepository repo)
+    public GetReviewsHandler(UserManager<User> userManager, ApplicationDbContext db)
     {
-        _repo = repo;
         _userManager = userManager;
+        _db = db;
     }
     public async Task<List<ReviewDto>> Handle(GetReviewsQuery request, CancellationToken ct)
     {
-        string? effectiveUserId = request.userId;
+        string? effectiveUserId = request.UserId;
 
-        if(string.IsNullOrWhiteSpace(effectiveUserId) && !string.IsNullOrWhiteSpace(request.userEmail))
+        if(string.IsNullOrWhiteSpace(effectiveUserId) && !string.IsNullOrWhiteSpace(request.UserEmail))
         {
-            var user = await _userManager.FindByEmailAsync(request.userEmail.Trim());
+            var user = await _userManager.FindByEmailAsync(request.UserEmail.Trim());
             effectiveUserId = user?.Id;
         }
-        
-        var list = await _repo.GetReviews(request.searchTxt, request.userId, request.completed, ct);
+
+        var query = _db.Reviews
+            .AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(request.SearchTxt))
+        {
+            var pattern = $"%{request.SearchTxt.Trim()}%";
+            query = query.Where(r =>
+                EF.Functions.Like(r.Advice ?? string.Empty, pattern) ||
+                EF.Functions.Like(r.Response ?? string.Empty, pattern));
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.UserId))
+        {
+            query = query.Where(r => r.CreatedByUserId == request.UserId);
+        }
+
+        if (request.Completed.HasValue)
+        {
+            query = query.Where(r => r.Completed == request.Completed.Value);
+        }
+
+        var list = await query
+            .OrderByDescending(r => r.DateCreated)
+            .ToListAsync(ct);
 
         return list
             .Select(r => new ReviewDto(
