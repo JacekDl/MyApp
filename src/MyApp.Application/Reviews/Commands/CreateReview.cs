@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using MyApp.Application.Abstractions;
 using MyApp.Application.Common;
+using MyApp.Application.Data;
 using MyApp.Domain;
 using System.Security.Cryptography;
 
@@ -12,14 +13,12 @@ public record CreateReviewCommand(string UserId, string Advice) : IRequest<Resul
 public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, Result<Review>>
 {
     private readonly UserManager<User> _userManager;
-    private readonly IReviewRepository _repo;
+    private readonly ApplicationDbContext _db;
 
-
-    public CreateReviewHandler(UserManager<User> userManager, IReviewRepository repo)
+    public CreateReviewHandler(UserManager<User> userManager, ApplicationDbContext db)
     {
         _userManager = userManager;
-        _repo = repo;
-
+        _db = db;
     }
 
     public async Task<Result<Review>> Handle(CreateReviewCommand request, CancellationToken ct)
@@ -30,8 +29,9 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, Result<R
 
         string number = GenerateDigits();
         var review = Review.Create(request.UserId, request.Advice, number);
-       
-        await _repo.CreateAsync(review, ct);
+
+        _db.Add(review);
+        await _db.SaveChangesAsync(ct);
         return Result<Review>.Ok(review);
     }
 
