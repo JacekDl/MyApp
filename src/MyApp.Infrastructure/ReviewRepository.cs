@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MyApp.Application.Abstractions;
+using MyApp.Application.Data;
 using MyApp.Domain;
 
 namespace MyApp.Infrastructure;

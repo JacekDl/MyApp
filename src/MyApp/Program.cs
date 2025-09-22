@@ -7,6 +7,7 @@ using MyApp.Services;
 using QuestPDF.Infrastructure;
 using MyApp.Application.Abstractions;
 using MyApp.Application.Users.Queries;
+using MyApp.Application.Data;
 
 
 QuestPDF.Settings.License = LicenseType.Community;

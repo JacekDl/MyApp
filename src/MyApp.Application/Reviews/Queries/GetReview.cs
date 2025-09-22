@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using MyApp.Application.Abstractions;
 using MyApp.Application.Common;
+using MyApp.Application.Data;
 
 namespace MyApp.Application.Reviews.Queries;
 
@@ -10,6 +11,7 @@ public class GetReviewHandler : IRequestHandler<GetReviewQuery, Result<ReviewDto
 {
 
     private readonly IReviewRepository _repo;
+    
     public GetReviewHandler(IReviewRepository repo)
     {
         _repo = repo;

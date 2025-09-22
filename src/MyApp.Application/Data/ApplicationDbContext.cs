@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain;
 
-namespace MyApp.Infrastructure;
+namespace MyApp.Application.Data;
 
 public class ApplicationDbContext : IdentityDbContext<User>
 {
