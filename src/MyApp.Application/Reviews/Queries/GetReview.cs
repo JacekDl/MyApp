@@ -1,24 +1,26 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using MyApp.Application.Abstractions;
 using MyApp.Application.Common;
 using MyApp.Application.Data;
 
 namespace MyApp.Application.Reviews.Queries;
 
-public record GetReviewQuery(string number) : IRequest<Result<ReviewDto>>;
+public record GetReviewQuery(string Number) : IRequest<Result<ReviewDto>>;
 
 public class GetReviewHandler : IRequestHandler<GetReviewQuery, Result<ReviewDto>>
 {
 
-    private readonly IReviewRepository _repo;
+    private readonly ApplicationDbContext _db;
     
-    public GetReviewHandler(IReviewRepository repo)
+    public GetReviewHandler(ApplicationDbContext db)
     {
-        _repo = repo;
+        _db = db;
     }
     public async Task<Result<ReviewDto>> Handle(GetReviewQuery request, CancellationToken ct)
     {
-        var review = await _repo.GetReviewAsync(request.number, ct);
+        var review = await _db.Reviews.SingleOrDefaultAsync(r => r.Number == request.Number, ct);
+
         if (review is null)
             return Result<ReviewDto>.Fail("Review not found");
 
