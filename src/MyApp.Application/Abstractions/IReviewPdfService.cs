@@ -1,6 +1,6 @@
 ﻿using MyApp.Domain;
 
-namespace MyApp.Services;
+namespace MyApp.Application.Abstractions;
 
 public interface IReviewPdfService
 {

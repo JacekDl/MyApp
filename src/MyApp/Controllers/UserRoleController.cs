@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyApp.Application.Abstractions;
 using MyApp.Application.Reviews.Commands;
 using MyApp.Application.Reviews.Queries;
-using MyApp.Services;
 using MyApp.ViewModels;
 using System.Security.Claims;
 
