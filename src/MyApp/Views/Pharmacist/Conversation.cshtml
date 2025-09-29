@@ -1,0 +1,29 @@
+﻿@model MyApp.Application.Reviews.ConversationDto
+
+@{
+    ViewData["Title"] = "Conversation";
+}
+
+<h2>Conversation @Model.Number</h2>
+
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th style="width:200px">When(UTC)</th>
+            <th style="width:220px">Who</th>
+            <th>Text</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var e in Model.Entries)
+        {
+            <tr>
+                <td>@e.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@(string.IsNullOrEmpty(e.UserId) ? "Patient(anonymous)" : $"User: { e.UserId}")</td>
+                <td>@e.Text</td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Tokens" class="btn btn-secondary">Back</a>
