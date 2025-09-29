@@ -37,8 +37,7 @@ else
             <tr>
                 <th>Created</th>
                 <th>Number</th>
-                <th>Advice</th>
-                <th>Review</th>
+                <th>Text</th>
                 <th>Completed</th>
             </tr>
         </thead>
@@ -48,8 +47,7 @@ else
             <tr>
                 <td>@rev.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
                 <td>@rev.Number</td>
-                <td>@rev.Advice</td>
-                <td>@rev.ReviewText</td>
+                <td>@rev.Text</td>
                 <td>@(rev.Completed ? "Yes" : "No")</td>
             </tr>        
 

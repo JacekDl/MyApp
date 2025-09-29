@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MyApp.Services;
 using MediatR;
 using MyApp.Application.Users.Queries;
 using MyApp.Application.Reviews.Queries;

@@ -3,10 +3,10 @@
 public record ReviewDto
 (
     int Id,
-    string CreatedByUserId,
+    string PharmacistId,
     string Number,
     DateTime DateCreated,
-    string Advice,
-    string ReviewText,
+    string Text,
+    string ReviewText, //not used
     bool Completed
 );

@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MyApp.Application.Abstractions;
 using MyApp.Application.Data;
 using MyApp.Domain;
 
@@ -54,25 +53,30 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, List<ReviewDto
 
         var list = await query
             .OrderByDescending(r => r.DateCreated)
+            .Select(r => new
+            {
+                r.Id,
+                r.PharmacistId,
+                r.Number,
+                r.DateCreated,
+                r.Completed,
+                FirstEntryText = r.Entries
+                    .OrderBy(e => e.CreatedUtc)
+                    .Select(e => e.Text)
+                    .FirstOrDefault() ?? string.Empty
+            })
             .ToListAsync(ct);
 
         return list
             .Select(r =>
-            {
-                var firstEntryText = r.Entries
-                .OrderBy(e => e.CreatedUtc)
-                .Select(e => e.Text)
-                .FirstOrDefault() ?? string.Empty;
-
-                return new ReviewDto(
+                 new ReviewDto(
                     r.Id,
                     r.PharmacistId,
                     r.Number,
                     r.DateCreated,
-                    firstEntryText,
+                    r.FirstEntryText,
                     string.Empty,
-                    r.Completed);
-            })
+                    r.Completed))
             .ToList();
     }
 }

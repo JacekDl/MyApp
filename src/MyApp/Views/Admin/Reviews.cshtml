@@ -23,8 +23,8 @@
 
 <div class="mb-3">
     <form method="get" asp-action="Reviews" class="d-flex gap-2">
-        <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Search in Advice or Review text" />
-        <input type="text" name="userId" value="@userId" class="form-control" placeholder="Search for User" />
+        <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Search for text..." />
+        <input type="text" name="userId" value="@userId" class="form-control" placeholder="Search for user" />
         <select name="completed" class="form-select">
             <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">All</option>
             <option value="true" selected=@(completed == "true" ? "selected" : null)>Completed</option>
@@ -47,8 +47,7 @@ else
                 <tr>
                     <th scope="col">Date Created</th>
                     <th scope="col">UserId</th>
-                    <th scope="col">Advice</th>
-                    <th scope="col">Review</th>
+                    <th scope="col">Text</th>
                     <th scope="col">Completed</th>
                     <th scope="col"></th>
                 </tr>
@@ -58,10 +57,9 @@ else
             {
                 <tr>
                     <td>@user.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
-                    <td>@user.CreatedByUserId</td>
-                    <td>@user.Advice</td>
-                    <td>@user.ReviewText</td>
-                        <td>@(user.Completed ? "Yes" : "No")</td>
+                    <td>@user.PharmacistId</td>
+                    <td>@user.Text</td>
+                    <td>@(user.Completed ? "Yes" : "No")</td>
                     <td>
                         <form asp-action="RemoveReview" method="post" asp-route-id="@user.Id" style="display:inline">
                             @Html.AntiForgeryToken()

@@ -59,7 +59,7 @@ public class UserRoleController(IReviewPdfService pdfService, IMediator mediator
         var review = result.Value!;
         var vm = new PublicReviewEditViewModel
         {
-            Advice = review.Advice,
+            Advice = review.Text,
             Number = review.Number,
             ReviewText = review.ReviewText ?? string.Empty
         };

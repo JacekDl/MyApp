@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using MyApp.Application.Abstractions;
 using MyApp.Application.Common;
 using MyApp.Application.Data;
 
