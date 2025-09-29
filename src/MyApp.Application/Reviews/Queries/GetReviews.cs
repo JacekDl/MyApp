@@ -36,13 +36,15 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, List<ReviewDto
         {
             var pattern = $"%{request.SearchTxt.Trim()}%";
             query = query.Where(r =>
-                EF.Functions.Like(r.Advice ?? string.Empty, pattern) ||
-                EF.Functions.Like(r.Response ?? string.Empty, pattern));
+                EF.Functions.Like(r.Entries
+                .OrderBy(e => e.CreatedUtc)
+                .Select(e => e.Text)
+                .FirstOrDefault() ?? string.Empty, pattern));
         }
 
         if (!string.IsNullOrWhiteSpace(request.UserId))
         {
-            query = query.Where(r => r.CreatedByUserId == request.UserId);
+            query = query.Where(r => r.PharmacistId == request.UserId);
         }
 
         if (request.Completed.HasValue)
@@ -55,14 +57,22 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, List<ReviewDto
             .ToListAsync(ct);
 
         return list
-            .Select(r => new ReviewDto(
-                r.Id,
-                r.CreatedByUserId,
-                r.Number,
-                r.DateCreated,
-                r.Advice,
-                r.Response ?? string.Empty,
-                r.Completed))
+            .Select(r =>
+            {
+                var firstEntryText = r.Entries
+                .OrderBy(e => e.CreatedUtc)
+                .Select(e => e.Text)
+                .FirstOrDefault() ?? string.Empty;
+
+                return new ReviewDto(
+                    r.Id,
+                    r.PharmacistId,
+                    r.Number,
+                    r.DateCreated,
+                    firstEntryText,
+                    string.Empty,
+                    r.Completed);
+            })
             .ToList();
     }
 }

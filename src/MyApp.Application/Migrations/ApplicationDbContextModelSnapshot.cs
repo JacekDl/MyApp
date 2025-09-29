@@ -4,11 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyApp.Application.Data;
-using MyApp.Infrastructure;
 
 #nullable disable
 
-namespace MyApp.Infrastructure.Migrations
+namespace MyApp.Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -146,22 +145,43 @@ namespace MyApp.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("MyApp.Domain.Entry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ReviewId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Entries");
+                });
+
             modelBuilder.Entity("MyApp.Domain.Review", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Advice")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<bool>("Completed")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("CreatedByUserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("DateCreated")
                         .ValueGeneratedOnAdd()
@@ -173,12 +193,18 @@ namespace MyApp.Infrastructure.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Response")
+                    b.Property<string>("PatientId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PharmacistId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedByUserId");
+                    b.HasIndex("PatientId");
+
+                    b.HasIndex("PharmacistId");
 
                     b.ToTable("Reviews");
                 });
@@ -321,15 +347,46 @@ namespace MyApp.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MyApp.Domain.Review", b =>
+            modelBuilder.Entity("MyApp.Domain.Entry", b =>
                 {
-                    b.HasOne("MyApp.Domain.User", "CreatedByUser")
-                        .WithMany("Reviews")
-                        .HasForeignKey("CreatedByUserId")
+                    b.HasOne("MyApp.Domain.Review", "Review")
+                        .WithMany("Entries")
+                        .HasForeignKey("ReviewId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CreatedByUser");
+                    b.HasOne("MyApp.Domain.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Review");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MyApp.Domain.Review", b =>
+                {
+                    b.HasOne("MyApp.Domain.User", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("MyApp.Domain.User", "Pharmacist")
+                        .WithMany("Reviews")
+                        .HasForeignKey("PharmacistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+
+                    b.Navigation("Pharmacist");
+                });
+
+            modelBuilder.Entity("MyApp.Domain.Review", b =>
+                {
+                    b.Navigation("Entries");
                 });
 
             modelBuilder.Entity("MyApp.Domain.User", b =>

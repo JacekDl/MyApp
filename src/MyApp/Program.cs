@@ -16,7 +16,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        b => b.MigrationsAssembly("MyApp.Application")
+        ));
 
 builder.Services.AddSingleton<IReviewPdfService, ReviewPdfService>();
 builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
@@ -35,20 +38,6 @@ builder.Services
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-//builder.Services
-//    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-//    .AddCookie(options =>
-//    {
-//        options.LoginPath = "/Account/Login";
-//        options.LogoutPath = "/Account/Logout";
-//        options.AccessDeniedPath = "/Account/AccessDenied";
-//        options.Cookie.Name = "MyAppAuthCookie";
-//        options.SlidingExpiration = true;
-//        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-//        options.Cookie.HttpOnly = true;
-//        options.Cookie.SameSite = SameSiteMode.Strict;
-//        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-//    });
 
 builder.Services.AddAuthorizationBuilder()
     .SetFallbackPolicy(new AuthorizationPolicyBuilder()

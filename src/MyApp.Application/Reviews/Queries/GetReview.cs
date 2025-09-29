@@ -19,7 +19,21 @@ public class GetReviewHandler : IRequestHandler<GetReviewQuery, Result<ReviewDto
     }
     public async Task<Result<ReviewDto>> Handle(GetReviewQuery request, CancellationToken ct)
     {
-        var review = await _db.Reviews.SingleOrDefaultAsync(r => r.Number == request.Number, ct);
+        var review = await _db.Reviews
+           .Where(r => r.Number == request.Number)
+           .Select(x => new
+           {
+               x.Id,
+               x.PharmacistId,
+               x.Number,
+               x.DateCreated,
+               x.Completed,
+               FirstEntryText = x.Entries
+               .OrderBy(e => e.CreatedUtc)
+               .Select(e => e.Text)
+               .FirstOrDefault()
+           })
+           .SingleOrDefaultAsync(ct);
 
         if (review is null)
             return Result<ReviewDto>.Fail("Review not found");
@@ -32,11 +46,11 @@ public class GetReviewHandler : IRequestHandler<GetReviewQuery, Result<ReviewDto
 
         var dto = new ReviewDto(
             review.Id,
-            review.CreatedByUserId,
+            review.PharmacistId,
             review.Number,
             review.DateCreated,
-            review.Advice,
-            review.Response!,
+            review.FirstEntryText ?? string.Empty,
+            string.Empty,
             review.Completed
             );
 

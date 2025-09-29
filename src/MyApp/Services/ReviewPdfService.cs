@@ -9,6 +9,11 @@ public class ReviewPdfService : IReviewPdfService
 {
     public Task<byte[]> GenerateReviewPdf(Review review)
     {
+        var firstEntry = review.Entries?
+            .OrderBy(e => e.CreatedUtc)
+            .Select(e => e.Text)
+            .FirstOrDefault() ?? string.Empty;
+
         var pdfBytes = Document.Create(container =>
         {
             container.Page(page =>
@@ -22,7 +27,7 @@ public class ReviewPdfService : IReviewPdfService
                     col.Item().Text(t =>
                     {
                         t.Span("Advice: ").Bold();
-                        t.Span(review.Advice ?? string.Empty);
+                        t.Span(firstEntry ?? string.Empty);
                     });
 
                     col.Item().Text(t =>

@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="13.0.0" />
-    <!--<PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />-->
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
@@ -21,8 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MyApp.Application\MyApp.Application.csproj" />
-    <!--<ProjectReference Include="..\MyApp.Domain\MyApp.Domain.csproj" /> -->
-    <ProjectReference Include="..\MyApp.Infrastructure\MyApp.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
