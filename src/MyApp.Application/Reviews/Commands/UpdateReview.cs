@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MyApp.Application.Common;
 using MyApp.Application.Data;
+using MyApp.Domain;
 
 namespace MyApp.Application.Reviews.Commands;
 
@@ -14,6 +15,33 @@ public class UpdateReviewHandler : IRequestHandler<UpdateReviewCommand, Result<b
     {
         _db = db;
     }
-    public Task<Result<bool>> Handle(UpdateReviewCommand request, CancellationToken ct)
-            => Task.FromResult(Result<bool>.Ok(true));
+    public async Task<Result<bool>> Handle(UpdateReviewCommand request, CancellationToken ct)
+    {
+        var review = await _db.Reviews
+            .Include(r => r.Entries)
+            .SingleOrDefaultAsync(r => r.Number == request.Number, ct);
+
+        if (review is null)
+            return Result<bool>.Fail("Review not found.");
+
+        if (review.Completed)
+            return Result<bool>.Fail("Review has been already submitted.");
+
+        if (review.DateCreated.AddDays(7) < DateTime.Now)
+            return Result<bool>.Fail("Review has expired.");
+
+        var text = (request.ReviewText ?? string.Empty).Trim();
+
+        review.Entries.Add(new Entry
+        {
+            UserId = null,
+            Text = text,
+            ReviewId = review.Id
+        });
+
+        review.Completed = true;
+
+        await _db.SaveChangesAsync();
+        return Result<bool>.Ok(true);
+    }
 }
