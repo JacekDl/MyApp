@@ -10,7 +10,7 @@ using System.Security.Claims;
 namespace MyApp.Controllers;
 
 [Authorize(Roles = "User")]
-public class UserRoleController(IReviewPdfService pdfService, IMediator mediator) : Controller
+public class PharmacistController(IReviewPdfService pdfService, IMediator mediator) : Controller
 {
 
     #region GenerateReview

@@ -92,7 +92,7 @@ public class AccountController : Controller
                     return Redirect(returnUrl);
                 if (string.Equals(result.Role, "Admin", StringComparison.OrdinalIgnoreCase))
                     return RedirectToAction("ViewUsers", "Admin");
-                return RedirectToAction("Reviews", "UserRole");
+                return RedirectToAction("Reviews", "Pharmacist");
 
             case LoginStatus.NotAllowed:
             case LoginStatus.LockedOut:

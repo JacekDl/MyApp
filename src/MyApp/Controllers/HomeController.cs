@@ -14,7 +14,7 @@ public class HomeController : Controller
             {
                 return RedirectToAction("ViewUsers", "Admin");
             }
-            return RedirectToAction("Reviews", "UserRole");
+            return RedirectToAction("Reviews", "Pharmacist");
         }
         return View();
     }

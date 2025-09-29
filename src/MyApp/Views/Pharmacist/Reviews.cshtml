@@ -9,7 +9,7 @@
 
 <partial name="~/Views/Shared/_UserRoleNav.cshtml" />
 
-<form asp-action="Reviews" asp-asp-controller="UserRole" method="post" target="_blank">
+<form asp-action="Reviews" asp-asp-controller="Pharmacist" method="post" target="_blank">
     @Html.AntiForgeryToken()
     <div class="mb-3">
         <label asp-for="Advice" class="form-label">Enter text to include in PDF</label>
