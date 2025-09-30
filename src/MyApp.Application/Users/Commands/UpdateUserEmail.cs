@@ -17,7 +17,6 @@ public class UpdateUserEmailHandler : IRequestHandler<UpdateUserEmailCommand, Re
     {
         _userManager = userManager;
         _signInManager = signInManager;
-
     }
 
     public async Task<Result<User>> Handle(UpdateUserEmailCommand request, CancellationToken ct)
@@ -46,6 +45,7 @@ public class UpdateUserEmailHandler : IRequestHandler<UpdateUserEmailCommand, Re
         }
         
         user.UserName = newEmail;
+        user.EmailConfirmed = false;
         var update = await _userManager.UpdateAsync(user);
         if(!update.Succeeded)
         {

@@ -13,18 +13,6 @@ public class FileEmailSender : IEmailSender
 
     public Task SendEmailAsync(string to, string subject, string htmlBody, CancellationToken ct = default)
     {
-        //var fileName = $"{DateTime.UtcNow:yyyyMMdd_HHmmss_fff}_{Guid.NewGuid()}.eml";
-        //var filePath = Path.Combine(_root, fileName);
-
-        //var content = $"""
-        //    To: {to}
-        //    Subject: {subject}
-        //    Date: {DateTime.UtcNow:O}
-        //    Content-Type: text/html; charset=utf-8
-
-        //    {htmlBody}
-        //    """;
-
         var file = Path.Combine(_root, $"{DateTime.UtcNow:yyyyMMdd_HHmmssffff}_{Guid.NewGuid():N}.html");
         var content = $"""
         <h3>To: {System.Net.WebUtility.HtmlEncode(to)}</h3>

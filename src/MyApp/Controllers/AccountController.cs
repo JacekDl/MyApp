@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using MyApp.ViewModels;
-using MediatR;
 using MyApp.Application.Users.Commands;
 using MyApp.Application.Users.Queries;
+using MyApp.ViewModels;
+using System.Security.Claims;
 
 namespace MyApp.Controllers;
 
@@ -218,8 +220,13 @@ public class AccountController : Controller
             return View(vm);
         }
 
-        TempData["Info"] = "Email updated.";
-        return RedirectToAction(nameof(Details));
+        var callbackBase = Url.Action(nameof(ConfirmEmail), "Account", null, Request.Scheme)!;
+        await _mediator.Send(new SendEmailConfirmationCommand(currentUserId, callbackBase));
+
+        await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+
+        TempData["Info"] = "We sent you a confirmation email. Please check your inbox.";
+        return RedirectToAction(nameof(ConfirmEmailSent));
     }
     #endregion
 
