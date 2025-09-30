@@ -46,8 +46,6 @@ public class AccountController : Controller
         var callbackBase = Url.Action(nameof(ConfirmEmail), "Account", null, Request.Scheme)!;
         await _mediator.Send(new SendEmailConfirmationCommand(user.Id, callbackBase));
 
-
-        TempData["Info"] = "We sent you a confirmation email. Please check your inbox.";
         return RedirectToAction(nameof(ConfirmEmailSent));
     }
 
@@ -225,7 +223,6 @@ public class AccountController : Controller
 
         await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
 
-        TempData["Info"] = "We sent you a confirmation email. Please check your inbox.";
         return RedirectToAction(nameof(ConfirmEmailSent));
     }
     #endregion
