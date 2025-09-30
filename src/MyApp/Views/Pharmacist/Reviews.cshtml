@@ -17,8 +17,20 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Generate PDF</button>
-    <a class="btn btn-outline-primary" asp-action="Reviews">Clear</a>
+    <!-- <a class="btn btn-outline-primary" asp-action="Reviews">Clear</a> -->
+    <button type="button" class="btn btn-secondary" id="clearBtn">Clear</button>
     <p class="text-muted mt-2">
         The PDF will open in a new tab.
     </p>
 </form>
+
+@section Scripts {
+    <script>
+        document.getElementById("clearBtn").addEventListener("click", function () {
+            const form = this.closest("form");
+            if (form) {
+                form.reset();
+            }
+        });
+    </script>
+}
