@@ -9,9 +9,9 @@
 <table class="table table-sm table-striped">
     <thead>
         <tr>
-            <th style="width:200px">When(UTC)</th>
-            <th style="width:220px">Who</th>
-            <th>Text</th>
+            <th style="width:200px">Date</th>
+            <th style="width:220px">Name</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -19,7 +19,7 @@
         {
             <tr>
                 <td>@e.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
-                <td>@(string.IsNullOrEmpty(e.UserId) ? "Patient(anonymous)" : $"User: { e.UserId}")</td>
+                <td>@(string.IsNullOrEmpty(e.UserId) ? "" : $"{e.UserId}")</td>
                 <td>@e.Text</td>
         </tr>
         }
