@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using MyApp.Application.Abstractions;
 using MyApp.Application.Common;
 using MyApp.Domain;
 using Microsoft.AspNetCore.Identity;
@@ -8,6 +7,17 @@ namespace MyApp.Application.Users.Commands;
 
 public record CreateUserCommand(string Email, string Password) : IRequest<Result<User>>;
 
+
+/// <summary>
+/// Handles the <see cref="CreateUserCommand"/> by creating a new user account.
+/// </summary>
+/// <param name="request">
+/// The command containing the user's email and password to create the account.
+/// </param>
+/// /// <returns>
+/// A <see cref="Result{User}"/> that contains the newly created <see cref="User"/> 
+/// if successful, or a failure result with an error message if the creation fails.
+/// </returns>
 public class CreateUserHandler : IRequestHandler<CreateUserCommand, Result<User>>
 {
     private readonly UserManager<User> _userManager;
@@ -20,7 +30,7 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, Result<User>
 
     public async Task<Result<User>> Handle(CreateUserCommand request, CancellationToken ct)
     {
-        var email = request.Email.Trim(); //.ToLower()?
+        var email = request.Email.Trim();
         var existing = await _userManager.FindByEmailAsync(email);
 
         if (existing is not null)
