@@ -1,0 +1,14 @@
+﻿@model MyApp.ViewModels.PublicReviewAccessViewModel
+
+<h2>Review @Model.Number</h2>
+
+<p>@Model.Advice</p>
+
+<div>
+    <a asp-controller="Patient" asp-action="PublicEdit" asp-route-number="@Model.Number"class="btn btn-primary">
+        Leave a comment
+    </a>
+    <a asp-controller="Account" asp-action="Register" asp-route-number="@Model.Number" class="btn btn-primary">
+        Login
+    </a>
+</div>

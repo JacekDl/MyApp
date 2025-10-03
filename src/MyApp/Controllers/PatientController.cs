@@ -12,6 +12,25 @@ public class PatientController(IMediator mediator) : Controller
     #region PublicEditReview
 
     [AllowAnonymous, HttpGet("/r/{number}")]
+    public async Task<IActionResult> PublicAccess(string number)
+    {
+        var result = await mediator.Send(new GetReviewQuery(number));
+
+        if (!result.IsSuccess)
+        {
+            return NotFound(); //View with error message can be implemented here.
+        }
+
+        var review = result.Value!;
+        var vm = new PublicReviewAccessViewModel
+        {
+            Advice = review.Text,
+            Number = review.Number,
+        };
+        return View(vm);
+    }
+
+    [AllowAnonymous, HttpGet("/r/{number}/edit")]
     public async Task<IActionResult> PublicEdit(string number)
     {
         var result = await mediator.Send(new GetReviewQuery(number));
@@ -32,7 +51,7 @@ public class PatientController(IMediator mediator) : Controller
     }
 
 
-    [AllowAnonymous, HttpPost("/r/{number}"), ValidateAntiForgeryToken]
+    [AllowAnonymous, HttpPost("/r/{number}/edit"), ValidateAntiForgeryToken]
     public async Task<IActionResult> PublicEdit(string number, PublicReviewEditViewModel vm)
     {
         if (number != vm.Number)
@@ -47,7 +66,6 @@ public class PatientController(IMediator mediator) : Controller
             return NotFound(); //TODO: View with error message can be implemented here.
         }
 
-        TempData["Saved"] = true;
         return RedirectToAction("CompleteEdit", new { number });
     }
 
