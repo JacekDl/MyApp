@@ -83,9 +83,9 @@ public class AccountController : Controller
     }
 
     [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-    public async Task<IActionResult> RegisterPatient(RegisterViewModel vm, string? returnUrl = null)
+    public async Task<IActionResult> RegisterPatient(RegisterViewModel vm)
     {
-        ViewData["ReturnUrl"] = returnUrl;
+        
         if (!ModelState.IsValid)
         {
             return View("Register", vm);
@@ -101,7 +101,7 @@ public class AccountController : Controller
 
         var user = result.Value!;
         var callbackBase = Url.Action(nameof(ConfirmEmail), "Account", null, Request.Scheme)!;
-        await _mediator.Send(new SendEmailConfirmationCommand(user.Id, callbackBase, returnUrl));
+        await _mediator.Send(new SendEmailConfirmationCommand(user.Id, callbackBase));
 
         return RedirectToAction(nameof(ConfirmEmailSent));
     }

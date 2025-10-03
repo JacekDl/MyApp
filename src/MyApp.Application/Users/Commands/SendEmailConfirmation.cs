@@ -5,7 +5,7 @@ using MyApp.Domain;
 
 namespace MyApp.Application.Users.Commands;
 
-public record SendEmailConfirmationCommand(string UserId, string CallbackUrl, string? ReturnUrl = null) : IRequest;
+public record SendEmailConfirmationCommand(string UserId, string CallbackUrl) : IRequest;
 
 public class SendEmailConfirmationHandler(UserManager<User> userManager, IEmailSender email) : IRequestHandler<SendEmailConfirmationCommand>
 {
@@ -22,11 +22,6 @@ public class SendEmailConfirmationHandler(UserManager<User> userManager, IEmailS
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
 
         var url = $"{request.CallbackUrl}?userId={user.Id}&token={Uri.EscapeDataString(token)}";
-
-        if (!string.IsNullOrWhiteSpace(request.ReturnUrl))
-        {
-            url = url + $"&returnUrl={Uri.EscapeDataString(request.ReturnUrl)}";
-        }
 
         var body = $"""
         <p>Confirm your email by clicking the link below:</p>
