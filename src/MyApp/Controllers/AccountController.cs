@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using MyApp.Application.Users.Commands;
 using MyApp.Application.Users.Queries;
 using MyApp.ViewModels;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 
 namespace MyApp.Controllers;
@@ -19,11 +20,13 @@ public class AccountController : Controller
         _mediator = mediator;
     }
 
-    #region RegisterUser
+    #region RegisterPharmacist
     [HttpGet, AllowAnonymous]
-    public IActionResult Register()
+    public IActionResult Register(string? returnUrl = null)
     {
-        return View(new RegisterViewModel());
+        ViewData["ReturnUrl"] = returnUrl;
+        var vm = new RegisterViewModel { PostAction = nameof(Register) };
+        return View(vm);
     }
 
     [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
@@ -34,7 +37,7 @@ public class AccountController : Controller
             return View(vm);
         }
 
-        var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password));
+        var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password, "Pharmacist"));
 
         if (!result.IsSuccess)
         {
@@ -64,6 +67,40 @@ public class AccountController : Controller
         if (!result) return View("ConfirmEmailFailed");
         return View("EmailConfirmed");
     }
+    #endregion
+
+    #region RegisterPatient
+    [HttpGet, AllowAnonymous]
+    public IActionResult RegisterPatient(string? returnUrl = null)
+    {
+        ViewData["ReturnUrl"] = returnUrl;
+        var vm = new RegisterViewModel { PostAction = nameof(RegisterPatient) };
+        return View("Register", vm);
+    }
+
+    [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
+    public async Task<IActionResult> RegisterPatient(RegisterViewModel vm)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View("Register", vm);
+        }
+
+        var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password, "Patient"));
+
+        if (!result.IsSuccess)
+        {
+            ModelState.AddModelError(nameof(vm.Email), result.Error!);
+            return View(vm);
+        }
+
+        var user = result.Value!;
+        var callbackBase = Url.Action(nameof(ConfirmEmail), "Account", null, Request.Scheme)!;
+        await _mediator.Send(new SendEmailConfirmationCommand(user.Id, callbackBase));
+
+        return RedirectToAction(nameof(ConfirmEmailSent));
+    }
+
     #endregion
 
     #region LoginUser

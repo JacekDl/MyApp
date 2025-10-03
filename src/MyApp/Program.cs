@@ -7,6 +7,7 @@ using QuestPDF.Infrastructure;
 using MyApp.Application.Abstractions;
 using MyApp.Application.Users.Queries;
 using MyApp.Application.Data;
+using MyApp.Application.Extensions;
 
 
 QuestPDF.Settings.License = LicenseType.Community;
@@ -46,48 +47,7 @@ builder.Services.AddAuthorizationBuilder()
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    await db.Database.MigrateAsync();
-
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-    const string adminRole = "Admin";
-    const string adminEmail = "admin@example.com";
-    const string adminPassword = "Admin#12345";
-
-    if (!await roleManager.RoleExistsAsync(adminRole))
-    {
-        await roleManager.CreateAsync(new IdentityRole(adminRole));
-    }
-
-    var admin = await userManager.FindByEmailAsync(adminEmail) ?? await userManager.FindByNameAsync(adminEmail);
-    if (admin is null)
-    {
-        admin = new User
-        {
-            UserName = adminEmail,
-            Email = adminEmail,
-            Role = adminRole,
-            EmailConfirmed = true
-        };
-
-        var createResult = await userManager.CreateAsync(admin, adminPassword);
-        if (createResult.Succeeded)
-        {
-            await userManager.AddToRoleAsync(admin, adminRole);
-        }
-    }
-    else
-    {
-        if (!await userManager.IsInRoleAsync(admin, adminRole))
-        {
-            await userManager.AddToRoleAsync(admin, adminRole);
-        }
-    }
-}
+await app.SeedDataAsync();
 
 if (!app.Environment.IsDevelopment())
 {

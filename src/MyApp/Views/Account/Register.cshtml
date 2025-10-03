@@ -2,11 +2,12 @@
 @model RegisterViewModel
 @{
     ViewData["Title"] = "Register";
+    var returnUrl = (string?)ViewData["ReturnUrl"];
 }
 
 <h2>Register</h2>
 
-<form asp-action="Register" method="post">
+<form asp-controller="Account" asp-action=@Model.PostAction asp-route-returnUrl="@(returnUrl ?? string.Empty)" method="post">
     @Html.AntiForgeryToken()
 
     <div class="mb-3">

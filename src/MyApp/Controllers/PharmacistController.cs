@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace MyApp.Controllers;
 
-[Authorize(Roles = "User")]
+[Authorize(Roles = "Pharmacist")]
 public class PharmacistController(IReviewPdfService pdfService, IMediator mediator) : Controller
 {
 

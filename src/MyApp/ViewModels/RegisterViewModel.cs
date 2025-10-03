@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MyApp.Controllers;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyApp.ViewModels;
 
@@ -19,4 +20,6 @@ public class RegisterViewModel
     [Compare(nameof(Password), ErrorMessage = "Passwords do not match.")]
     [Display(Name = "Confirm Password")]
     public string ConfirmPassword { get; set; } = string.Empty;
+
+    public string PostAction { get; set; } = nameof(AccountController.Register);
 }

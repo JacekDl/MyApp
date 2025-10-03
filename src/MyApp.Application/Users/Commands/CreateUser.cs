@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace MyApp.Application.Users.Commands;
 
-public record CreateUserCommand(string Email, string Password) : IRequest<Result<User>>;
+public record CreateUserCommand(string Email, string Password,string Role) : IRequest<Result<User>>;
 
 
 /// <summary>
@@ -20,6 +20,8 @@ public record CreateUserCommand(string Email, string Password) : IRequest<Result
 /// </returns>
 public class CreateUserHandler : IRequestHandler<CreateUserCommand, Result<User>>
 {
+    private static readonly string[] Allowed = { "Pharmacist", "Patient" };
+
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     public CreateUserHandler(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
@@ -34,13 +36,22 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, Result<User>
         var existing = await _userManager.FindByEmailAsync(email);
 
         if (existing is not null)
+        {
             return Result<User>.Fail("Email is already registered.");
+        }
+
+        var role = Allowed.FirstOrDefault(r => r.Equals(request.Role, StringComparison.OrdinalIgnoreCase));
+        if (role is null)
+        {
+            return Result<User>.Fail("Unsupported role.");
+        }
 
         var user = new User
         {
             UserName = email,
             Email = email,
-            Role = "User"
+            Role = request.Role,
+            EmailConfirmed = false
         };
 
         var create = await _userManager.CreateAsync(user, request.Password);
@@ -50,11 +61,7 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, Result<User>
             return Result<User>.Fail(message);
         }
 
-        const string defaultRole = "User";
-        if (!await _roleManager.RoleExistsAsync(defaultRole))
-            await _roleManager.CreateAsync(new IdentityRole(defaultRole));
-
-        await _userManager.AddToRoleAsync(user, defaultRole);
+        var addRole = await _userManager.AddToRoleAsync(user, role);
 
         return Result<User>.Ok(user);
     }
