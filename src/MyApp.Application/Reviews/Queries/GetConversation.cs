@@ -24,7 +24,7 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, Resu
         if (review is null)
             return Result<ConversationDto>.Fail("Review not found.");
 
-        if (review.PharmacistId != request.RequestingUserId)
+        if (review.PharmacistId != request.RequestingUserId && review.PatientId != request.RequestingUserId)
             return Result<ConversationDto>.Fail("Forbidden.");
 
         var dto = new ConversationDto(

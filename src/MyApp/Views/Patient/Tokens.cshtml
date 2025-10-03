@@ -44,7 +44,7 @@ else
                     <td>@rev.Text</td>
                     <td>@(rev.Completed ? "Yes" : "No")</td>
                     <td>
-                        <a asp-action="Conversation" asp-controller="Patient" asp-route-number="@rev.Number"
+                        <a asp-action="Display" asp-controller="Conversation" asp-route-number="@rev.Number"
                            class="btn btn-sm btn-primary">View</a>
                     </td>
                 </tr>

@@ -1,0 +1,37 @@
+﻿@model MyApp.Application.Reviews.ConversationDto
+
+@{
+    ViewData["Title"] = "Conversation";
+}
+
+<h2>Conversation @Model.Number</h2>
+
+<ul class="list-group mb-3">
+    @foreach(var e in Model.Entries)
+    {
+        <li class="list-group-item">
+            <div class="small text-muted">@e.CreatedUtc.ToLocalTime()</div>
+            <div>@e.Text</div>
+        </li>
+    }
+</ul>
+
+<form asp-controller="Conversation" asp-action="Display" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="number" value="@Model.Number" />
+    <div class="mb-3">
+        <label for="Text" class="form-label">Add message</label>
+        <textarea id="Text" name="Text" class="form-control" rows="3"></textarea>
+        <span class="text-danger">@Html.ValidationMessage("Text")</span>
+    </div>
+    <button type="submit" class="btn btn-primary">Send</button>
+    @if (User.IsInRole("Pharmacist"))
+    {
+        <a asp-controller="Pharmacist" asp-action="Tokens" class="btn btn-secondary">Back</a>
+    }
+    else if (User.IsInRole("Patient"))
+    {
+        <a asp-controller="Patient" asp-action="Tokens" class="btn btn-secondary">Back</a>
+    }
+</form>

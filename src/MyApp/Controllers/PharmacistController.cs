@@ -55,22 +55,6 @@ public class PharmacistController(IReviewPdfService pdfService, IMediator mediat
         ViewBag.Completed = completed?.ToString().ToLowerInvariant();
         return View(dto);
     }
-    #endregion
-
-    #region ConversationDetails
-    [HttpGet]
-    public async Task<IActionResult> Conversation(string number)
-    {
-        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var result = await mediator.Send(new GetConversationQuery(number, currentUserId));
-
-        if (!result.IsSuccess || result.Value is null)
-        {
-            return NotFound();
-        }
-        return View(result.Value);
-    }
-
     #endregion  
 }
 
