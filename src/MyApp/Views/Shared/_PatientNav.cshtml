@@ -1,0 +1,10 @@
+﻿@{
+    var current = (ViewContext.RouteData.Values["action"]?.ToString() ?? "").ToLowerInvariant();
+}
+
+<ul class="nav nav-pills mb-3">
+    <li class="nav-item">
+        <a class="nav-link @(current == "reviews" ? "active" : "")"
+           asp-controller="Patient" asp-action="Tokens">Reviews</a>
+    </li>
+</ul>

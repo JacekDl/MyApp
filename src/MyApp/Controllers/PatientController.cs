@@ -4,12 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using MyApp.Application.Reviews.Commands;
 using MyApp.Application.Reviews.Queries;
 using MyApp.ViewModels;
+using System.Security.Claims;
 
 namespace MyApp.Controllers;
 
 public class PatientController(IMediator mediator) : Controller
 {
-    #region PublicEditReview
+    #region EditOrRegister
 
     [AllowAnonymous, HttpGet("/r/{number}")]
     public async Task<IActionResult> PublicAccess(string number)
@@ -29,6 +30,10 @@ public class PatientController(IMediator mediator) : Controller
         };
         return View(vm);
     }
+
+    #endregion
+
+    #region PublicReview
 
     [AllowAnonymous, HttpGet("/r/{number}/edit")]
     public async Task<IActionResult> PublicEdit(string number)
@@ -74,7 +79,18 @@ public class PatientController(IMediator mediator) : Controller
     {
         return View();
     }
+    #endregion
 
+    #region ViewReviews
+    [HttpGet]
+    [Authorize(Roles = "Patient")]
+    public async Task<IActionResult> Tokens(string? searchTxt)
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var dto = await mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, null));
 
+        ViewBag.Query = searchTxt;
+        return View(dto);
+    }
     #endregion
 }

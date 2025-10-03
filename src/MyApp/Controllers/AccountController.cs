@@ -59,12 +59,17 @@ public class AccountController : Controller
     }
 
     [AllowAnonymous]
-    public async Task<IActionResult> ConfirmEmail(string userId, string token)
+    public async Task<IActionResult> ConfirmEmail(string userId, string token, string? returnUrl = null)
     {
         if (string.IsNullOrWhiteSpace(token)) return BadRequest();
 
         var result = await _mediator.Send(new ConfirmEmailCommand(userId, token));
         if (!result) return View("ConfirmEmailFailed");
+
+        if(!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
         return View("EmailConfirmed");
     }
     #endregion
@@ -79,8 +84,9 @@ public class AccountController : Controller
     }
 
     [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-    public async Task<IActionResult> RegisterPatient(RegisterViewModel vm)
+    public async Task<IActionResult> RegisterPatient(RegisterViewModel vm, string? returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
         if (!ModelState.IsValid)
         {
             return View("Register", vm);
@@ -96,7 +102,7 @@ public class AccountController : Controller
 
         var user = result.Value!;
         var callbackBase = Url.Action(nameof(ConfirmEmail), "Account", null, Request.Scheme)!;
-        await _mediator.Send(new SendEmailConfirmationCommand(user.Id, callbackBase));
+        await _mediator.Send(new SendEmailConfirmationCommand(user.Id, callbackBase, returnUrl));
 
         return RedirectToAction(nameof(ConfirmEmailSent));
     }
@@ -126,10 +132,22 @@ public class AccountController : Controller
         {
             case LoginStatus.Succeeded:
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                {
                     return Redirect(returnUrl);
+                }
+                    
                 if (string.Equals(result.Role, "Admin", StringComparison.OrdinalIgnoreCase))
+                {
                     return RedirectToAction("ViewUsers", "Admin");
-                return RedirectToAction("Reviews", "Pharmacist");
+                }
+                
+                if (string.Equals(result.Role, "Pharmacist", StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction("Reviews", "Pharmacist");
+                }
+
+                return RedirectToAction("Tokens", "Patient");
+                
 
             case LoginStatus.NotAllowed:
             case LoginStatus.LockedOut:

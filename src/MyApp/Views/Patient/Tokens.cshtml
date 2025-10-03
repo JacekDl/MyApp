@@ -1,0 +1,57 @@
+﻿@using MyApp.Application.Reviews
+@using MyApp.ViewModels
+@model List<ReviewDto>
+
+@{
+    ViewData["Title"] = "Your reviews";
+    var searchTxt = (string?)ViewBag.Query ?? "";
+}
+
+
+<h1 class="mb-3">@ViewData["Title"]</h1>
+
+<partial name="~/Views/Shared/_PatientNav.cshtml" />
+
+<div class="mb-3">
+    <form method="get" asp-action="Tokens" class="d-flex gap-2">
+        <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Search..." />
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a asp-action="Tokens" class="btn btn-outline-secondary">Clear</a>
+    </form>
+
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">You haven't got any reviews yet.</div>
+}
+else
+{
+    <table class="table table-stripped align-middle">
+        <thead>
+            <tr>
+                <th>Created</th>
+                <th>Text</th>
+                <th>Completed</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var rev in Model)
+            {
+                <tr>
+                    <td>@rev.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@rev.Text</td>
+                    <td>@(rev.Completed ? "Yes" : "No")</td>
+                    <td>
+                        <a asp-action="Conversation" asp-controller="Patient" asp-route-number="@rev.Number"
+                           class="btn btn-sm btn-primary">View</a>
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+}
+
+

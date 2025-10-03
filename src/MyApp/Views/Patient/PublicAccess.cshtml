@@ -8,7 +8,10 @@
     <a asp-controller="Patient" asp-action="PublicEdit" asp-route-number="@Model.Number"class="btn btn-primary">
         Leave a comment
     </a>
-    <a asp-controller="Account" asp-action="RegisterPatient" asp-route-number="@Model.Number" class="btn btn-primary">
-        Register
+    <a asp-controller="Account" 
+        asp-action="RegisterPatient" 
+        asp-route-returnUrl="@Url.Action("PublicEdit", "Patient", new {number = Model.Number})"
+        class="btn btn-primary">
+        Register or login
     </a>
 </div>

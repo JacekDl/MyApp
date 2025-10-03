@@ -14,7 +14,12 @@ public class HomeController : Controller
             {
                 return RedirectToAction("ViewUsers", "Admin");
             }
-            return RedirectToAction("Reviews", "Pharmacist");
+
+            if (User.IsInRole("Pharmacist"))
+            {
+                return RedirectToAction("Reviews", "Pharmacist");
+            }
+            else return RedirectToAction("Tokens", "Patient");
         }
         return View();
     }
