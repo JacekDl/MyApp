@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using MyApp.Application.Users.Commands;
 using MyApp.Application.Users.Queries;
 using MyApp.ViewModels;
-using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 
 namespace MyApp.Controllers;

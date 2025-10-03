@@ -81,6 +81,46 @@ public class PatientController(IMediator mediator) : Controller
     }
     #endregion
 
+    #region GetReview
+
+    [Authorize(Roles = "Patient")]
+    [HttpGet]
+    public IActionResult GetReview()
+    {
+        return View(new GetReviewViewModel());
+    }
+
+    [Authorize(Roles = "Patient")]
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> GetReview(GetReviewViewModel vm)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(vm);
+        }
+
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+        var precheck = await mediator.Send(new GetReviewQuery(vm.Number));
+        if (!precheck.IsSuccess) 
+        { 
+            ModelState.AddModelError(nameof(vm.Number), precheck.Error!); return View(vm); 
+        }
+
+        var claim = await mediator.Send(new ClaimReviewByPatientCommand(vm.Number, currentUserId));
+        if(!claim.IsSuccess)
+        {
+            ModelState.AddModelError(nameof(vm.Number), claim.Error!);
+            return View(vm);
+        }
+        TempData["Info"] = "Review successfully assigned to your account.";
+        return RedirectToAction(nameof(Tokens));
+    }
+
+
+
+    #endregion
+
     #region ViewReviews
     [HttpGet]
     [Authorize(Roles = "Patient")]

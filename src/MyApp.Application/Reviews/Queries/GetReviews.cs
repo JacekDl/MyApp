@@ -43,7 +43,7 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, List<ReviewDto
 
         if (!string.IsNullOrWhiteSpace(request.UserId))
         {
-            query = query.Where(r => r.PharmacistId == request.UserId);
+            query = query.Where(r => r.PharmacistId == request.UserId || r.PatientId == request.UserId);
         }
 
         if (request.Completed.HasValue)

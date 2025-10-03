@@ -1,0 +1,20 @@
+﻿@model MyApp.ViewModels.GetReviewViewModel
+@{
+    ViewData["Title"] = "Get Your Review";
+}
+
+<h1 class="mb-3">@ViewData["Title"]</h1>
+
+<partial name="~/Views/Shared/_PatientNav.cshtml" />
+
+<form asp-action="GetReview" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label asp-for="Number" class="form-label"></label>
+        <input asp-for="Number" class="form-control"/>
+        <span asp-validation-for="Number" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Assign to me</button>
+</form>
