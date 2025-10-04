@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyApp.Application.Reviews.Commands;
 using MyApp.Application.Reviews.Queries;
 using System.Security.Claims;
 
@@ -22,5 +23,28 @@ public class ConversationController(IMediator mediator) : Controller
         }
         return View(result.Value);
     }
+
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Display(string number, string text)
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+        var add = await mediator.Send(new AddConversationEntryCommand(number, currentUserId, text));
+        if (!add.IsSuccess)
+        {
+            var thread = await mediator.Send(new GetConversationQuery(number, currentUserId));
+            if (!thread.IsSuccess || thread.Value is null)
+            {
+                return NotFound();
+            }
+            ModelState.AddModelError("text", add.Error!);
+            return View(thread.Value);
+        }
+        TempData["Info"] = "Message sent.";
+        return RedirectToAction(nameof(Display), new { number });
+    }
     #endregion
+
+
 }

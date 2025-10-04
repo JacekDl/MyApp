@@ -1,9 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using MyApp.Application.Common;
 using MyApp.Application.Data;
-using MyApp.Domain;
 
 namespace MyApp.Application.Reviews.Commands;
 
