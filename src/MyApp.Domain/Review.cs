@@ -11,12 +11,15 @@ public class Review
     public DateTime DateCreated { get; set; } //will not need that - get DateCreated from first Entry 
     public bool Completed { get; set; }
 
-    [Required]
+    [Required] //won't be required when deleting Pharmacist account - Review will stay with null Pharmacist
     public string PharmacistId { get; set; } = default!;
     public User Pharmacist { get; set; } = default!;
 
     public string? PatientId { get; set; }
     public User? Patient { get; set; } = default!;
+
+    public bool PharmacistModified { get; set; }
+    public bool PatientModified { get; set; }
 
     public List<Entry> Entries { get; set; } = new();
   
