@@ -50,7 +50,8 @@ public class GetReviewHandler : IRequestHandler<GetReviewQuery, Result<ReviewDto
             review.DateCreated,
             review.FirstEntryText ?? string.Empty,
             string.Empty,
-            review.Completed
+            review.Completed,
+            true
             );
 
         return Result<ReviewDto>.Ok(dto);

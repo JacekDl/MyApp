@@ -8,5 +8,6 @@ public record ReviewDto
     DateTime DateCreated,
     string Text,
     string ReviewText, //not used
-    bool Completed
+    bool Completed,
+    bool IsNewForViewer
 );

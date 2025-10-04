@@ -21,6 +21,8 @@ public class ConversationController(IMediator mediator) : Controller
         {
             return NotFound();
         }
+
+        await mediator.Send(new MarkConversationSeenCommand(number, currentUserId));
         return View(result.Value);
     }
 

@@ -50,18 +50,23 @@ else
                     <th scope="col">Text</th>
                     <th scope="col">Completed</th>
                     <th scope="col"></th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
-            @foreach (var user in Model)
+            @foreach (var rev in Model)
             {
                 <tr>
-                    <td>@user.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
-                    <td>@user.PharmacistId</td>
-                    <td>@user.Text</td>
-                    <td>@(user.Completed ? "Yes" : "No")</td>
+                    <td>@rev.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@rev.PharmacistId</td>
+                    <td>@rev.Text</td>
+                    <td>@(rev.Completed ? "Yes" : "No")</td>
+                        <td>
+                            <a asp-action="Display" asp-controller="Conversation" asp-route-number="@rev.Number"
+                               class="btn btn-sm btn-primary">View</a>
+                        </td>
                     <td>
-                        <form asp-action="RemoveReview" method="post" asp-route-id="@user.Id" style="display:inline">
+                        <form asp-action="RemoveReview" method="post" asp-route-id="@rev.Id" style="display:inline">
                             @Html.AntiForgeryToken()
                             <button type="submit" class="btn btn-sm btn-danger"
                                     onclick="return confirm('Are you sure you want to remove this review?');">

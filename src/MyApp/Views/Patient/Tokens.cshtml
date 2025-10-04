@@ -32,6 +32,7 @@ else
             <tr>
                 <th>Created</th>
                 <th>Text</th>
+                <th>Status</th>
                 <th>Completed</th>
                 <th></th>
             </tr>
@@ -39,9 +40,19 @@ else
         <tbody>
             @foreach (var rev in Model)
             {
-                <tr>
+                <tr class="@(rev.IsNewForViewer ? "table-warning" : "")">
                     <td>@rev.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
                     <td>@rev.Text</td>
+                    <td>
+                        @if (rev.IsNewForViewer)
+                        {
+                            <span class="badge bg-success">New</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Seen</span>
+                        }
+                    </td>
                     <td>@(rev.Completed ? "Yes" : "No")</td>
                     <td>
                         <a asp-action="Display" asp-controller="Conversation" asp-route-number="@rev.Number"

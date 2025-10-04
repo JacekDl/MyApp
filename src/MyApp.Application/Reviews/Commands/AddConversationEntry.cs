@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MyApp.Application.Common;
 using MyApp.Application.Data;
+using MyApp.Domain;
 
 namespace MyApp.Application.Reviews.Commands;
 
@@ -40,12 +41,27 @@ public class AddConversationEntryHandler : IRequestHandler<AddConversationEntryC
             return Result<bool>.Fail("Forbidden.");
         }
 
-        review.Entries.Add(new Domain.Entry
+        review.Entries.Add(new Entry
         {
             UserId = request.UserId,
             Text = text,
-            ReviewId = review.Id
+            ReviewId = review.Id,
+            CreatedUtc = DateTime.UtcNow
         });
+
+        if(request.UserId == review.PharmacistId)
+        {
+            review.PharmacistModified = true;
+        }
+        else if (request.UserId == review.PatientId)
+        {
+            review.PatientModified = true;
+        }
+        else // leave in case Admin wanted to add message for both parties to read
+        {
+            review.PharmacistModified = true;
+            review.PatientModified = true;
+        }
 
         await _db.SaveChangesAsync(ct);
         return Result<bool>.Ok(true);
