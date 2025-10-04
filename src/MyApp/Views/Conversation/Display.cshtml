@@ -10,6 +10,7 @@
     @foreach(var e in Model.Entries)
     {
         <li class="list-group-item">
+            <strong>@e.DisplayName</strong>
             <div class="small text-muted">@e.CreatedUtc.ToLocalTime()</div>
             <div>@e.Text</div>
         </li>

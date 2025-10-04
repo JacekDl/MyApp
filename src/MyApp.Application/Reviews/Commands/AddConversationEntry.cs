@@ -63,7 +63,7 @@ public class AddConversationEntryHandler : IRequestHandler<AddConversationEntryC
         {
             review.PatientModified = true;
         }
-        else // leave in case Admin wanted to add message for both parties to read
+        else
         {
             review.PharmacistModified = true;
             review.PatientModified = true;

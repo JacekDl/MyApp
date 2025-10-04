@@ -36,9 +36,46 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, Resu
         if (!viewerIsParticipant && !viewerIsAdmin)
             return Result<ConversationDto>.Fail("Forbidden.");
 
+        var entries = new List<EntryDto>();
+        foreach (var e in review.Entries.OrderBy(en => en.CreatedUtc))
+        {
+            string displayName = "Unknown";
+            if (!string.IsNullOrEmpty(e.UserId))
+            {
+                var entryUser = await _userManager.FindByIdAsync(e.UserId);
+                if (entryUser != null)
+                {
+                    displayName = !string.IsNullOrWhiteSpace(entryUser.DisplayName) ? entryUser.DisplayName : entryUser.Email ?? "Unknown";
+                    var roles = await _userManager.GetRolesAsync(entryUser);
+                    if (string.IsNullOrEmpty(displayName) && roles.Count > 0)
+                    {
+                        displayName = roles[0];
+                    }
+                }
+            }
+            else
+            {
+                if (review.PharmacistId == request.RequestingUserId)
+                {
+                    displayName = "Pharmacist";
+                }
+                else if(review.PatientId == request.RequestingUserId)
+                {
+                    displayName = "Patient";
+                }
+                else
+                {
+                    displayName = "Admin"; 
+                }
+            }
+
+            entries.Add(new EntryDto(e.UserId, e.Text, e.CreatedUtc, displayName));
+        }
+
         var dto = new ConversationDto(
             review.Number,
-            review.Entries.Select(e => new EntryDto(e.UserId, e.Text, e.CreatedUtc)).ToList());
+            entries);
+            
 
         return Result<ConversationDto>.Ok(dto);
     }
