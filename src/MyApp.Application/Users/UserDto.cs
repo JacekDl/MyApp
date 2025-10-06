@@ -5,7 +5,5 @@ public record UserDto(
     string Email,
     string Role,
     string DisplayName,
-    string PharmacyName,
-    string PharmacyCity,
     DateTime CreatedUtc
     );

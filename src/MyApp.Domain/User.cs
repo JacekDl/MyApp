@@ -15,12 +15,6 @@ public class User : IdentityUser
     [MaxLength(32)]
     public string? DisplayName { get; set; }
 
-    [MaxLength(32)]
-    public string? PharmacyName { get; set; }
-
-    [MaxLength(32)]
-    public string? PharmacyCity { get; set; }
-
     public List<Review>? Reviews { get; set; }
 
     public static User Create(string email, string role = "User")

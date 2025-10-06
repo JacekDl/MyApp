@@ -28,8 +28,6 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, List<UserDto
                 u.Email ?? string.Empty,
                 u.Role,
                 u.DisplayName ?? string.Empty,
-                u.PharmacyName ?? string.Empty,
-                u.PharmacyCity ?? string.Empty,
                 u.CreatedUtc))
             .ToListAsync(ct);
     }

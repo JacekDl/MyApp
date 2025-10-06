@@ -31,8 +31,6 @@ public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, Result<UserD
             user.Email ?? string.Empty,
             user.Role,
             user.DisplayName ?? string.Empty,
-            user.PharmacyName ?? string.Empty,
-            user.PharmacyCity ?? string.Empty,
             user.CreatedUtc
         );
 

@@ -208,8 +208,6 @@ public class AccountController : Controller
         var vm = new EditProfileViewModel
         {
             DisplayName = result.Value!.DisplayName,
-            PharmacyName = result.Value.PharmacyName,
-            PharmacyCity = result.Value.PharmacyCity
         };
         return View(vm);
     }
@@ -223,7 +221,7 @@ public class AccountController : Controller
         }
 
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var result = await _mediator.Send(new UpdateUserDetailsCommand(currentUserId, vm.DisplayName, vm.PharmacyName, vm.PharmacyCity));
+        var result = await _mediator.Send(new UpdateUserDetailsCommand(currentUserId, vm.DisplayName));
 
         if (!result.IsSuccess)
         {
