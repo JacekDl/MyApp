@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MyApp.Domain;
+using MyApp.Model;
 using MyApp.Services;
 using QuestPDF.Infrastructure;
-using MyApp.Application.Abstractions;
-using MyApp.Application.Users.Queries;
-using MyApp.Application.Data;
-using MyApp.Application.Extensions;
+using MyApp.Domain.Abstractions;
+using MyApp.Domain.Users.Queries;
+using MyApp.Domain.Data;
+using MyApp.Domain.Extensions;
 
 
 QuestPDF.Settings.License = LicenseType.Community;
@@ -19,7 +19,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        b => b.MigrationsAssembly("MyApp.Application")
+        b => b.MigrationsAssembly("MyApp.Domain")
         ));
 
 builder.Services.AddSingleton<IReviewPdfService, ReviewPdfService>();

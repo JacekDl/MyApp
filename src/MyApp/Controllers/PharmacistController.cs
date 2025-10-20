@@ -1,11 +1,12 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MyApp.Application.Abstractions;
-using MyApp.Application.Reviews.Commands;
-using MyApp.Application.Reviews.Queries;
+using MyApp.Domain.Abstractions;
+using MyApp.Domain.Reviews.Commands;
+using MyApp.Domain.Reviews.Queries;
 using MyApp.ViewModels;
 using System.Security.Claims;
+using MyApp.Model;
 
 namespace MyApp.Controllers;
 

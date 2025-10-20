@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
-using MyApp.Application.Users.Queries;
-using MyApp.Application.Reviews.Queries;
-using MyApp.Application.Users.Commands;
+using MyApp.Domain.Users.Queries;
+using MyApp.Domain.Reviews.Queries;
+using MyApp.Domain.Users.Commands;
 
 namespace MyApp.Controllers;
 

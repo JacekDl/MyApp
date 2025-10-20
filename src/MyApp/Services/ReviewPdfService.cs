@@ -1,5 +1,5 @@
-﻿using MyApp.Application.Abstractions;
-using MyApp.Domain;
+﻿using MyApp.Domain.Abstractions;
+using MyApp.Model;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 

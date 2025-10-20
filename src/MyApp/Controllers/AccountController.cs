@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using MyApp.Application.Users.Commands;
-using MyApp.Application.Users.Queries;
+using MyApp.Domain.Users.Commands;
+using MyApp.Domain.Users.Queries;
 using MyApp.ViewModels;
 using System.Security.Claims;
 

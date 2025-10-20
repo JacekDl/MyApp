@@ -1,4 +1,4 @@
-﻿using MyApp.Application.Abstractions;
+﻿using MyApp.Domain.Abstractions;
 
 namespace MyApp.Services;
 
