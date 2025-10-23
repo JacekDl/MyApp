@@ -11,14 +11,30 @@
 
 <form asp-action="Reviews" asp-asp-controller="Pharmacist" method="post" target="_blank">
     @Html.AntiForgeryToken()
-    <div class="mb-3">
-        <label asp-for="Advice" class="form-label">Enter text to include in PDF</label>
-        <textarea asp-for="Advice" class="form-control" rows="6" placeholder="Type anything here..."></textarea>
-    </div>
+
+    <fieldset id="medAdviceFieldset" class="mt-4 mb-4" style="border:1px solid #ccc;padding:1rem;border-radius:.5rem;margin-top:1rem;">
+
+        <div style="display:flex; gap:.75rem; flex-wrap:wrap; align-items:flex-end;">
+            <div style="flex:1; min-width:220px;">
+                <label for="medicineName" class="form-label">Medicine name</label>
+                <input type="text" id="medicineName" class="form-control" />
+            </div>
+            <div style="flex:2; min-width:280px;">
+                <label for="medicineAdvice" class="form-label">Advice / instructions</label>
+                <input type="text" id="medicineAdvice" class="form-control" />
+            </div>
+            <div>
+                <button type="button" id="addMedAdviceBtn" class="btn btn-primary">Add</button>
+            </div>
+        </div>
+
+        <div id="medAdviceList" class="mt-3"></div>
+
+        <input type="hidden" id="medAdviceHidden" name="Advice" value="" />
+    </fieldset>
 
     <button type="submit" class="btn btn-primary">Generate PDF</button>
-    <!-- <a class="btn btn-outline-primary" asp-action="Reviews">Clear</a> -->
-    <button type="button" class="btn btn-secondary" id="clearBtn">Clear</button>
+    <button type="button" class="btn btn-secondary" id="clearBtn">Delete All</button>
     <p class="text-muted mt-2">
         The PDF will open in a new tab.
     </p>
@@ -26,11 +42,94 @@
 
 @section Scripts {
     <script>
-        document.getElementById("clearBtn").addEventListener("click", function () {
-            const form = this.closest("form");
-            if (form) {
-                form.reset();
+        (function () {
+            const maxPairs = 10;
+            const nameInput = document.getElementById('medicineName');
+            const adviceInput = document.getElementById('medicineAdvice');
+            const addBtn = document.getElementById('addMedAdviceBtn');
+            const list = document.getElementById('medAdviceList');
+            const hidden = document.getElementById('medAdviceHidden');
+            const clearBtn = document.getElementById('clearBtn');
+
+            let pairs = [];
+
+            function render() {
+                list.innerHTML = '';
+                if (pairs.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.className = 'text-muted';
+                    empty.textContent = 'No items added yet.';
+                    list.appendChild(empty);
+                } else {
+                    const ul = document.createElement('ul');
+                    ul.className = 'list-group';
+                    pairs.forEach((p, idx) => {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item d-flex justify-content-between align-items-start';
+                        li.innerHTML = `<div><strong>${escapeHtml(p.name)}</strong>: ${escapeHtml(p.advice)}</div>`;
+
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'btn btn-sm btn-outline-danger';
+                        btn.textContent = 'Remove';
+                        btn.addEventListener('click', () => {
+                            pairs.splice(idx, 1);
+                            render();
+                        });
+
+                        const right = document.createElement('div');
+                        right.appendChild(btn);
+                        li.appendChild(right);
+
+                        ul.appendChild(li);
+                    });
+                    list.appendChild(ul);
+                }
+
+                hidden.value = pairs.map(p => `${p.name} – ${p.advice}`).join('\n');
+
+                addBtn.disabled = pairs.length >= maxPairs;
             }
-        });
+
+            function escapeHtml(str) {
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+
+            function addPair() {
+                const name = (nameInput?.value || '').trim();
+                const advice = (adviceInput?.value || '').trim();
+                if (!name || !advice) {
+                    if (!name) nameInput?.focus();
+                    else adviceInput?.focus();
+                    return;
+                }
+                if (pairs.length >= maxPairs) return;
+
+                pairs.push({ name, advice });
+                nameInput.value = '';
+                adviceInput.value = '';
+                nameInput.focus();
+                render();
+            }
+
+            addBtn?.addEventListener('click', addPair);
+            nameInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addPair(); } });
+            adviceInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addPair(); } });
+
+            clearBtn?.addEventListener('click', function () {
+                pairs = [];
+                render();
+                const form = this.closest('form');
+                if (form) form.reset();
+            });
+
+            // Initial render
+            render();
+        })();
     </script>
 }
