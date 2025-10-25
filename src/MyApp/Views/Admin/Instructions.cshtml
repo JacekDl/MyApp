@@ -1,0 +1,83 @@
+﻿@model IReadOnlyList<MyApp.Domain.Instructions.InstructionDto>
+@{
+    ViewData["Title"] = "Instructions";
+}
+
+<partial name="~/Views/Shared/_AdminNav.cshtml" />
+
+<h1 class="mb-3">@ViewData["Title"]</h1>
+
+<div class="container mt-3">
+    
+    @if (TempData["Info"] is string infoMsg)
+    {
+        <div class="alert alert-success">@infoMsg</div>
+    }
+    @if (TempData["Error"] is string errMsg)
+    {
+        <div class="alert alert-danger">@errMsg</div>
+    }
+
+    <!-- Add new instruction row -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <form asp-action="AddInstruction" asp-controller="Admin" method="post" class="row g-2">
+                @Html.AntiForgeryToken()
+                <div class="col-sm-3">
+                    <input name="Code" class="form-control" placeholder="Code" maxlength="64" required />
+                </div>
+                <div class="col-sm-7">
+                    <input name="Text" class="form-control" placeholder="Text" maxlength="1024" required />
+                </div>
+                <div class="col-sm-2 d-grid">
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- List -->
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th style="width: 80px;">Id</th>
+                    <th style="width: 180px;">Code</th>
+                    <th>Text</th>
+                    <th style="width: 120px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model is { Count: > 0 })
+                {
+                    foreach (var i in Model)
+                    {
+                        <tr>
+                            <td>@i.Id</td>
+                            <td>@i.Code</td>
+                            <td class="text-break">@i.Text</td>
+                            <td>
+                                <form asp-action="DeleteInstruction" asp-controller="Admin" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@i.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Delete this instruction?');">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No instructions yet.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <a asp-action="ViewUsers" class="btn btn-secondary">Back</a>
+</div>

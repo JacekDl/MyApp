@@ -1,0 +1,83 @@
+﻿@model IReadOnlyList<MyApp.Domain.Medicines.MedicineDto>
+@{
+    ViewData["Title"] = "Medicines";
+}
+
+<partial name="~/Views/Shared/_AdminNav.cshtml" />
+
+<h1 class="mb-3">@ViewData["Title"]</h1>
+
+<div class="container mt-3">
+
+    @if (TempData["Info"] is string infoMsg)
+    {
+        <div class="alert alert-success">@infoMsg</div>
+    }
+    @if (TempData["Error"] is string errMsg)
+    {
+        <div class="alert alert-danger">@errMsg</div>
+    }
+
+    <!-- Add new medicine row -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <form asp-action="AddMedicine" asp-controller="Admin" method="post" class="row g-2">
+                @Html.AntiForgeryToken()
+                <div class="col-sm-3">
+                    <input name="Code" class="form-control" placeholder="Code" maxlength="64" required />
+                </div>
+                <div class="col-sm-6">
+                    <input name="Name" class="form-control" placeholder="Name" maxlength="256" required />
+                </div>
+                <div class="col-sm-3 d-grid">
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- List -->
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th style="width: 80px;">Id</th>
+                    <th style="width: 180px;">Code</th>
+                    <th>Name</th>
+                    <th style="width: 120px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model is { Count: > 0 })
+                {
+                    foreach (var m in Model)
+                    {
+                        <tr>
+                            <td>@m.Id</td>
+                            <td>@m.Code</td>
+                            <td>@m.Name</td>
+                            <td>
+                                <form asp-action="DeleteMedicine" asp-controller="Admin" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@m.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Delete this medicine?');">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No medicines yet.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <a asp-action="ViewUsers" class="btn btn-secondary">Back</a>
+</div>
