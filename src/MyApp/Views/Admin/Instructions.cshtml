@@ -1,24 +1,54 @@
 ﻿@model IReadOnlyList<MyApp.Domain.Instructions.InstructionDto>
 @{
-    ViewData["Title"] = "Instructions";
+    var infoMsg = TempData["Info"] as string;
+    var errMsg = TempData["Error"] as string;
 }
 
 <partial name="~/Views/Shared/_AdminNav.cshtml" />
 
-<h1 class="mb-3">@ViewData["Title"]</h1>
-
 <div class="container mt-3">
-    
-    @if (TempData["Info"] is string infoMsg)
+    @if (!string.IsNullOrWhiteSpace(infoMsg) || !string.IsNullOrWhiteSpace(errMsg))
     {
-        <div class="alert alert-success">@infoMsg</div>
-    }
-    @if (TempData["Error"] is string errMsg)
-    {
-        <div class="alert alert-danger">@errMsg</div>
+        <div class="toast-container position-fixed top-0 end-0 p-3 z-3" style="pointer-events: none;">
+            @if (!string.IsNullOrWhiteSpace(infoMsg))
+            {
+                <div class="toast text-bg-success border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000" style="pointer-events: auto;">
+                    <div class="toast-header bg-success text-white">
+                        <strong class="me-auto">Success</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        @infoMsg
+                    </div>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(errMsg))
+            {
+                <div class="toast text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false" style="pointer-events: auto;">
+                    <div class="toast-header bg-danger text-white">
+                        <strong class="me-auto">Error</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        @errMsg
+                    </div>
+                </div>
+            }
+        </div>
+
+        @section Scripts {
+            <script>
+                (function () {
+                    var toasts = document.querySelectorAll('.toast');
+                    toasts.forEach(function (el) {
+                        var t = new bootstrap.Toast(el);
+                        t.show();
+                    });
+                })();
+            </script>
+        }
     }
 
-    <!-- Add new instruction row -->
     <div class="card mb-3">
         <div class="card-body">
             <form asp-action="AddInstruction" asp-controller="Admin" method="post" class="row g-2">
@@ -36,48 +66,37 @@
         </div>
     </div>
 
-    <!-- List -->
     <div class="table-responsive">
         <table class="table table-striped align-middle">
             <thead>
                 <tr>
-                    <th style="width: 80px;">Id</th>
-                    <th style="width: 180px;">Code</th>
-                    <th>Text</th>
-                    <th style="width: 120px;"></th>
+                    <th scope="col" class="col-1">Id</th>
+                    <th scope="col" class="col-2">Code</th>
+                    <th scope="col">Text</th>
+                    <th scope="col" class="col-1"></th>
                 </tr>
             </thead>
             <tbody>
-                @if (Model is { Count: > 0 })
-                {
-                    foreach (var i in Model)
-                    {
-                        <tr>
-                            <td>@i.Id</td>
-                            <td>@i.Code</td>
-                            <td class="text-break">@i.Text</td>
-                            <td>
-                                <form asp-action="DeleteInstruction" asp-controller="Admin" method="post" class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@i.Id" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger"
-                                            onclick="return confirm('Delete this instruction?');">
-                                        Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
-                }
-                else
+                @foreach (var item in Model)
                 {
                     <tr>
-                        <td colspan="4" class="text-center text-muted">No instructions yet.</td>
+                        <td>@item.Id</td>
+                        <td>@item.Code</td>
+                        <td class="text-break">@item.Text</td>
+                        <td>
+                            <form asp-action="DeleteInstruction" asp-controller="Admin" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Delete this instruction?');">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
 
-    <a asp-action="ViewUsers" class="btn btn-secondary">Back</a>
 </div>

@@ -1,18 +1,18 @@
 ﻿@{
-    var current = (ViewContext.RouteData.Values["action"]?.ToString() ?? "").ToLowerInvariant();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 }
 
-<ul class="nav nav-pills mb-3">
+<ul class="nav nav-tabs mb-4">
     <li class="nav-item">
-        <a class="nav-link @(current == "viewusers" ? "active" : "")" asp-controller="Admin" asp-action="ViewUsers">Users</a>
+        <a class="nav-link @(currentAction == "ViewUsers" ? "active" : "")" asp-action="ViewUsers" asp-controller="Admin">Users</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(current == "reviews" ? "active" : "")" asp-controller="Admin" asp-action="Reviews">Reviews</a>
+        <a class="nav-link @(currentAction == "Reviews" ? "active" : "")" asp-action="Reviews" asp-controller="Admin">Reviews</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(current == "medicines" ? "active" : "")" asp-controller="Admin" asp-action="Medicines">Medicines</a>
+        <a class="nav-link @(currentAction == "Medicines" ? "active" : "")" asp-action="Medicines" asp-controller="Admin">Medicines</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(current == "instructions" ? "active" : "")" asp-controller="Admin" asp-action="Instructions">Instructions</a>
+        <a class="nav-link @(currentAction == "Instructions" ? "active" : "")" asp-action="Instructions" asp-controller="Admin">Instructions</a>
     </li>
 </ul>

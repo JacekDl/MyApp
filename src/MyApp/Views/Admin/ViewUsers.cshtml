@@ -1,13 +1,6 @@
 ﻿@model List<MyApp.Domain.Users.UserDto>
 
-@{
-    ViewData["Title"] = "Users";
-}
 <partial name="~/Views/Shared/_AdminNav.cshtml" />
-
-<h1 class="mb-3">@ViewData["Title"]</h1>
-
-<p>Welcome, @User.Identity?.Name! You have administrator access.</p>
 
 @if(TempData["Error"] != null)
 {

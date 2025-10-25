@@ -72,7 +72,7 @@ public class AdminController(IMediator mediator) : Controller
     public async Task<IActionResult> AddMedicine(MedicineDto item)
     {
         var result = await mediator.Send(new AddMedicineCommand(item.Code, item.Name));
-
+        TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Medicine added." : result.Error;
         return RedirectToAction(nameof(Medicines));
     }
 
@@ -80,9 +80,7 @@ public class AdminController(IMediator mediator) : Controller
     public async Task<IActionResult> DeleteMedicine(int id)
     {
         var result = await mediator.Send(new DeleteMedicineCommand(id));
-
         TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Medicine deleted." : result.Error;
-
         return RedirectToAction(nameof(Medicines));
     }
 
