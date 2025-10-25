@@ -13,6 +13,8 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<User> ApplicationUsers => Set<User>();
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<Entry> Entries => Set<Entry>();
+    public DbSet<Instruction> Instructions => Set<Instruction>();
+    public DbSet<Medicine> Medicines => Set<Medicine>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -46,6 +48,24 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .WithMany(r => r.Entries)
             .HasForeignKey(x => x.ReviewId)
             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Instruction>(e =>
+        {
+            e.ToTable("Instructions");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Code).HasMaxLength(32).IsRequired();
+            e.Property(x => x.Text).HasMaxLength(256).IsRequired();
+            e.HasIndex(x => x.Code).IsUnique();
+        });
+
+        modelBuilder.Entity<Medicine>(e =>
+        {
+            e.ToTable("Medicines");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Code).HasMaxLength(32).IsRequired();
+            e.Property(x => x.Name).HasMaxLength(128).IsRequired();
+            e.HasIndex(x => x.Code).IsUnique();
         });
     }
 }

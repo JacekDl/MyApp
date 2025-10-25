@@ -7,32 +7,22 @@ using MyApp.Domain.Reviews.Queries;
 using MyApp.ViewModels;
 using System.Security.Claims;
 using MyApp.Model;
-using System.Text.Json;
+using MyApp.Domain.Dictionaries.Queries;
 
 namespace MyApp.Controllers;
 
 [Authorize(Roles = "Pharmacist")]
-public class PharmacistController(IReviewPdfService pdfService, IMediator mediator, IWebHostEnvironment env) : Controller
+public class PharmacistController(IReviewPdfService pdfService, IMediator mediator) : Controller
 {
 
     #region GenerateReview
     [HttpGet]
-    public IActionResult Reviews()
+    public async Task<IActionResult> ReviewsAsync()
     {
-        // existing instructions load
-        var instrPath = Path.Combine(env.WebRootPath, "data", "instructions.json");
-        var instrJson = System.IO.File.Exists(instrPath) ? System.IO.File.ReadAllText(instrPath) : "{}";
-        var instrDict = JsonSerializer.Deserialize<Dictionary<string, string>>(instrJson)
-                       ?? new Dictionary<string, string>();
-        ViewBag.InstructionMap = instrDict;
+        var refData = await mediator.Send(new GetDictionariesQuery());
 
-        // NEW: medicines load
-        var medsPath = Path.Combine(env.WebRootPath, "data", "medicines.json");
-        var medsJson = System.IO.File.Exists(medsPath) ? System.IO.File.ReadAllText(medsPath) : "{}";
-        var medsDict = JsonSerializer.Deserialize<Dictionary<string, string>>(medsJson)
-                       ?? new Dictionary<string, string>();
-        ViewBag.MedicineMap = medsDict;
-
+        ViewBag.InstructionMap = refData.InstructionMap;
+        ViewBag.MedicineMap = refData.MedicineMap;
         return View(new ReviewCreateViewModel());
     }
 
