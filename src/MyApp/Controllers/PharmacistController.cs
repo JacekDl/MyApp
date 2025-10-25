@@ -19,11 +19,20 @@ public class PharmacistController(IReviewPdfService pdfService, IMediator mediat
     [HttpGet]
     public IActionResult Reviews()
     {
-        var path = Path.Combine(env.WebRootPath, "data", "instructions.json");
-        var json = System.IO.File.Exists(path) ? System.IO.File.ReadAllText(path) : "{}";
-        var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(json)
-                   ?? new Dictionary<string, string>();
-        ViewBag.InstructionMap = dict;
+        // existing instructions load
+        var instrPath = Path.Combine(env.WebRootPath, "data", "instructions.json");
+        var instrJson = System.IO.File.Exists(instrPath) ? System.IO.File.ReadAllText(instrPath) : "{}";
+        var instrDict = JsonSerializer.Deserialize<Dictionary<string, string>>(instrJson)
+                       ?? new Dictionary<string, string>();
+        ViewBag.InstructionMap = instrDict;
+
+        // NEW: medicines load
+        var medsPath = Path.Combine(env.WebRootPath, "data", "medicines.json");
+        var medsJson = System.IO.File.Exists(medsPath) ? System.IO.File.ReadAllText(medsPath) : "{}";
+        var medsDict = JsonSerializer.Deserialize<Dictionary<string, string>>(medsJson)
+                       ?? new Dictionary<string, string>();
+        ViewBag.MedicineMap = medsDict;
+
         return View(new ReviewCreateViewModel());
     }
 
