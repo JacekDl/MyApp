@@ -1,4 +1,7 @@
-﻿@using MyApp.ViewModels
+﻿@using System.Text.Json
+@using System.Collections.Generic
+
+@using MyApp.ViewModels
 @model ReviewCreateViewModel
 
 @{
@@ -45,23 +48,57 @@
 @section Scripts {
     <script>
         (function () {
-            const maxPairs = 10;
-            const nameInput = document.getElementById('medicineName');
+            // ---- 1) Dictionary from server (with a fallback so 2QDS works even if ViewBag is empty) ----
+            const serverMap = @Html.Raw(
+                            JsonSerializer.Serialize(
+                                    ViewBag.InstructionMap ?? new Dictionary<string, string>()
+                            )
+                    );
+        const fallbackMap = {
+            "1OD":  "Take one once a day",
+            "1BD":  "Take one twice a day",
+            "2TDS": "Take two three times a day",
+            "2QDS": "Take two four times a day",
+            "PRN":  "Take as needed"
+        };
+        const instructionMap = (serverMap && Object.keys(serverMap).length) ? serverMap : fallbackMap;
+        console.debug("[InstructionMap]", instructionMap);
+
+            // ---- 2) Grab elements ----
+            const maxPairs = 5;
+            const nameInput  = document.getElementById('medicineName');
             const adviceInput = document.getElementById('medicineAdvice');
-            const addBtn = document.getElementById('addMedAdviceBtn');
-            const list = document.getElementById('medAdviceList');
-            const hidden = document.getElementById('medAdviceHidden');
-            const clearBtn = document.getElementById('clearBtn');
+            const addBtn     = document.getElementById('addMedAdviceBtn');
+            const list       = document.getElementById('medAdviceList');
+            const hidden     = document.getElementById('medAdviceHidden');
+            const clearBtn   = document.getElementById('clearBtn');
 
-            let pairs = [];
+            let pairs = []; // { name, advice }
 
+            // ---- 3) Expansion helpers ----
+            function expandShorthand(text) {
+                if (!text) return text;
+                const key = text.trim().toUpperCase();
+                if (instructionMap && Object.prototype.hasOwnProperty.call(instructionMap, key)) {
+                    return instructionMap[key];
+                }
+                return text;
+            }
+
+            // Expand live if the field contains a single token (no spaces)
+            function maybeLiveExpand() {
+                const v = adviceInput.value.trim();
+                if (v && !/\s/.test(v)) {
+                    const expanded = expandShorthand(v);
+                    if (expanded !== v) adviceInput.value = expanded;
+                }
+            }
+
+            // ---- 4) Render list + hidden field ----
             function render() {
                 list.innerHTML = '';
                 if (pairs.length === 0) {
-                    const empty = document.createElement('div');
-                    empty.className = 'text-muted';
-                    empty.textContent = 'No items added yet.';
-                    list.appendChild(empty);
+                    list.innerHTML = '<div class="text-muted">No items added yet.</div>';
                 } else {
                     const ul = document.createElement('ul');
                     ul.className = 'list-group';
@@ -69,27 +106,17 @@
                         const li = document.createElement('li');
                         li.className = 'list-group-item d-flex justify-content-between align-items-start';
                         li.innerHTML = `<div><strong>${escapeHtml(p.name)}</strong>: ${escapeHtml(p.advice)}</div>`;
-
                         const btn = document.createElement('button');
                         btn.type = 'button';
                         btn.className = 'btn btn-sm btn-outline-danger';
                         btn.textContent = 'Remove';
-                        btn.addEventListener('click', () => {
-                            pairs.splice(idx, 1);
-                            render();
-                        });
-
-                        const right = document.createElement('div');
-                        right.appendChild(btn);
-                        li.appendChild(right);
-
+                        btn.addEventListener('click', () => { pairs.splice(idx, 1); render(); });
+                        li.appendChild(btn);
                         ul.appendChild(li);
                     });
                     list.appendChild(ul);
                 }
-
                 hidden.value = pairs.map(p => `${p.name} – ${p.advice}`).join('\n');
-
                 addBtn.disabled = pairs.length >= maxPairs;
             }
 
@@ -102,16 +129,17 @@
                     .replace(/'/g, '&#39;');
             }
 
+            // ---- 5) Add pair (with expansion) ----
             function addPair() {
                 const name = (nameInput?.value || '').trim();
-                const advice = (adviceInput?.value || '').trim();
+                let advice = (adviceInput?.value || '').trim();
                 if (!name || !advice) {
-                    if (!name) nameInput?.focus();
-                    else adviceInput?.focus();
+                    if (!name) nameInput?.focus(); else adviceInput?.focus();
                     return;
                 }
                 if (pairs.length >= maxPairs) return;
 
+                advice = expandShorthand(advice); // ensure expansion before storing
                 pairs.push({ name, advice });
                 nameInput.value = '';
                 adviceInput.value = '';
@@ -119,18 +147,37 @@
                 render();
             }
 
+            // ---- 6) Events ----
             addBtn?.addEventListener('click', addPair);
-            nameInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addPair(); } });
-            adviceInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addPair(); } });
+
+            adviceInput?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    adviceInput.value = expandShorthand(adviceInput.value);
+                    addPair();
+                }
+            });
+
+            adviceInput?.addEventListener('blur', () => {
+                adviceInput.value = expandShorthand(adviceInput.value);
+            });
+
+            adviceInput?.addEventListener('input', () => {
+                // live expansion for single-token codes like "2QDS"
+                maybeLiveExpand();
+            });
+
+            nameInput?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); addPair(); }
+            });
 
             clearBtn?.addEventListener('click', function () {
                 pairs = [];
                 render();
-                const form = this.closest('form');
-                if (form) form.reset();
+                this.closest('form')?.reset();
             });
 
-            // Initial render
+            // ---- 7) Init ----
             render();
         })();
     </script>

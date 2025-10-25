@@ -7,17 +7,23 @@ using MyApp.Domain.Reviews.Queries;
 using MyApp.ViewModels;
 using System.Security.Claims;
 using MyApp.Model;
+using System.Text.Json;
 
 namespace MyApp.Controllers;
 
 [Authorize(Roles = "Pharmacist")]
-public class PharmacistController(IReviewPdfService pdfService, IMediator mediator) : Controller
+public class PharmacistController(IReviewPdfService pdfService, IMediator mediator, IWebHostEnvironment env) : Controller
 {
 
     #region GenerateReview
     [HttpGet]
     public IActionResult Reviews()
     {
+        var path = Path.Combine(env.WebRootPath, "data", "instructions.json");
+        var json = System.IO.File.Exists(path) ? System.IO.File.ReadAllText(path) : "{}";
+        var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(json)
+                   ?? new Dictionary<string, string>();
+        ViewBag.InstructionMap = dict;
         return View(new ReviewCreateViewModel());
     }
 
