@@ -64,31 +64,28 @@
 
             let pairs = []; // { name, advice }
 
-            function expandInstruction(text) {
+            function expandInstruction(text) 
+            {
                 if (!text) return text;
                 const key = text.trim().toUpperCase();
                 return Object.prototype.hasOwnProperty.call(instr, key) ? instr[key] : text;
             }
-            function expandMedicine(text) {
+
+            function expandMedicine(text) 
+            {
                 if (!text) return text;
                 const key = text.trim().toUpperCase();
                 return Object.prototype.hasOwnProperty.call(meds, key) ? meds[key] : text;
             }
 
-            // live-expand single-token medicine codes (e.g., PARA → Paracetamol)
-            function maybeLiveExpandMedicine() {
-                const v = (nameInput?.value || '').trim();
-                if (v && !/\s/.test(v)) {
-                    const expanded = expandMedicine(v);
-                    if (expanded !== v) nameInput.value = expanded;
-                }
-            }
-
-            function render() {
+            function render() 
+            {
                 list.innerHTML = '';
-                if (pairs.length === 0) {
+                if (pairs.length === 0) 
+                {
                     list.innerHTML = '<div class="text-muted">No items added yet.</div>';
-                } else {
+                } else 
+                {
                     const ul = document.createElement('ul');
                     ul.className = 'list-group';
                     pairs.forEach((p, idx) => {
@@ -110,23 +107,25 @@
                 addBtn.disabled = pairs.length >= maxPairs;
             }
 
-            function escapeHtml(str) {
+            function escapeHtml(str) 
+            {
                 return String(str)
                     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
                     .replace(/'/g, '&#39;');
             }
 
-            function addPair() {
+            function addPair() 
+            {
                 let name   = (nameInput?.value || '').trim();
                 let advice = (adviceInput?.value || '').trim();
-                if (!name || !advice) {
+                if (!name || !advice) 
+                {
                     if (!name) nameInput?.focus(); else adviceInput?.focus();
                     return;
                 }
                 if (pairs.length >= maxPairs) return;
 
-                // expand codes
                 name   = expandMedicine(name);
                 advice = expandInstruction(advice);
 
@@ -140,15 +139,34 @@
             // --------- EVENTS ---------
             addBtn?.addEventListener('click', addPair);
 
-            nameInput?.addEventListener('input', maybeLiveExpandMedicine);
-            nameInput?.addEventListener('blur', () => { nameInput.value = expandMedicine(nameInput.value); });
             nameInput?.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') { e.preventDefault(); nameInput.value = expandMedicine(nameInput.value); addPair(); }
+                if (e.key === 'Tab' || e.key === ' ') 
+                {
+                    const el = e.currentTarget;
+                    el.value = expandMedicine(el.value);
+                }
+                if (e.key === 'Enter') 
+                {
+                    e.preventDefault();
+                    nameInput.value = expandMedicine(nameInput.value);
+                    addPair();
+                }
             });
 
-            adviceInput?.addEventListener('blur', () => { adviceInput.value = expandInstruction(adviceInput.value); });
-            adviceInput?.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') { e.preventDefault(); adviceInput.value = expandInstruction(adviceInput.value); addPair(); }
+
+            adviceInput?.addEventListener('keydown', function (e) {
+                if (e.key === 'Tab' || e.key === ' ') 
+                {
+                    const el = e.currentTarget; 
+                    el.value = expandInstruction(el.value);
+                }
+                if (e.key === 'Enter') 
+                {
+                    e.preventDefault();
+                    const el = e.currentTarget;
+                    el.value = expandInstruction(el.value);
+                    addPair();
+                }
             });
 
             clearBtn?.addEventListener('click', function () {
