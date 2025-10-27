@@ -53,7 +53,7 @@
 }
 
 <div class="mb-3">
-    <form method="get" asp-action="Reviews" class="d-flex gap-2">
+    <form method="get" asp-controller="Admin" asp-action="Reviews" class="d-flex gap-2">
         <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Search for text..." />
         <input type="text" name="userId" value="@userId" class="form-control" placeholder="Search for user" />
         <select name="completed" class="form-select">

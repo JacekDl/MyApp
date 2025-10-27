@@ -49,21 +49,19 @@
         }
     }
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <form asp-action="AddMedicine" asp-controller="Admin" method="post" class="row g-2">
-                @Html.AntiForgeryToken()
-                <div class="col-sm-3">
-                    <input name="Code" class="form-control" placeholder="Code" maxlength="64" required />
-                </div>
-                <div class="col-sm-7">
-                    <input name="Name" class="form-control" placeholder="Name" maxlength="256" required />
-                </div>
-                <div class="col-sm-2 d-grid">
-                    <button type="submit" class="btn btn-primary">Add</button>
-                </div>
-            </form>
-        </div>
+    <div class="mb-3">
+        <form asp-action="AddMedicine" asp-controller="Admin" method="post" class="row g-2">
+            @Html.AntiForgeryToken()
+            <div class="col-sm-3">
+                <input name="Code" class="form-control" placeholder="Code" maxlength="64" required />
+            </div>
+            <div class="col-sm-7">
+                <input name="Name" class="form-control" placeholder="Name" maxlength="256" required />
+            </div>
+            <div class="col-sm-2 d-grid">
+                <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+        </form>
     </div>
 
     <div class="table-responsive">
