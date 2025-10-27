@@ -1,15 +1,12 @@
 ﻿@{
-    var current = (ViewContext.RouteData.Values["action"]?.ToString() ?? "").ToLowerInvariant();
+    var current = ViewContext.RouteData.Values["action"]?.ToString();
 }
 
-<ul class="nav nav-pills mb-3">
+<ul class="nav nav-tabs mb-4">
     <li class="nav-item">
-        <a class="nav-link @(current == "reviews" ? "active" : "")"
-           asp-controller="Pharmacist" asp-action="Reviews">Reviews</a>
+        <a class="nav-link @(current == "Reviews" ? "active" : "")" asp-controller="Pharmacist" asp-action="Reviews">Reviews</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(current == "tokens" ? "active" : "")"
-           asp-controller="Pharmacist" asp-action="Tokens">Tokens</a>
+        <a class="nav-link @(current == "Tokens" ? "active" : "")" asp-controller="Pharmacist" asp-action="Tokens">Tokens</a>
     </li>
-
 </ul>

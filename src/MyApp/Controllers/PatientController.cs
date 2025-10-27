@@ -117,8 +117,6 @@ public class PatientController(IMediator mediator) : Controller
         return RedirectToAction(nameof(Tokens));
     }
 
-
-
     #endregion
 
     #region ViewReviews

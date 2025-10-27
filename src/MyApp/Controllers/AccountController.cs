@@ -137,7 +137,7 @@ public class AccountController : Controller
                     
                 if (string.Equals(result.Role, "Admin", StringComparison.OrdinalIgnoreCase))
                 {
-                    return RedirectToAction("ViewUsers", "Admin");
+                    return RedirectToAction("Users", "Admin");
                 }
                 
                 if (string.Equals(result.Role, "Pharmacist", StringComparison.OrdinalIgnoreCase))

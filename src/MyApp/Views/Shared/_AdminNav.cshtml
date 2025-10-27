@@ -1,18 +1,18 @@
 ﻿@{
-    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var current = ViewContext.RouteData.Values["action"]?.ToString();
 }
 
 <ul class="nav nav-tabs mb-4">
     <li class="nav-item">
-        <a class="nav-link @(currentAction == "ViewUsers" ? "active" : "")" asp-action="ViewUsers" asp-controller="Admin">Users</a>
+        <a class="nav-link @(current == "Users" ? "active" : "")" asp-action="Users" asp-controller="Admin">Users</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(currentAction == "Reviews" ? "active" : "")" asp-action="Reviews" asp-controller="Admin">Reviews</a>
+        <a class="nav-link @(current == "Reviews" ? "active" : "")" asp-action="Reviews" asp-controller="Admin">Reviews</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(currentAction == "Medicines" ? "active" : "")" asp-action="Medicines" asp-controller="Admin">Medicines</a>
+        <a class="nav-link @(current == "Medicines" ? "active" : "")" asp-action="Medicines" asp-controller="Admin">Medicines</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(currentAction == "Instructions" ? "active" : "")" asp-action="Instructions" asp-controller="Admin">Instructions</a>
+        <a class="nav-link @(current == "Instructions" ? "active" : "")" asp-action="Instructions" asp-controller="Admin">Instructions</a>
     </li>
 </ul>

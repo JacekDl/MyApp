@@ -16,32 +16,19 @@ namespace MyApp.Controllers;
 public class AdminController(IMediator mediator) : Controller
 {
 
-    #region ViewUsers
-    public async Task<IActionResult> ViewUsers()
+    #region Users
+    public async Task<IActionResult> Users()
     {
         var dto = await mediator.Send(new GetAllUsersQuery());
         return View(dto);
     }
 
-    #endregion
-
-    #region RemoveUser
-
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> RemoveUser(string id)
     {
         var result = await mediator.Send(new RemoveUserCommand(id));
-
-        if (!result.IsSuccess)
-        {
-            TempData["Error"] = result.Error;
-        }
-        else
-        {
-            TempData["Info"] = "User removed";
-        }
-
-        return RedirectToAction(nameof(ViewUsers));
+        TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "User removed." : result.Error;
+        return RedirectToAction(nameof(Users));
     }
     #endregion
 

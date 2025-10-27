@@ -12,7 +12,7 @@ public class HomeController : Controller
         {
             if (User.IsInRole("Admin"))
             {
-                return RedirectToAction("ViewUsers", "Admin");
+                return RedirectToAction("Users", "Admin");
             }
 
             if (User.IsInRole("Pharmacist"))
