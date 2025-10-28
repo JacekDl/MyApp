@@ -9,7 +9,6 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
-
     public DbSet<User> ApplicationUsers => Set<User>();
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<Entry> Entries => Set<Entry>();
@@ -23,7 +22,8 @@ public class ApplicationDbContext : IdentityDbContext<User>
         modelBuilder.Entity<User>()
             .HasMany(u => u.Reviews)
             .WithOne(p => p.Pharmacist)
-            .HasForeignKey(p => p.PharmacistId);
+            .HasForeignKey(p => p.PharmacistId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<Review>()
             .Property(r => r.DateCreated)
@@ -31,10 +31,10 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .ValueGeneratedOnAdd();
 
         modelBuilder.Entity<Review>()
-            .HasOne(r => r.Patient)
+            .HasOne(r => r.Patient) 
             .WithMany()
             .HasForeignKey(r => r.PatientId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<Entry>(e =>
         {
@@ -43,7 +43,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
             e.HasOne(x => x.User)
             .WithMany()
             .HasForeignKey(x => x.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.SetNull);
             e.HasOne(x => x.Review)
             .WithMany(r => r.Entries)
             .HasForeignKey(x => x.ReviewId)

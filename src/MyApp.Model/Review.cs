@@ -11,9 +11,8 @@ public class Review
     public DateTime DateCreated { get; set; } //will not need that - get DateCreated from first Entry 
     public bool Completed { get; set; }
 
-    [Required] //won't be required when deleting Pharmacist account - Review will stay with null Pharmacist
-    public string PharmacistId { get; set; } = default!;
-    public User Pharmacist { get; set; } = default!;
+    public string? PharmacistId { get; set; } = default!;
+    public User? Pharmacist { get; set; } = default!;
 
     public string? PatientId { get; set; }
     public User? Patient { get; set; } = default!;
@@ -23,12 +22,12 @@ public class Review
 
     public List<Entry> Entries { get; set; } = new();
   
-    public static Review Create(string pharmacistId, string initialTxt, string number, string? patientId = null)
+    public static Review Create(string pharmacistId, string initialTxt, string number)
     {
         var review =  new Review
         {
             PharmacistId = pharmacistId,
-            PatientId = patientId,
+            PatientId = null,
             Number = number,
             DateCreated = DateTime.UtcNow,
             Completed = false

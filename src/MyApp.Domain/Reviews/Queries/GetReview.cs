@@ -45,7 +45,7 @@ public class GetReviewHandler : IRequestHandler<GetReviewQuery, Result<ReviewDto
 
         var dto = new ReviewDto(
             review.Id,
-            review.PharmacistId,
+            review.PharmacistId!,
             review.Number,
             review.DateCreated,
             review.FirstEntryText ?? string.Empty,

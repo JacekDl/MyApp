@@ -22,7 +22,7 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, Result<R
 
     public async Task<Result<Review>> Handle(CreateReviewCommand request, CancellationToken ct)
     {
-        var user = await _userManager.FindByIdAsync(request.UserId);
+        var user = await _userManager.FindByIdAsync(request.UserId); //user is Pharmacist
         if (user is null)
             return Result<Review>.Fail("User not found.");
 

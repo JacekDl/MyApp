@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyApp.Domain.Data;
 
@@ -10,9 +11,11 @@ using MyApp.Domain.Data;
 namespace MyApp.Domain.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251028175011_ChangeUserDeleteBehaviour")]
+    partial class ChangeUserDeleteBehaviour
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
@@ -418,8 +421,7 @@ namespace MyApp.Domain.Migrations
 
                     b.HasOne("MyApp.Model.User", "Pharmacist")
                         .WithMany("Reviews")
-                        .HasForeignKey("PharmacistId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("PharmacistId");
 
                     b.Navigation("Patient");
 

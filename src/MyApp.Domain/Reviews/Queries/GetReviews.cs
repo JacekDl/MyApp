@@ -82,7 +82,7 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, List<ReviewDto
             .Select(r =>
                  new ReviewDto(
                     r.Id,
-                    r.PharmacistId,
+                    r.PharmacistId!,
                     r.Number,
                     r.DateCreated,
                     r.FirstEntryText,
