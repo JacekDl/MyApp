@@ -6,6 +6,7 @@ using MyApp.Domain.Instructions.Queries;
 using MyApp.Domain.Medicines;
 using MyApp.Domain.Medicines.Commands;
 using MyApp.Domain.Medicines.Queries;
+using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
 using MyApp.Domain.Users.Commands;
 using MyApp.Domain.Users.Queries;
@@ -44,6 +45,13 @@ public class AdminController(IMediator mediator) : Controller
         ViewBag.UserEmail = userEmail;
 
         return View(dto);
+    }
+
+    public async Task<IActionResult> DeleteReview(int id)
+    {
+        var result = await mediator.Send(new DeleteReviewCommand(id));
+        TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Review deleted." : result.Error;
+        return RedirectToAction(nameof(Reviews));
     }
     #endregion
 
