@@ -4,12 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Abstractions;
 using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
-using MyApp.ViewModels;
+using MyApp.Web.ViewModels;
 using System.Security.Claims;
-using MyApp.Model;
 using MyApp.Domain.Dictionaries.Queries;
 
-namespace MyApp.Controllers;
+namespace MyApp.Web.Controllers;
 
 [Authorize(Roles = "Pharmacist")]
 public class PharmacistController(IReviewPdfService pdfService, IMediator mediator) : Controller

@@ -1,4 +1,4 @@
-﻿namespace MyApp.ViewModels;
+﻿namespace MyApp.Web.ViewModels;
 
 public class PublicReviewAccessViewModel
 {

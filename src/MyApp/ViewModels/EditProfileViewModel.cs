@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MyApp.ViewModels;
+namespace MyApp.Web.ViewModels;
 
 public class EditProfileViewModel
 {

@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Users.Commands;
 using MyApp.Domain.Users.Queries;
-using MyApp.ViewModels;
+using MyApp.Web.ViewModels;
 using System.Security.Claims;
 
-namespace MyApp.Controllers;
+namespace MyApp.Web.Controllers;
 
 public class AccountController : Controller
 {

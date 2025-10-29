@@ -5,7 +5,7 @@ using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
 using System.Security.Claims;
 
-namespace MyApp.Controllers;
+namespace MyApp.Web.Controllers;
 
 [Authorize]
 public class ConversationController(IMediator mediator) : Controller

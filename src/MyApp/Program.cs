@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Model;
-using MyApp.Services;
+using MyApp.Web.Services;
 using QuestPDF.Infrastructure;
 using MyApp.Domain.Abstractions;
 using MyApp.Domain.Users.Queries;

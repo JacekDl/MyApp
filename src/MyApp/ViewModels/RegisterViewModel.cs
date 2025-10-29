@@ -1,7 +1,7 @@
-﻿using MyApp.Controllers;
+﻿using MyApp.Web.Controllers;
 using System.ComponentModel.DataAnnotations;
 
-namespace MyApp.ViewModels;
+namespace MyApp.Web.ViewModels;
 
 public class RegisterViewModel
 {

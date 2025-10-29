@@ -3,7 +3,7 @@ using MyApp.Model;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 
-namespace MyApp.Services;
+namespace MyApp.Web.Services;
 
 public class ReviewPdfService : IReviewPdfService
 {

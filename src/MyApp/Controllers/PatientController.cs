@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
-using MyApp.ViewModels;
+using MyApp.Web.ViewModels;
 using System.Security.Claims;
 
-namespace MyApp.Controllers;
+namespace MyApp.Web.Controllers;
 
 public class PatientController(IMediator mediator) : Controller
 {

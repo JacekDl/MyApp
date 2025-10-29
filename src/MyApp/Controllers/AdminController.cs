@@ -11,7 +11,7 @@ using MyApp.Domain.Reviews.Queries;
 using MyApp.Domain.Users.Commands;
 using MyApp.Domain.Users.Queries;
 
-namespace MyApp.Controllers;
+namespace MyApp.Web.Controllers;
 
 [Authorize(Roles = "Admin")]
 public class AdminController(IMediator mediator) : Controller

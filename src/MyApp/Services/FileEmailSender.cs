@@ -1,6 +1,6 @@
 ﻿using MyApp.Domain.Abstractions;
 
-namespace MyApp.Services;
+namespace MyApp.Web.Services;
 
 public class FileEmailSender : IEmailSender
 {
