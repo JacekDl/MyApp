@@ -94,15 +94,17 @@ else
                     <td>@(rev.Completed ? "Yes" : "No")</td>
                         <td>
                             <a asp-action="Display" asp-controller="Conversation" asp-route-number="@rev.Number"
-                               class="btn btn-sm btn-primary">View</a>
+                               class="btn btn-sm btn-outline-primary">View</a>
                         </td>
                     <td>
                         <form asp-action="DeleteReview" method="post" asp-route-id="@rev.Id" style="display:inline">
                             @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-sm btn-danger"
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-sm btn-outline-danger"
                                     onclick="return confirm('Are you sure you want to remove this review?');">
-                                Remove
-                            </button>
+                                Delete
+                                </button>
                         </form>
                     </td>
                 </tr>
