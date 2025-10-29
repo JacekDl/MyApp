@@ -8,14 +8,14 @@ using MyApp.Domain.Data;
 
 #nullable disable
 
-namespace MyApp.Application.Migrations
+namespace MyApp.Domain.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20251006165447_RemovePharmacyFieldsFromUser")]
     partial class RemovePharmacyFieldsFromUser
     {
         /// <inheritdoc />
-        protected void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");

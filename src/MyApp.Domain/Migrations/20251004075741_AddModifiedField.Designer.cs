@@ -8,14 +8,14 @@ using MyApp.Domain.Data;
 
 #nullable disable
 
-namespace MyApp.Application.Migrations
+namespace MyApp.Domain.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20251004075741_AddModifiedField")]
     partial class AddModifiedField
     {
         /// <inheritdoc />
-        protected void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");

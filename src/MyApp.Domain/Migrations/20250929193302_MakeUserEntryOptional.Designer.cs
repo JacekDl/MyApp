@@ -8,7 +8,7 @@ using MyApp.Domain.Data;
 
 #nullable disable
 
-namespace MyApp.Application.Migrations
+namespace MyApp.Domain.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20250929193302_MakeUserEntryOptional")]
