@@ -12,59 +12,55 @@
 
 <div class="mb-3">
     <form method="get" asp-action="Tokens" class="d-flex gap-2">
-        <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Search..." />
+        <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Wyszukaj tekst..." />
         <select name="completed" class="form-select">
-            <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">All</option>
-            <option value="true" selected=@(completed == "true" ? "selected" : null)>Completed</option>
-            <option value="false" selected=@(completed == "false" ? "selected" : null)>Not Completed</option>
-        </select><button type="submit" class="btn btn-primary">Search</button>
-        <a asp-action="Tokens" class="btn btn-outline-secondary">Clear</a>
+            <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">Wszystkie</option>
+            <option value="true" selected=@(completed == "true" ? "selected" : null)>Ukończone</option>
+            <option value="false" selected=@(completed == "false" ? "selected" : null)>Nieukończone</option>
+        </select><button type="submit" class="btn btn-primary">Filtruj</button>
+        <a asp-action="Tokens" class="btn btn-outline-secondary">Wyczyść</a>
     </form>
 
 </div>
 
 @if (!Model.Any())
 {
-    <div class="alert alert-light">You haven't generated any reviews yet.'</div>
+    <div class="alert alert-light">Nie dodałeś jeszcze żadnych zaleceń. Zrób to w zakładce Zalecenia.</div>
 }
 else
 {
-    <table class="table table-stripped align-middle">
-        <thead>
-            <tr>
-                <th>Created</th>
-                <th>Text</th>
-                <th>Status</th>
-                <th>Completed</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach(var rev in Model)
+    <div class="container">
+        <div class="row fw-bold border-bottom py-2">
+            <div class="col-2">Utworzono</div>
+            <div class="col-7">Tekst</div>
+            <div class="col-1">Status</div>
+            <div class="col-1">Ukończone</div>
+            <div class="col-1 text-end"></div>
+        </div>
+
+        @foreach (var rev in Model)
         {
-            <tr class="@(rev.IsNewForViewer ? "table-warning" : "")">
-                <td>@rev.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
-                <td>@rev.Text</td>
-                <td>
-                    @if(rev.IsNewForViewer)
+            <div class="row align-items-center border-bottom py-2 @(rev.IsNewForViewer ? "bg-warning-subtle" : "")">
+                <div class="col-2">@rev.DateCreated.ToString("yyyy-MM-dd HH:mm")</div>
+                <div class="col-7">@rev.Text</div>
+                <div class="col-1">
+                    @if (rev.IsNewForViewer)
                     {
-                        <span class="badge bg-success">New</span>
+                        <span class="badge bg-success">Nowe</span>
                     }
                     else
                     {
-                        <span class="badge bg-secondary">Seen</span>
+                        <span class="badge bg-secondary">Obejrzane</span>
                     }
-                </td>
-                <td>@(rev.Completed ? "Yes" : "No")</td>
-                <td>
+                </div>
+                <div class="col-1">@((rev.Completed) ? "Tak" : "Nie")</div>
+                <div class="col-1 text-end">
                     <a asp-action="Display" asp-controller="Conversation" asp-route-number="@rev.Number"
-                    class="btn btn-sm btn-primary">View</a>
-                </td>
-            </tr>        
-
+                       class="btn btn-sm btn-outline-primary">Info</a>
+                </div>
+            </div>
         }
-        </tbody>
-    </table>
+    </div>
 }
 
 

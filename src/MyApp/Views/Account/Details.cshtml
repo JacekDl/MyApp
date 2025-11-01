@@ -1,7 +1,7 @@
 ﻿@model MyApp.Domain.Users.UserDto;
 
 @{
-    ViewData["Title"] = "Account Details";
+    ViewData["Title"] = "Szczegóły konta";
 }
 
 <h1 class="mb-3">@ViewData["Title"]</h1>
@@ -11,17 +11,17 @@
         <dl class="row mb-0">
             <dt class="col-sm-3">Email</dt>
             <dd class="col-sm-9">@Model.Email</dd>
-            <dt class="col-sm-3">Name</dt>
+            <dt class="col-sm-3">Imię</dt>
             <dd class="col-sm-9">@Model.DisplayName</dd>
-            <dt class="col-sm-3">Created</dt>
+            <dt class="col-sm-3">Utworzono</dt>
             <dd class="col-sm-9">@Model.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</dd>
         </dl>
     </div>
 </div>
 
-<div class="d-grip gap-2 d-md-flex">
-    <a class="btn btn-outline-primary" asp-action="ChangeEmail">Change Email</a>
-    <a class="btn btn-outline-primary" asp-action="ChangePassword">Change Password</a>
-    <a class="btn btn-outline-primary" asp-action="EditProfile">Add / Edit Profile Data</a>
-    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Back</a>
+<div class="d-grid gap-2 d-md-flex">
+    <a class="btn btn-outline-primary" asp-action="ChangeEmail">Zmień email</a>
+    <a class="btn btn-outline-primary" asp-action="ChangePassword">Zmień hasło</a>
+    <a class="btn btn-outline-primary" asp-action="EditProfile">Zmień dane konta</a>
+    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Powrót</a>
 </div>
