@@ -29,6 +29,16 @@
             </div>
         </div>
 
+        <div class="row g-3 align-items-end">
+            <div class="col-md-10">
+                <label for="generalAdvice" class="form-label">Zalecenia</label>
+                <input type="text" id="generalAdvice" class="form-control" />
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="button" id="addGenAdviceBtn" class="btn btn-primary">Dodaj</button>
+            </div>
+        </div>
+
         <div id="medAdviceList" class="mt-4"></div>
 
         <input type="hidden" id="medAdviceHidden" name="Advice" value="" />
@@ -52,15 +62,21 @@
             const instr = (instructionMap && Object.keys(instructionMap).length) ? instructionMap : {};
             const meds  = (medicineMap && Object.keys(medicineMap).length) ? medicineMap : {};
 
-            const maxPairs   = 10;
-            const nameInput  = document.getElementById('medicineName');
-            const adviceInput= document.getElementById('medicineAdvice');
-            const addBtn     = document.getElementById('addMedAdviceBtn');
-            const list       = document.getElementById('medAdviceList');
-            const hidden     = document.getElementById('medAdviceHidden');
-            const clearBtn   = document.getElementById('clearBtn');
+            const maxPairs          = 10;
+            const nameInput         = document.getElementById('medicineName');
+            const adviceInput       = document.getElementById('medicineAdvice');
+            const genAdviceInput    = document.getElementById('generalAdvice');
 
-            let pairs = []; // { name, advice }
+            const addBtn            = document.getElementById('addMedAdviceBtn');
+            const addGenBtn         = document.getElementById('addGenAdviceBtn');
+
+            const list              = document.getElementById('medAdviceList');
+            const hidden            = document.getElementById('medAdviceHidden');
+            const clearBtn          = document.getElementById('clearBtn');
+
+            let pairs = []; // { medicine name, instructions }
+            let genAdvice = "";
+
 
             function expandInstruction(text) 
             {
@@ -80,6 +96,7 @@
             {
                 list.innerHTML = '';
 
+                // medicine - instruction
                 const ul = document.createElement('ul');
                 ul.className = 'list-group';
                 pairs.forEach((p, idx) => {
@@ -89,15 +106,57 @@
                     const btn = document.createElement('button');
                     btn.type = 'button';
                     btn.className = 'btn btn-sm btn-outline-danger';
-                    btn.textContent = 'Remove';
+                    btn.textContent = 'Usuń';
                     btn.addEventListener('click', () => { pairs.splice(idx, 1); render(); });
                     li.appendChild(btn);
                     ul.appendChild(li);
                 });
-                list.appendChild(ul);
+                // general advice
+                if (genAdvice != "")
+                {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item d-flex justify-content-between align-items-start';
+                    // li.innerHTML = `<div>${escapeHtml(genAdvice)}</div>`;
 
-                hidden.value = pairs.map(p => `${p.name} – ${p.advice}`).join('\n');
+                    const text = document.createElement('span');
+                    text.textContent = escapeHtml(genAdvice);
+
+                    const buttonGroup = document.createElement('div');
+
+                    const btnMod = document.createElement('button');
+                    btnMod.type = 'button';
+                    btnMod.classList.add('btn', 'btn-sm', 'btn-outline-primary', 'me-2');
+                    btnMod.textContent = 'Zmień';
+                    btnMod.addEventListener('click', () =>  //TODO: fix this
+                    {
+                        genAdviceInput.value = genAdvice;
+                        genAdvice = "";
+                        genAdviceInput?.focus();
+                        render();
+                    });
+                    
+                    const btnDel = document.createElement('button');
+                    btnDel.type = 'button';
+                    btnDel.classList.add('btn', 'btn-sm', 'btn-outline-danger');
+                    btnDel.textContent = 'Usuń';
+                    btnDel.addEventListener('click', () => 
+                    { 
+                        genAdvice = ""; 
+                        render(); 
+                    });
+                    
+                    buttonGroup.append(btnMod, btnDel);
+                    li.append(text, buttonGroup);
+                    ul.appendChild(li);
+                }
+
+                list.appendChild(ul);
+                let text = pairs.map(p => `${p.name} – ${p.advice}`).join('\n');
+                text += genAdvice != "" ? `\n\n${genAdvice}` : "";
+
+                hidden.value = text;
                 addBtn.disabled = pairs.length >= maxPairs;
+                addGenBtn.disabled = genAdvice != "";
             }
 
             function escapeHtml(str) 
@@ -114,7 +173,8 @@
                 let advice = (adviceInput?.value || '').trim();
                 if (!name || !advice) 
                 {
-                    if (!name) nameInput?.focus(); else adviceInput?.focus();
+                    if (!name) nameInput?.focus(); 
+                    else adviceInput?.focus();
                     return;
                 }
                 if (pairs.length >= maxPairs) return;
@@ -129,8 +189,27 @@
                 render();
             }
 
+            function addAdvice()
+            {
+                let advice = (genAdviceInput?.value || '').trim();
+                if (!advice)
+                {
+                    genAdviceInput?.focus();
+                    return;
+                }
+                if (genAdvice != "")
+                {
+                    return;
+                }
+                genAdvice = advice;
+                genAdviceInput.value = '';
+                nameInput.focus();
+                render();
+            }
+
             // --------- EVENTS ---------
             addBtn?.addEventListener('click', addPair);
+            addGenBtn?.addEventListener('click', addAdvice);
 
             nameInput?.addEventListener('keydown', (e) => {
                 if (e.key === 'Tab' || e.key === ' ') 
@@ -164,6 +243,7 @@
 
             clearBtn?.addEventListener('click', function () {
                 pairs = [];
+                genAdvice = "";
                 render();
                 this.closest('form')?.reset();
             });
