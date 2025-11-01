@@ -102,13 +102,34 @@
                 pairs.forEach((p, idx) => {
                     const li = document.createElement('li');
                     li.className = 'list-group-item d-flex justify-content-between align-items-start';
-                    li.innerHTML = `<div><strong>${escapeHtml(p.name)}</strong>: ${escapeHtml(p.advice)}</div>`;
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'btn btn-sm btn-outline-danger';
-                    btn.textContent = 'Usuń';
-                    btn.addEventListener('click', () => { pairs.splice(idx, 1); render(); });
-                    li.appendChild(btn);
+
+                    const text = document.createElement('span');
+                    text.textContent = escapeHtml(`${p.name}: ${p.advice}`);
+
+                    const buttonGroup = document.createElement('div');
+
+                    const btnMod = document.createElement('button');
+                    btnMod.type = 'button';
+                    btnMod.classList.add('btn', 'btn-sm', 'btn-outline-primary', 'me-2');
+                    btnMod.textContent = 'Zmień';
+                    btnMod.addEventListener('click', () =>
+                    {
+                        nameInput.value = p.name;
+                        adviceInput.value = p.advice;
+                        pairs.splice(idx, 1);
+                        nameInput?.focus();
+                        render();
+                    });
+
+                    const btnDel = document.createElement('button');
+                    btnDel.type = 'button';
+                    btnDel.className = 'btn btn-sm btn-outline-danger';
+                    btnDel.textContent = 'Usuń';
+                    btnDel.addEventListener('click', () => { pairs.splice(idx, 1); render(); });
+
+                    buttonGroup.append(btnMod, btnDel);
+
+                    li.append(text, buttonGroup);
                     ul.appendChild(li);
                 });
                 // general advice
@@ -116,7 +137,6 @@
                 {
                     const li = document.createElement('li');
                     li.className = 'list-group-item d-flex justify-content-between align-items-start';
-                    // li.innerHTML = `<div>${escapeHtml(genAdvice)}</div>`;
 
                     const text = document.createElement('span');
                     text.textContent = escapeHtml(genAdvice);
@@ -127,7 +147,7 @@
                     btnMod.type = 'button';
                     btnMod.classList.add('btn', 'btn-sm', 'btn-outline-primary', 'me-2');
                     btnMod.textContent = 'Zmień';
-                    btnMod.addEventListener('click', () =>  //TODO: fix this
+                    btnMod.addEventListener('click', () =>
                     {
                         genAdviceInput.value = genAdvice;
                         genAdvice = "";
