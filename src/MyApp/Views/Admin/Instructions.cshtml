@@ -50,7 +50,7 @@
     }
 
     <div class="mb-3">
-        <form asp-action="AddInstruction" asp-controller="Admin" method="post" class="row g-2">
+        <form asp-action="AddInstruction" asp-controller="Medicine" method="post" class="row g-2">
             @Html.AntiForgeryToken()
             <div class="col-sm-3">
                 <input name="Code" class="form-control" placeholder="Kod" maxlength="64" required />
@@ -80,7 +80,7 @@
                         <td class="col-2">@item.Code</td>
                         <td class="col-9 text-break">@item.Text</td>
                         <td class="col-1">
-                            <form asp-action="DeleteInstruction" asp-controller="Admin" method="post" class="d-inline">
+                            <form asp-action="DeleteInstruction" asp-controller="Medicine" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@item.Id" />
                                 <button type="submit" class="btn btn-sm btn-outline-danger"

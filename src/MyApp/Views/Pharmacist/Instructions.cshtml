@@ -1,0 +1,31 @@
+﻿@model IReadOnlyList<MyApp.Domain.Instructions.InstructionDto>
+@{
+    var infoMsg = TempData["Info"] as string;
+    var errMsg = TempData["Error"] as string;
+}
+
+<partial name="~/Views/Shared/_PharmacistNav.cshtml" />
+
+<div class="container mt-3">
+
+    <div class="table-responsive">
+        <table class="table table-striped align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col" class="col-3">Kod</th>
+                    <th scope="col" class="col-9">Dawkowanie</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="col-3">@item.Code</td>
+                        <td class="col-9 text-break">@item.Text</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

@@ -55,31 +55,31 @@ public class AdminController(IMediator mediator) : Controller
     }
     #endregion
 
-    #region Medicines
+    //#region Medicines
 
-    public async Task<IActionResult> Medicines()
-    {
-        var dto = await mediator.Send(new GetMedicinesQuery());
-        return View(dto);
-    }
+    //public async Task<IActionResult> Medicines()
+    //{
+    //    var dto = await mediator.Send(new GetMedicinesQuery());
+    //    return View(dto);
+    //}
 
-    [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddMedicine(MedicineDto item)
-    {
-        var result = await mediator.Send(new AddMedicineCommand(item.Code, item.Name));
-        TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Medicine added." : result.Error;
-        return RedirectToAction(nameof(Medicines));
-    }
+    //[HttpPost, ValidateAntiForgeryToken]
+    //public async Task<IActionResult> AddMedicine(MedicineDto item)
+    //{
+    //    var result = await mediator.Send(new AddMedicineCommand(item.Code, item.Name));
+    //    TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Medicine added." : result.Error;
+    //    return RedirectToAction(nameof(Medicines));
+    //}
 
-    [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteMedicine(int id)
-    {
-        var result = await mediator.Send(new DeleteMedicineCommand(id));
-        TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Medicine deleted." : result.Error;
-        return RedirectToAction(nameof(Medicines));
-    }
+    //[HttpPost, ValidateAntiForgeryToken]
+    //public async Task<IActionResult> DeleteMedicine(int id)
+    //{
+    //    var result = await mediator.Send(new DeleteMedicineCommand(id));
+    //    TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Medicine deleted." : result.Error;
+    //    return RedirectToAction(nameof(Medicines));
+    //}
 
-    #endregion
+    //#endregion
 
     #region Instructions
 

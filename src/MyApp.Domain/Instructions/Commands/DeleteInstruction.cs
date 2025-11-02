@@ -13,7 +13,7 @@ namespace MyApp.Domain.Instructions.Commands
         public async Task<Result<bool>> Handle(DeleteInstructionCommand request, CancellationToken ct)
         {
             var entity = await db.Set<Instruction>().FirstOrDefaultAsync(i => i.Id == request.Id, ct);
-            if (entity is null) return Result<bool>.Fail("Instruction not found.");
+            if (entity is null) return Result<bool>.Fail("Nie znaleziono dawkowania.");
 
             db.Remove(entity);
             await db.SaveChangesAsync(ct);
