@@ -17,7 +17,7 @@
         {
             <div class="toast text-bg-success border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000" style="pointer-events: auto;">
                 <div class="toast-header bg-success text-white">
-                    <strong class="me-auto">Success</strong>
+                    <strong class="me-auto">Sukces</strong>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
@@ -29,7 +29,7 @@
         {
             <div class="toast text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false" style="pointer-events: auto;">
                 <div class="toast-header bg-danger text-white">
-                    <strong class="me-auto">Error</strong>
+                    <strong class="me-auto">Błąd</strong>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
@@ -54,21 +54,21 @@
 
 <div class="mb-3">
     <form method="get" asp-controller="Admin" asp-action="Reviews" class="d-flex gap-2">
-        <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Search for text..." />
-        <input type="text" name="userId" value="@userId" class="form-control" placeholder="Search for user" />
+        <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Wyszukaj..." />
+        <input type="text" name="userId" value="@userId" class="form-control" placeholder="Wyszukaj użytkownika..." />
         <select name="completed" class="form-select">
-            <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">All</option>
-            <option value="true" selected=@(completed == "true" ? "selected" : null)>Completed</option>
-            <option value="false" selected=@(completed == "false" ? "selected" : null)>Not Completed</option>
+            <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">Wszystkie</option>
+            <option value="true" selected=@(completed == "true" ? "selected" : null)>Ukończone</option>
+            <option value="false" selected=@(completed == "false" ? "selected" : null)>Nieukończone</option>
         </select>
-        <button type="submit" class="btn btn-primary">Search</button>
-        <a asp-action="Reviews" class="btn btn-outline-secondary">Clear</a>
+        <button type="submit" class="btn btn-primary">Filtruj</button>
+        <a asp-action="Reviews" class="btn btn-outline-secondary">Wyczyść</a>
     </form>
 </div>
 
 @if (!Model.Any())
 {
-    <div class="alert alert-info">No reviews found</div>
+    <div class="alert alert-info">Nie znaleziono żadnych zaleceń.</div>
 }
 else
 {
@@ -76,20 +76,20 @@ else
         <table class="table table-sm table-striped align-middle mb-0">
             <thead class="table-light">
                 <tr>
-                    <th scope="col" class="text-nowrap">Date</th>
-                    <th scope="col">Text</th>
-                    <th scope="col" class="text-nowrap">Completed</th>
-                    <th scope="col" class="text-end" colspan="2">Actions</th>
+                    <th scope="col" class="text-nowrap">Utworzono</th>
+                    <th scope="col">Treść</th>
+                    <th scope="col" class="text-nowrap">Ukończone</th>
+                    <th scope="col" class="text-end" colspan="2"></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var rev in Model)
                 {
                     <tr>
-                        <td class="text-nowrap">@rev.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="text-nowrap">@rev.DateCreated.ToString("yy-MM-dd")</td>
                         <td class="text-break" style="white-space: pre-wrap;">@rev.Text</td>
 
-                        <td class="text-nowrap">@((rev.Completed) ? "Yes" : "No")</td>
+                        <td class="text-nowrap">@((rev.Completed) ? "Tak" : "Nie")</td>
 
                         <td class="text-end">
                             <div class="d-grid gap-2 d-md-inline">
@@ -97,7 +97,7 @@ else
                                    asp-controller="Conversation"
                                    asp-route-number="@rev.Number"
                                    class="btn btn-sm btn-outline-primary w-100 w-md-auto text-nowrap">
-                                    View
+                                    Podgląd
                                 </a>
                             </div>
                         </td>
@@ -105,10 +105,11 @@ else
                         <td class="text-start text-md-end">
                             <form asp-action="DeleteReview" method="post" asp-route-id="@rev.Id" class="d-inline">
                                 @Html.AntiForgeryToken()
+
                                 <button type="submit"
                                         class="btn btn-sm btn-outline-danger w-100 w-md-auto text-nowrap"
-                                        onclick="return confirm('Are you sure you want to remove this review?');">
-                                    Delete
+                                        onclick="return confirm('Czy na pewno chcesz usunąć ten wpis?');">
+                                    Usuń
                                 </button>
                             </form>
                         </td>

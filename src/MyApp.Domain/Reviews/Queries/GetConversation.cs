@@ -45,7 +45,19 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, Resu
                 var entryUser = await _userManager.FindByIdAsync(e.UserId);
                 if (entryUser != null)
                 {
-                    displayName = !string.IsNullOrWhiteSpace(entryUser.DisplayName) ? entryUser.DisplayName : entryUser.Email ?? "Unknown";
+                    if (!string.IsNullOrEmpty(entryUser.DisplayName))
+                    {
+                        displayName = entryUser.DisplayName;
+                    }
+                    else if (entryUser.Role == "Pharmacist")
+                    {
+                        displayName = "Pharmacist";
+                    }
+                    else if (entryUser.Role == "Patient")
+                    {
+                        displayName = "Patient";
+                    }
+
                     var roles = await _userManager.GetRolesAsync(entryUser);
                     if (string.IsNullOrEmpty(displayName) && roles.Count > 0)
                     {

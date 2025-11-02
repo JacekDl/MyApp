@@ -1,0 +1,34 @@
+﻿@model MyApp.Domain.Medicines.MedicineDto
+@{
+    ViewData["Title"] = "Zmień lek";
+}
+
+<div class="container mt-3">
+    <h5 class="mb-3">Edytuj lek</h5>
+
+    <form asp-action="ModifyMedicine" asp-controller="Medicine" method="post" class="row g-3">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <div class="col-12 col-md-4">
+            <label asp-for="Code" class="form-label">Kod</label>
+            <input asp-for="Code" class="form-control" />
+            <span asp-validation-for="Code" class="text-danger"></span>
+        </div>
+
+        <div class="col-12 col-md-8">
+            <label asp-for="Name" class="form-label">Nazwa</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="col-12 d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Zapisz</button>
+            <a asp-action="Medicines" asp-controller="Medicine" class="btn btn-outline-secondary">Anuluj</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

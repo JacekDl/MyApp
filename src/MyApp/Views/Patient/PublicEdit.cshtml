@@ -11,8 +11,10 @@
 }
 
 <div class="mb-3">
-    <label class="form-label">Zalecenia</label>
-    <div class="form-control-plaintext">@Model.Advice</div>
+    <div class="text-center mb-3">
+        <label for="generalAdvice" class="form-label d-block">Zalecenia</label>
+    </div>
+    <div class="form-control-plaintext" style="white-space: pre-wrap;">@Model.Advice</div>
 </div>
 
 <form method="post" asp-action="PublicEdit" asp-route-number="@Model.Number">
@@ -20,9 +22,13 @@
     <input type="hidden" asp-for="@Model.Number" />
 
     <div class="mb-3">
-        <label class="form-label">Twoja opinia</label>
+        <div class="text-center mb-3">
+            <label class="form-label d-block">Twoja opinia</label>
+        </div>
         <textarea class="form-control" rows="8" asp-for="ReviewText" placeholder="Wpisz tutaj swoją opinię na temat zaleceń i skuteczności działania leków poleconych przez Twojego faramaceutę.Prosimy, aby nie umieszczać swoich danych osobowych."></textarea>
     </div>
 
-    <button class="btn btn-outline-primary" type="submit">Prześlij</button>
+    <div class="text-center">
+        <button type="submit" class="btn btn-outline-primary">Prześlij</button>
+    </div>
 </form>

@@ -69,7 +69,7 @@
             <thead>
                 <tr>
                     <th scope="col" class="col-2">Kod</th>
-                    <th scope="col" class="col-9">Nazwa</th>
+                    <th scope="col" class="col-8">Nazwa</th>
                     <th scope="col" class="col-1"></th>
                 </tr>
             </thead>
@@ -79,6 +79,15 @@
                     <tr>
                         <td class="col-2">@item.Code</td>
                         <td class="col-9">@item.Name</td>
+                        <td class="col-1">
+                            <form asp-action="ModifyMedicine" asp-controller="Medicine" method="get" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">
+                                    Zmień
+                                </button>
+                            </form>
+                        </td>
                         <td class="col-1">
                             <form asp-action="DeleteMedicine" asp-controller="Medicine" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()

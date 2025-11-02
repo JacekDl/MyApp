@@ -12,12 +12,10 @@ public record UpdateUserDetailsCommand(string Id, string? Name) : IRequest<Resul
 public class UpdateUserDetailsHandler : IRequestHandler<UpdateUserDetailsCommand, Result<User>>
 {
     private readonly UserManager<User> _userManager;
-    //private readonly SignInManager<User> _signInManager;
 
     public UpdateUserDetailsHandler(UserManager<User> userManager)
     {
         _userManager = userManager;
-        //_signInManager = signInManager;
     }
     public async Task<Result<User>> Handle(UpdateUserDetailsCommand request, CancellationToken ct)
     {

@@ -29,11 +29,70 @@
 }
 else
 {
-    <div class="container-fluid">
+    <div class="table-responsive-sm">
+        <table class="table table-sm table-striped align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col" class="text-nowrap">Utworzono</th>
+                    <th scope="col">Treść</th>
+                    <th scope="col" class="text-nowrap">Status</th>
+                    <th scope="col" class="text-nowrap">Ukończone</th>
+                    <th scope="col" class="text-end" colspan="2"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rev in Model)
+                {
+                    <tr>
+                        <td class="text-nowrap">@rev.DateCreated.ToString("yy-MM-dd")</td>
+                        <td class="text-break" style="white-space: pre-wrap;">@rev.Text</td>
+                        <td>
+                            <span class="d-inline d-md-none text-muted me-2">Status:</span>
+                            @if (rev.IsNewForViewer)
+                            {
+                                <span class="badge bg-success">Nowe</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Obejrzane</span>
+                            }
+                        </td>
+                        <td class="text-nowrap">@((rev.Completed) ? "Tak" : "Nie")</td>
+
+                        <td class="text-end">
+                            <div class="d-grid gap-2 d-md-inline">
+                                <a asp-action="Display"
+                                   asp-controller="Conversation"
+                                   asp-route-number="@rev.Number"
+                                   class="btn btn-sm btn-outline-primary w-100 w-md-auto text-nowrap">
+                                    Podgląd
+                                </a>
+                            </div>
+                        </td>
+
+                        <td class="text-start text-md-end">
+                            <form asp-action="DeleteReview" method="post" asp-route-id="@rev.Id" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-danger w-100 w-md-auto text-nowrap"
+                                        onclick="return confirm('Czy na pewno chcesz usunąć ten wpis?');">
+                                    Usuń
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+    // Old version with responsive design
+    @* <div class="container-fluid">
         <!-- Header: visible on md+ -->
         <div class="row fw-bold border-bottom py-2 d-none d-md-flex">
             <div class="col-md-2 text-center">Utworzono</div>
-            <div class="col-md-7 text-center">Tekst</div>
+            <div class="col-md-7 text-center">Treść</div>
             <div class="col-md-1 text-center">Status</div>
             <div class="col-md-1 text-center">Ukończone</div>
             <div class="col-md-1 text-end">Akcje</div>
@@ -67,26 +126,24 @@ else
                     }
                 </div>
 
-                <!-- Ukończone -->
                 <div class="col-6 col-md-1">
                     <span class="d-inline d-md-none text-muted me-2">Ukończone:</span>
                     @((rev.Completed) ? "Tak" : "Nie")
                 </div>
 
-                <!-- Actions -->
                 <div class="col-12 col-md-1 text-md-end">
                     <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end">
                         <a asp-action="Display"
                            asp-controller="Conversation"
                            asp-route-number="@rev.Number"
                            class="btn btn-sm btn-outline-primary text-nowrap w-100 w-md-auto">
-                            Info
+                            Podgląd
                         </a>
                     </div>
                 </div>
             </div>
         }
-    </div>
+    </div> *@
 }
 
 
