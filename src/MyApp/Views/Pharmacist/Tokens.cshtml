@@ -3,7 +3,7 @@
 @model List<ReviewDto>
 
 @{
-    ViewData["Title"] = "Your reviews";
+    ViewData["Title"] = "Wystawione zalecenia";
     var searchTxt = (string?)ViewBag.Query ?? "";
     var completed = (string?)ViewBag.Completed ?? "";
 }
@@ -51,7 +51,7 @@ else
                 <!-- Tekst -->
                 <div class="col-12 col-md-7">
                     <span class="d-inline d-md-none text-muted me-2">Tekst:</span>
-                    <span class="text-break">@rev.Text</span>
+                    <span class="text-break" style="white-space: pre-wrap;">@rev.Text</span>
                 </div>
 
                 <!-- Status -->

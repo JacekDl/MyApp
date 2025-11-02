@@ -5,7 +5,7 @@
 @model ReviewCreateViewModel
 
 @{
-    ViewData["Title"] = "Create Review";
+    ViewData["Title"] = "Utwórz Zalecenie";
 }
 
 <partial name="~/Views/Shared/_PharmacistNav.cshtml" />
@@ -176,7 +176,7 @@
 
                 list.appendChild(ul);
                 let text = pairs.map(p => `${p.name} – ${p.advice}`).join('\n');
-                text += genAdvice != "" ? `\n\n${genAdvice}` : "";
+                text += genAdvice != "" ? `\n${genAdvice}` : "";
 
                 hidden.value = text;
                 addBtn.disabled = pairs.length >= maxPairs;
