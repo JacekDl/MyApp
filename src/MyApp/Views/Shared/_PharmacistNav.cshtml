@@ -9,4 +9,10 @@
     <li class="nav-item">
         <a class="nav-link @(current == "Tokens" ? "active" : "")" asp-controller="Pharmacist" asp-action="Tokens">Zalecenia</a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link @(current == "Medicines" ? "active" : "")" asp-controller="Medicine" asp-action="Medicines">Leki</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(current == "Instructions" ? "active" : "")" asp-controller="Instruction" asp-action="Instructions">Dawkowanie</a>
+    </li>
 </ul>

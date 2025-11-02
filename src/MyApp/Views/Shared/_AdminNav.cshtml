@@ -4,15 +4,15 @@
 
 <ul class="nav nav-tabs mb-4">
     <li class="nav-item">
-        <a class="nav-link @(current == "Users" ? "active" : "")" asp-action="Users" asp-controller="Admin">Users</a>
+        <a class="nav-link @(current == "Users" ? "active" : "")" asp-controller="Admin" asp-action="Users">Użytkownicy</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(current == "Reviews" ? "active" : "")" asp-action="Reviews" asp-controller="Admin">Reviews</a>
+        <a class="nav-link @(current == "Reviews" ? "active" : "")" asp-controller="Admin" asp-action="Reviews">Zalecenia</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(current == "Medicines" ? "active" : "")" asp-action="Medicines" asp-controller="Admin">Medicines</a>
+        <a class="nav-link @(current == "Medicines" ? "active" : "")" asp-controller="Medicine" asp-action="Medicines">Leki</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(current == "Instructions" ? "active" : "")" asp-action="Instructions" asp-controller="Admin">Instructions</a>
+        <a class="nav-link @(current == "Instructions" ? "active" : "")" asp-controller="Admin" asp-action="Instructions">Instructions</a>
     </li>
 </ul>

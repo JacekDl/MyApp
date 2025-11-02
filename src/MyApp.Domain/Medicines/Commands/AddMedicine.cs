@@ -12,17 +12,17 @@ namespace MyApp.Domain.Medicines.Commands
     {
         public async Task<Result<bool>> Handle(AddMedicineCommand request, CancellationToken ct)
         {
-            var trimmedCode = (request.Code ?? "").Trim();
+            var trimmedCode = (request.Code ?? "").Trim().ToUpper();
             var trimmedName = (request.Name ?? "").Trim();
 
             if (string.IsNullOrWhiteSpace(trimmedCode) || string.IsNullOrWhiteSpace(trimmedName))
-                return Result<bool>.Fail("Code and Name are required.");
+                return Result<bool>.Fail("Kod i nazwa leku są wymagane.");
 
-            var exists = await db.Set<Medicine>()
+            var exists = await db.Set<Medicine>()   
                 .AnyAsync(m => m.Code == trimmedCode, ct);
 
             if (exists)
-                return Result<bool>.Fail($"Medicine with code '{trimmedCode}' already exists.");
+                return Result<bool>.Fail($"Kod '{trimmedCode}' jest już przypisany do leku.");
 
             db.Add(new Medicine { Code = trimmedCode, Name = trimmedName });
             await db.SaveChangesAsync(ct);
