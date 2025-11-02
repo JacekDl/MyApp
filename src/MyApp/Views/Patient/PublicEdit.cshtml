@@ -2,10 +2,8 @@
 @model PublicReviewEditViewModel
 
 @{
-    ViewData["Title"] = "Your review";
+    ViewData["Title"] = "Twoja Opinia";
 }
-
-<h2>Your review</h2>
 
 @if(TempData["Saved"] is not null)
 {
@@ -13,7 +11,7 @@
 }
 
 <div class="mb-3">
-    <label class="form-label">Advice</label>
+    <label class="form-label">Zalecenia</label>
     <div class="form-control-plaintext">@Model.Advice</div>
 </div>
 
@@ -22,9 +20,9 @@
     <input type="hidden" asp-for="@Model.Number" />
 
     <div class="mb-3">
-        <label class="form-label">Your response</label>
-        <textarea class="form-control" rows="8" asp-for="ReviewText" placeholder="Write your review here..."></textarea>
+        <label class="form-label">Twoja opinia</label>
+        <textarea class="form-control" rows="8" asp-for="ReviewText" placeholder="Wpisz tutaj swoją opinię na temat zaleceń i skuteczności działania leków poleconych przez Twojego faramaceutę.Prosimy, aby nie umieszczać swoich danych osobowych."></textarea>
     </div>
 
-    <button class="btn btn-primary" type="submit">Save</button>
+    <button class="btn btn-outline-primary" type="submit">Prześlij</button>
 </form>

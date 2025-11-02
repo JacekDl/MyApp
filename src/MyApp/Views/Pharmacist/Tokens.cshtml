@@ -29,21 +29,34 @@
 }
 else
 {
-    <div class="container">
-        <div class="row fw-bold border-bottom py-2">
-            <div class="col-2">Utworzono</div>
-            <div class="col-7">Tekst</div>
-            <div class="col-1">Status</div>
-            <div class="col-1">Ukończone</div>
-            <div class="col-1 text-end"></div>
+    <div class="container-fluid">
+        <!-- Header: visible on md+ -->
+        <div class="row fw-bold border-bottom py-2 d-none d-md-flex">
+            <div class="col-md-2 text-center">Utworzono</div>
+            <div class="col-md-7 text-center">Tekst</div>
+            <div class="col-md-1 text-center">Status</div>
+            <div class="col-md-1 text-center">Ukończone</div>
+            <div class="col-md-1 text-end">Akcje</div>
         </div>
 
         @foreach (var rev in Model)
         {
-            <div class="row align-items-center border-bottom py-2 @(rev.IsNewForViewer ? "bg-warning-subtle" : "")">
-                <div class="col-2">@rev.DateCreated.ToString("yyyy-MM-dd HH:mm")</div>
-                <div class="col-7">@rev.Text</div>
-                <div class="col-1">
+            <div class="row align-items-center border-bottom py-3 g-2 @(rev.IsNewForViewer ? "bg-warning-subtle" : "")">
+                <!-- Utworzono -->
+                <div class="col-12 col-md-2">
+                    <span class="d-inline d-md-none text-muted me-2">Utworzono:</span>
+                    @rev.DateCreated.ToString("yyyy-MM-dd HH:mm")
+                </div>
+
+                <!-- Tekst -->
+                <div class="col-12 col-md-7">
+                    <span class="d-inline d-md-none text-muted me-2">Tekst:</span>
+                    <span class="text-break">@rev.Text</span>
+                </div>
+
+                <!-- Status -->
+                <div class="col-6 col-md-1">
+                    <span class="d-inline d-md-none text-muted me-2">Status:</span>
                     @if (rev.IsNewForViewer)
                     {
                         <span class="badge bg-success">Nowe</span>
@@ -53,10 +66,23 @@ else
                         <span class="badge bg-secondary">Obejrzane</span>
                     }
                 </div>
-                <div class="col-1">@((rev.Completed) ? "Tak" : "Nie")</div>
-                <div class="col-1 text-end">
-                    <a asp-action="Display" asp-controller="Conversation" asp-route-number="@rev.Number"
-                       class="btn btn-sm btn-outline-primary">Info</a>
+
+                <!-- Ukończone -->
+                <div class="col-6 col-md-1">
+                    <span class="d-inline d-md-none text-muted me-2">Ukończone:</span>
+                    @((rev.Completed) ? "Tak" : "Nie")
+                </div>
+
+                <!-- Actions -->
+                <div class="col-12 col-md-1 text-md-end">
+                    <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end">
+                        <a asp-action="Display"
+                           asp-controller="Conversation"
+                           asp-route-number="@rev.Number"
+                           class="btn btn-sm btn-outline-primary text-nowrap w-100 w-md-auto">
+                            Info
+                        </a>
+                    </div>
                 </div>
             </div>
         }

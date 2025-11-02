@@ -1,18 +1,18 @@
 ﻿@using MyApp.Web.ViewModels
 @model PublicReviewAccessViewModel
 
-<h2>Review @Model.Number</h2>
+<h2>Twoje zalecenia</h2>
 
-<p>@Model.Advice</p>
+<p>Zalecenia dostępne po wybraniu jednej z poniższych opcji:</p>
 
 <div>
-    <a asp-controller="Patient" asp-action="PublicEdit" asp-route-number="@Model.Number"class="btn btn-primary">
-        Leave a comment
+    <a asp-controller="Patient" asp-action="PublicEdit" asp-route-number="@Model.Number" class="btn btn-primary">
+        Wystaw opinię
     </a>
     <a asp-controller="Account" 
         asp-action="RegisterPatient" 
         asp-route-returnUrl="@Url.Action("PublicEdit", "Patient", new {number = Model.Number})"
         class="btn btn-primary">
-        Register or login
+        Zarejestruj się lub zaloguj
     </a>
 </div>

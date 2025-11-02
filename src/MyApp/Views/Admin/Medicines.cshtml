@@ -53,13 +53,13 @@
         <form asp-action="AddMedicine" asp-controller="Admin" method="post" class="row g-2">
             @Html.AntiForgeryToken()
             <div class="col-sm-3">
-                <input name="Code" class="form-control" placeholder="Code" maxlength="64" required />
+                <input name="Code" class="form-control" placeholder="Kod" maxlength="64" required />
             </div>
             <div class="col-sm-7">
-                <input name="Name" class="form-control" placeholder="Name" maxlength="256" required />
+                <input name="Name" class="form-control" placeholder="Nazwa" maxlength="256" required />
             </div>
             <div class="col-sm-2 d-grid">
-                <button type="submit" class="btn btn-primary">Add</button>
+                <button type="submit" class="btn btn-outline-primary">Dodaj</button>
             </div>
         </form>
     </div>
@@ -68,9 +68,8 @@
         <table class="table table-striped align-middle">
             <thead>
                 <tr>
-                    <th scope="col" class="col-1">Id</th>
-                    <th scope="col" class="col-2">Code</th>
-                    <th scope="col">Name</th>
+                    <th scope="col" class="col-2">Kod</th>
+                    <th scope="col" class="col-9">Nazwa</th>
                     <th scope="col" class="col-1"></th>
                 </tr>
             </thead>
@@ -78,16 +77,15 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td>@item.Id</td>
-                        <td>@item.Code</td>
-                        <td>@item.Name</td>
-                        <td>
+                        <td class="col-2">@item.Code</td>
+                        <td class="col-9">@item.Name</td>
+                        <td class="col-1">
                             <form asp-action="DeleteMedicine" asp-controller="Admin" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@item.Id" />
                                 <button type="submit" class="btn btn-sm btn-outline-danger"
-                                        onclick="return confirm('Delete this medicine?');">
-                                    Delete
+                                        onclick="return confirm('Czy na pewno chcesz usunąć?');">
+                                    Usuń
                                 </button>
                             </form>
                         </td>

@@ -1,11 +1,11 @@
 ﻿@using MyApp.Web.ViewModels
 @model RegisterViewModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Rejestracja";
     var returnUrl = (string?)ViewData["ReturnUrl"];
 }
 
-<h2>Register</h2>
+<h2>Rejestracja</h2>
 
 <form asp-controller="Account" asp-action=@Model.PostAction asp-route-returnUrl="@(returnUrl ?? string.Empty)" method="post">
     @Html.AntiForgeryToken()
@@ -17,18 +17,18 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="Password" class="form-label"></label>
+        <label class="form-label">Hasło</label>
         <input asp-for="Password" class="form-control" />
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="ConfirmPassword" class="form-label"></label>
+        <label class="form-label">Potwierdź hasło</label>
         <input asp-for="ConfirmPassword" class="form-control" />
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
     </div>
 
-    <button type="Submit" class="btn btn-success">Create account</button>
+    <button type="Submit" class="btn btn-primary">Utwórz konto</button>
 </form>
 
 @section Scripts {

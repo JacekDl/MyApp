@@ -53,24 +53,23 @@
         <form asp-action="AddInstruction" asp-controller="Admin" method="post" class="row g-2">
             @Html.AntiForgeryToken()
             <div class="col-sm-3">
-                <input name="Code" class="form-control" placeholder="Code" maxlength="64" required />
+                <input name="Code" class="form-control" placeholder="Kod" maxlength="64" required />
             </div>
             <div class="col-sm-7">
-                <input name="Text" class="form-control" placeholder="Text" maxlength="1024" required />
+                <input name="Text" class="form-control" placeholder="Dawkowanie" maxlength="1024" required />
             </div>
             <div class="col-sm-2 d-grid">
-                <button type="submit" class="btn btn-primary">Add</button>
+                <button type="submit" class="btn btn-outline-primary">Dodaj</button>
             </div>
         </form>
     </div>
 
     <div class="table-responsive">
-        <table class="table table-striped align-middle">
-            <thead>
+        <table class="table table-striped align-middle mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th scope="col" class="col-1">Id</th>
-                    <th scope="col" class="col-2">Code</th>
-                    <th scope="col">Text</th>
+                    <th scope="col" class="col-2">Kod</th>
+                    <th scope="col" class="col-9">Dawkowanie</th>
                     <th scope="col" class="col-1"></th>
                 </tr>
             </thead>
@@ -78,16 +77,15 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td>@item.Id</td>
-                        <td>@item.Code</td>
-                        <td class="text-break">@item.Text</td>
-                        <td>
+                        <td class="col-2">@item.Code</td>
+                        <td class="col-9 text-break">@item.Text</td>
+                        <td class="col-1">
                             <form asp-action="DeleteInstruction" asp-controller="Admin" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@item.Id" />
                                 <button type="submit" class="btn btn-sm btn-outline-danger"
-                                        onclick="return confirm('Delete this instruction?');">
-                                    Delete
+                                        onclick="return confirm('Czy na pewno chcesz usunąć?');">
+                                    Usuń
                                 </button>
                             </form>
                         </td>

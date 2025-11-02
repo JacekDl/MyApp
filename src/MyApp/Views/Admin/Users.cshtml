@@ -41,22 +41,20 @@
         <table class="table table-sm table-striped align-middle">
             <thead>
                 <tr>
-                    <th scope="col">Id</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Role</th>
-                    <th scope="col">Created</th>
-                    <th scope="col"></th>
+                    <th scope="col" class="col-4">Email</th>
+                    <th scope="col" class="col-4">Rola</th>
+                    <th scope="col" class="col-3">Utworzono</th>
+                    <th scope="col" class="col-1"></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach(var user in Model)
                 {
                     <tr>
-                        <td>@user.Id</td>
-                        <td>@user.Email</td>
-                        <td>@user.Role</td>
-                        <td>@user.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
-                        <td>
+                        <td class="col-4">@user.Email</td>
+                        <td class="col-4">@user.Role</td>
+                        <td class="col-3">@user.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="col-1">
                             @if (!string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
                             {
                                 <form asp-action="RemoveUser" method="post" asp-route-id="@user.Id" style="display:inline">
@@ -64,8 +62,8 @@
                                     <button 
                                         type="submit" 
                                         class="btn btn-sm btn-outline-danger"
-                                        onclick="return confirm('Are you sure you want to remove this user?');">
-                                        Delete
+                                        onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?');">
+                                        Usuń
                                     </button>
                                 </form>
                             }

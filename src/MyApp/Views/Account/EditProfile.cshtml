@@ -2,7 +2,7 @@
 @model EditProfileViewModel
 
 @{
-    ViewData["Title"] = "Edit Profile";
+    ViewData["Title"] = "Edytuj Profil";
 }
 
 <h1 class="mb-3">@ViewData["Title"]</h1>
@@ -18,8 +18,8 @@
         <span asp-validation-for="DisplayName" class="text-danger"></span>
     </div>
 
-    <button class="btn btn-primary" type="submit">Save</button>
-    <a class="btn btn-link" asp-action="Details">Cancel</a>
+    <button class="btn btn-primary" type="submit">Zapisz</button>
+    <a class="btn btn-link" asp-action="Details">Anuluj</a>
 
 </form>
 
