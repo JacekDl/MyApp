@@ -14,6 +14,12 @@ namespace MyApp.Domain.Medicines.Commands
         {
             var trimmedCode = (request.Code ?? "").Trim().ToUpper();
             var trimmedName = (request.Name ?? "").Trim();
+            trimmedName = trimmedName.Length switch
+            {
+                0 => "",
+                1 => trimmedName.ToUpper(),
+                _ => char.ToUpper(trimmedName[0]) + trimmedName[1..].ToLower()
+            };
 
             if (string.IsNullOrWhiteSpace(trimmedCode) || string.IsNullOrWhiteSpace(trimmedName))
                 return Result<bool>.Fail("Kod i nazwa leku są wymagane.");
