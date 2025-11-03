@@ -7,6 +7,7 @@ using MyApp.Domain.Medicines;
 using MyApp.Domain.Medicines.Commands;
 using MyApp.Domain.Medicines.Queries;
 using MyApp.Domain.Abstractions;
+using MyApp.Domain.Instructions;
 
 namespace MyApp.Web.Controllers
 {
@@ -111,6 +112,31 @@ namespace MyApp.Web.Controllers
         {
             var result = await mediator.Send(new DeleteInstructionCommand(id));
             TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Usunięto dawkowanie." : result.Error;
+            return RedirectToAction(nameof(Instructions));
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<IActionResult> ModifyInstruction(int id)
+        {
+            var result = await mediator.Send(new GetInstructionQuery(id));
+            if (!result.IsSuccess)
+            {
+                TempData["Error"] = "Dawkowanie nie zostało odnalezione.";
+                return RedirectToAction(nameof(Instructions));
+            }
+            return View("~/Views/Admin/ModifyInstruction.cshtml", result.Value);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ModifyInstruction(InstructionDto item)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(item);
+            }
+            var result = await mediator.Send(new UpdateInstructionCommand(item.Id, item.Code, item.Text));
             return RedirectToAction(nameof(Instructions));
         }
 

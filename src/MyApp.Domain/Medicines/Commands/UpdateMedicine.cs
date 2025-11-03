@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
-using MyApp.Domain.Users.Commands;
 using MyApp.Model;
 
 namespace MyApp.Domain.Medicines.Commands
@@ -12,13 +11,10 @@ namespace MyApp.Domain.Medicines.Commands
 
     public class UpdateMedicineHandler : IRequestHandler<UpdateMedicineCommand, Result<bool>>
     {
-        private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _db;
 
-
-        public UpdateMedicineHandler(UserManager<User> userManager, ApplicationDbContext db)
+        public UpdateMedicineHandler( ApplicationDbContext db)
         {
-            _userManager = userManager;
             _db = db;
         }
         public async Task<Result<bool>> Handle(UpdateMedicineCommand request, CancellationToken ct)
