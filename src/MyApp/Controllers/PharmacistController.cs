@@ -34,18 +34,30 @@ public class PharmacistController(IReviewPdfService pdfService, IMediator mediat
         }
 
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var result = await mediator.Send(new CreateReviewCommand(currentUserId, vm.Advice));
-
-        if(!result.IsSuccess || result.Value is null)
+        try
         {
-            ModelState.AddModelError("", result.Error ?? "Could not create review.");
+
+            var result = await mediator.Send(new CreateReviewCommand(currentUserId, vm.Advice));
+
+            if (!result.IsSuccess || result.Value is null)
+            {
+                ModelState.AddModelError("", result.Error ?? "Could not create review.");
+                return View(vm);
+            }
+
+            var pdfBytes = await pdfService.GenerateReviewPdf(result.Value!);
+
+            Response.Headers.ContentDisposition = "inline; filename=review.pdf";
+            return File(pdfBytes, "application/pdf");
+        }
+        catch (FluentValidation.ValidationException ex)
+        {
+            foreach(var error in ex.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
             return View(vm);
         }
-
-        var pdfBytes = await pdfService.GenerateReviewPdf(result.Value!);
-
-        Response.Headers.ContentDisposition = "inline; filename=review.pdf";
-        return File(pdfBytes, "application/pdf");
     }
     #endregion
 

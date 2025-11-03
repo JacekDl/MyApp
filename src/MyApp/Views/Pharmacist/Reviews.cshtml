@@ -13,6 +13,7 @@
 <form asp-action="Reviews" asp-controller="Pharmacist" method="post" target="_blank">
     @Html.AntiForgeryToken()
 
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
     
     <div>
         <div class="row g-3 align-items-end">

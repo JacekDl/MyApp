@@ -1,13 +1,15 @@
+using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Abstractions;
 using MyApp.Domain.Data;
 using MyApp.Domain.Extensions;
+using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Users.Queries;
 using MyApp.Model;
 using MyApp.Web.Services;
-using QuestPDF.Drawing;
 using QuestPDF.Infrastructure;
 
 
@@ -26,6 +28,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddSingleton<IReviewPdfService, ReviewPdfService>();
 builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
 
+
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(GetAllUsersHandler).Assembly);
@@ -45,6 +49,8 @@ builder.Services.AddAuthorizationBuilder()
     .SetFallbackPolicy(new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
         .Build());
+
+builder.Services.AddValidatorsFromAssemblyContaining<CreateReviewCommandValidator>(); //czy inne assemblies tez trzeba zarejestrowac?
 
 var app = builder.Build();
 

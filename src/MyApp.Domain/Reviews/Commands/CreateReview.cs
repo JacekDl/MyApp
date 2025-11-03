@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
@@ -34,6 +35,7 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, Result<R
         return Result<Review>.Ok(review);
     }
 
+
     private static string GenerateDigits(int bytes = 16)
     {
         byte[] buffer = new byte[bytes];
@@ -44,5 +46,17 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, Result<R
             .Replace("=", "") 
             [..bytes];
         return token;
+    }
+}
+
+public class CreateReviewCommandValidator : AbstractValidator<CreateReviewCommand>
+{
+    public CreateReviewCommandValidator()
+    {
+        RuleFor(x => x.UserId)
+            .NotEmpty().WithMessage("UserId jest wymagany.");
+        RuleFor(x => x.Advice)
+            .NotEmpty().WithMessage("Zalecenia są wymagane.")
+            .MaximumLength(500).WithMessage("Zalecania nie mogą być dłuższe niż 500 znaków.");
     }
 }
