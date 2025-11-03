@@ -32,19 +32,38 @@ public class ConversationController(IMediator mediator) : Controller
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        var add = await mediator.Send(new AddConversationEntryCommand(number, currentUserId, text));
-        if (!add.IsSuccess)
+        try
         {
+            var add = await mediator.Send(new AddConversationEntryCommand(number, currentUserId, text));
+            if (!add.IsSuccess)
+            {
+                var threadFail = await mediator.Send(new GetConversationQuery(number, currentUserId));
+                if (!threadFail.IsSuccess || threadFail.Value is null)
+                {
+                    return NotFound();
+                }
+                ModelState.AddModelError("text", add.Error ?? "Nie można dodać wiadomości.");
+                return View(threadFail.Value);
+            }
+
+            TempData["Info"] = "Message sent.";
+            return RedirectToAction(nameof(Display), new { number });
+        }
+        catch(FluentValidation.ValidationException ex)
+        {
+            foreach (var error in ex.Errors)
+            {
+                var key = string.IsNullOrWhiteSpace(error.PropertyName) ? "text" : error.PropertyName;
+                ModelState.AddModelError(key, error.ErrorMessage);
+            }
+
             var thread = await mediator.Send(new GetConversationQuery(number, currentUserId));
             if (!thread.IsSuccess || thread.Value is null)
-            {
                 return NotFound();
-            }
-            ModelState.AddModelError("text", add.Error!);
+
             return View(thread.Value);
         }
-        TempData["Info"] = "Message sent.";
-        return RedirectToAction(nameof(Display), new { number });
+
     }
     #endregion
 

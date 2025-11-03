@@ -4,35 +4,85 @@
     ViewData["Title"] = "Conversation";
 }
 
-<h2>Conversation @Model.Number</h2>
 
-<ul class="list-group mb-3">
-    @foreach(var e in Model.Entries)
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+    @if (TempData["Info"] is string infoMsg)
     {
-        <li class="list-group-item">
-            <strong>@e.DisplayName</strong>
-            <div class="small text-muted">@e.CreatedUtc.ToLocalTime()</div>
-            <div>@e.Text</div>
-        </li>
+        <div class="toast text-bg-success border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000" style="pointer-events: auto;">
+            <div class="toast-header bg-success text-white">
+                <strong class="me-auto">Success</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                @infoMsg
+            </div>
+        </div>
     }
-</ul>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        var errors = ViewData.ModelState
+        .SelectMany(kvp => kvp.Value!.Errors.Select(e => new { Key = kvp.Key, e.ErrorMessage }))
+        .ToList();
+
+        foreach (var errMsg in errors)
+        {
+            <div class="toast text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false" style="pointer-events: auto;">
+                <div class="toast-header bg-danger text-white">
+                    <strong class="me-auto">Error</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    @errMsg.ErrorMessage
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<div>
+    <ul class="list-group mb-3">
+        @foreach(var e in Model.Entries)
+        {
+            <li class="list-group-item">
+                <strong>@e.DisplayName</strong>
+                <div class="small text-muted">@e.CreatedUtc.ToLocalTime()</div>
+                <div>@e.Text</div>
+            </li>
+        }
+    </ul>
+</div>
 
 <form asp-controller="Conversation" asp-action="Display" method="post">
     @Html.AntiForgeryToken()
 
     <input type="hidden" name="number" value="@Model.Number" />
     <div class="mb-3">
-        <label for="Text" class="form-label">Add message</label>
+        <label for="Text" class="form-label">Dodaj wiadomość</label>
         <textarea id="Text" name="Text" class="form-control" rows="3"></textarea>
-        <span class="text-danger">@Html.ValidationMessage("Text")</span>
     </div>
-    <button type="submit" class="btn btn-primary">Send</button>
+    <button type="submit" class="btn btn-primary">Wyślij</button>
     @if (User.IsInRole("Pharmacist"))
     {
-        <a asp-controller="Pharmacist" asp-action="Tokens" class="btn btn-secondary">Back</a>
+        <a asp-controller="Pharmacist" asp-action="Tokens" class="btn btn-outline-secondary">Powrót</a>
     }
     else if (User.IsInRole("Patient"))
     {
-        <a asp-controller="Patient" asp-action="Tokens" class="btn btn-secondary">Back</a>
+        <a asp-controller="Patient" asp-action="Tokens" class="btn btn-outline-secondary">Powrót</a>
     }
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!window.bootstrap || !bootstrap.Toast) return;
+
+            document.querySelectorAll('.toast').forEach(function (el) {
+                const t = new bootstrap.Toast(el, { autohide: true, delay: 5000 });
+                t.show();
+            });
+        });
+    </script>
+}

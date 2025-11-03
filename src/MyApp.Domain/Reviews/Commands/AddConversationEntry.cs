@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
@@ -71,5 +72,33 @@ public class AddConversationEntryHandler : IRequestHandler<AddConversationEntryC
 
         await _db.SaveChangesAsync(ct);
         return Result<bool>.Ok(true);
+    }
+}
+
+public class AddConversationEntryCommandValidator : AbstractValidator<AddConversationEntryCommand>
+{
+    private const int RequiredNumberLength = 16;
+    private const int MaxTextLength = 200;
+
+    public AddConversationEntryCommandValidator()
+    {
+        RuleFor(x => x.Number)
+            .NotEmpty().WithMessage("Review number is required.")
+            .Length(RequiredNumberLength)
+                .WithMessage($"Review number must be exactly {RequiredNumberLength} characters long.")
+            .Matches("^[A-Za-z0-9]+$")
+                .WithMessage("Review number must contain only letters and digits.");
+
+        RuleFor(x => x.RequestingUserId)
+            .NotEmpty().WithMessage("User ID is required.");
+
+        RuleFor(x => x.Text)
+            .Cascade(CascadeMode.Stop)
+            .NotNull().WithMessage("Wiadomość nie może być pusta.")
+            .Must(s => !string.IsNullOrWhiteSpace(s))
+                .WithMessage("Message cannot be empty.")
+            .Must(s => (s ?? string.Empty).Trim().Length <= MaxTextLength)
+                .WithMessage($"Message cannot exceed {MaxTextLength} characters.")
+            .OverridePropertyName("text");
     }
 }
