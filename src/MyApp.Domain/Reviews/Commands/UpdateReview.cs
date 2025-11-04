@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
@@ -43,5 +44,25 @@ public class UpdateReviewHandler : IRequestHandler<UpdateReviewCommand, Result<b
 
         await _db.SaveChangesAsync();
         return Result<bool>.Ok(true);
+    }
+
+    public class UpdateReviewCommandValidator : AbstractValidator<UpdateReviewCommand>
+    {
+        private const int NumberLen = 16;
+        private const int MaxReviewLen = 200;
+
+        public UpdateReviewCommandValidator()
+        {
+            RuleFor(x => x.Number)
+                .NotEmpty().WithMessage("Numer tokenu jest wymagany.")
+                .Length(NumberLen).WithMessage($"Numer tokenu musi mieć dokładnie {NumberLen} znaków.")
+                .Matches("^[A-Za-z0-9]+$").WithMessage("Numer tokenu może zawierać tylko litery i cyfry.");
+
+            RuleFor(x => x.ReviewText)
+                .Must(s => !string.IsNullOrWhiteSpace(s))
+                    .WithMessage("Opinia nie może być pusta.")
+                .Must(s => (s ?? string.Empty).Trim().Length <= MaxReviewLen)
+                    .WithMessage($"Opinia nie może przekraczać {MaxReviewLen} znaków.");
+        }
     }
 }

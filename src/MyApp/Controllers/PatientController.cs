@@ -65,14 +65,44 @@ public class PatientController(IMediator mediator) : Controller
             return BadRequest();
         }
 
-        var result = await mediator.Send(new UpdateReviewCommand(number, vm.ReviewText));
-
-        if (!result.IsSuccess)
+        try
         {
-            return NotFound(); //TODO: View with error message can be implemented here.
+            var result = await mediator.Send(new UpdateReviewCommand(number, vm.ReviewText));
+
+            if (!result.IsSuccess)
+            {
+                ModelState.AddModelError(nameof(vm.ReviewText), result.Error!);
+                var data = await mediator.Send(new GetReviewQuery(number));
+                if (data.IsSuccess && data.Value is not null)
+                {
+                    vm.Advice = data.Value.Text;
+                    vm.Number = data.Value.Number;
+                }
+                return View(vm);
+            }   
+            return RedirectToAction("CompleteEdit", new { number });
+        }
+        catch(FluentValidation.ValidationException ex)
+        {
+            foreach (var err in ex.Errors)
+            {
+                if (string.Equals(err.PropertyName, nameof(UpdateReviewCommand.ReviewText), StringComparison.OrdinalIgnoreCase))
+                    ModelState.AddModelError(nameof(vm.ReviewText), err.ErrorMessage);
+                else if (string.Equals(err.PropertyName, nameof(UpdateReviewCommand.Number), StringComparison.OrdinalIgnoreCase))
+                    ModelState.AddModelError(nameof(vm.Number), err.ErrorMessage);
+                else
+                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
+            }
+
+            var data = await mediator.Send(new GetReviewQuery(number));
+            if (data.IsSuccess && data.Value is not null)
+            {
+                vm.Advice = data.Value.Text;
+                vm.Number = data.Value.Number;
+            }
+            return View(vm);
         }
 
-        return RedirectToAction("CompleteEdit", new { number });
     }
 
     [AllowAnonymous, HttpGet("/r/complete")]
