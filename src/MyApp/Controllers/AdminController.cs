@@ -1,8 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MyApp.Domain.Instructions.Commands;
-using MyApp.Domain.Instructions.Queries;
 using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
 using MyApp.Domain.Users.Commands;
@@ -25,7 +23,7 @@ public class AdminController(IMediator mediator) : Controller
     public async Task<IActionResult> RemoveUser(string id)
     {
         var result = await mediator.Send(new RemoveUserCommand(id));
-        TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "User removed." : result.Error;
+        TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Usunięto użytkownika." : result.Error;
         return RedirectToAction(nameof(Users));
     }
     #endregion

@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
-using MyApp.Domain.Abstractions;
 using MyApp.Domain.Common;
 using MyApp.Model;
 
