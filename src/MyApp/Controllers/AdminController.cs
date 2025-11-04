@@ -42,11 +42,20 @@ public class AdminController(IMediator mediator) : Controller
         return View(dto);
     }
 
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteReview(int id)
     {
-        var result = await mediator.Send(new DeleteReviewCommand(id));
-        TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Usunięto zalecenia." : result.Error;
-        return RedirectToAction(nameof(Reviews));
+        try
+        {
+            var result = await mediator.Send(new DeleteReviewCommand(id));
+            TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Usunięto zalecenia." : result.Error;
+            return RedirectToAction(nameof(Reviews));
+        }
+        catch (FluentValidation.ValidationException ex)
+        {
+            TempData["Error"] = string.Join(" ", ex.Errors.Select(e => e.ErrorMessage));
+            return RedirectToAction(nameof(Reviews));
+        }
     }
     #endregion
 }

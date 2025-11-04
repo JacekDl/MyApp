@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
@@ -26,6 +27,16 @@ namespace MyApp.Domain.Reviews.Commands
             {
                 return Result<bool>.Fail($"Nie udało się usunąć zaleceń: {ex.InnerException?.Message ?? ex.Message}");
             }
+        }
+    }
+
+    public class DeleteReviewCommandValidator : AbstractValidator<DeleteReviewCommand>
+    {
+        public DeleteReviewCommandValidator()
+        {
+            RuleFor(x => x.Id)
+                .GreaterThan(0)
+                .WithMessage("Nieprawidłowy identyfikator zaleceń.");
         }
     }
 }

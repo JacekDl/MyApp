@@ -60,9 +60,9 @@ else
                         </td>
 
                         <td class="text-start text-md-end">
-                            <form asp-action="DeleteReview" method="post" asp-route-id="@rev.Id" class="d-inline">
+                            <form asp-action="DeleteReview" asp-controller="Admin" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
-
+                                <input type="hidden" name="id" value="@rev.Id" />
                                 <button type="submit"
                                         class="btn btn-sm btn-outline-danger w-100 w-md-auto text-nowrap"
                                         onclick="return confirm('Czy na pewno chcesz usunąć ten wpis?');">
