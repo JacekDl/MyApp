@@ -47,60 +47,8 @@ public class AdminController(IMediator mediator) : Controller
     public async Task<IActionResult> DeleteReview(int id)
     {
         var result = await mediator.Send(new DeleteReviewCommand(id));
-        TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Review deleted." : result.Error;
+        TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Usunięto zalecenia." : result.Error;
         return RedirectToAction(nameof(Reviews));
     }
-    #endregion
-
-    //#region Medicines
-
-    //public async Task<IActionResult> Medicines()
-    //{
-    //    var dto = await mediator.Send(new GetMedicinesQuery());
-    //    return View(dto);
-    //}
-
-    //[HttpPost, ValidateAntiForgeryToken]
-    //public async Task<IActionResult> AddMedicine(MedicineDto item)
-    //{
-    //    var result = await mediator.Send(new AddMedicineCommand(item.Code, item.Name));
-    //    TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Medicine added." : result.Error;
-    //    return RedirectToAction(nameof(Medicines));
-    //}
-
-    //[HttpPost, ValidateAntiForgeryToken]
-    //public async Task<IActionResult> DeleteMedicine(int id)
-    //{
-    //    var result = await mediator.Send(new DeleteMedicineCommand(id));
-    //    TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Medicine deleted." : result.Error;
-    //    return RedirectToAction(nameof(Medicines));
-    //}
-
-    //#endregion
-
-    #region Instructions
-
-    public async Task<IActionResult> Instructions()
-    {
-        var model = await mediator.Send(new GetInstructionsQuery());
-        return View(model);
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddInstruction(AddInstructionCommand command)
-    {
-        var result = await mediator.Send(command);
-        TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Instruction added." : result.Error;
-        return RedirectToAction(nameof(Instructions));
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteInstruction(int id)
-    {
-        var result = await mediator.Send(new DeleteInstructionCommand(id));
-        TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Instruction deleted." : result.Error;
-        return RedirectToAction(nameof(Instructions));
-    }
-
     #endregion
 }

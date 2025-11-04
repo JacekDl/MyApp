@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
 using MyApp.Web.ViewModels;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
 namespace MyApp.Web.Controllers;
@@ -107,14 +108,24 @@ public class PatientController(IMediator mediator) : Controller
             ModelState.AddModelError(nameof(vm.Number), precheck.Error!); return View(vm); 
         }
 
-        var claim = await mediator.Send(new ClaimReviewByPatientCommand(vm.Number, currentUserId));
-        if(!claim.IsSuccess)
+        try
         {
-            ModelState.AddModelError(nameof(vm.Number), claim.Error!);
+            var claim = await mediator.Send(new ClaimReviewByPatientCommand(vm.Number, currentUserId));
+            if (!claim.IsSuccess)
+            {
+                ModelState.AddModelError(nameof(vm.Number), claim.Error!);
+                return View(vm);
+            }
+            TempData["Info"] = "Token został przypisany do Twojego konta.";
+            return RedirectToAction(nameof(Tokens));
+        }
+        catch(FluentValidation.ValidationException ex)
+        {
+            foreach (var err in ex.Errors)
+                ModelState.AddModelError(nameof(vm.Number), err.ErrorMessage);
+
             return View(vm);
         }
-        TempData["Info"] = "Review successfully assigned to your account.";
-        return RedirectToAction(nameof(Tokens));
     }
 
     #endregion

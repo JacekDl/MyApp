@@ -23,22 +23,22 @@
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Details">Details</a>
+                                <a class="nav-link" asp-controller="Account" asp-action="Details">Dane użytkownika</a>
                             </li>
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-link nav-link px-2 p-0">Logout</button>
+                                    <button type="submit" class="btn btn-link nav-link px-2 p-0">Wyloguj</button>
                                 </form>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+                                <a class="nav-link" asp-controller="Account" asp-action="Register">Załóż konto</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">Zaloguj</a>
                             </li>
                         }
                     </ul>
@@ -57,9 +57,19 @@
             &copy; 2025 - MyApp
         </div>
     </footer>
+
+    <partial name="~/Views/Shared/_ToastsPartial.cshtml" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!window.bootstrap || !bootstrap.Toast) return;
+            document.querySelectorAll('.toast').forEach(function (el) {
+                new bootstrap.Toast(el, { autohide: true, delay: 5000 }).show();
+            });
+        });
+    </script>
 </body>
 </html>

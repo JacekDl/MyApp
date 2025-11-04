@@ -1,56 +1,13 @@
 ﻿@model List<MyApp.Domain.Reviews.ReviewDto>
 
 @{
+    ViewData["Title"] = "Zalecenia";
     var searchTxt = (string?)ViewBag.Query ?? "";
     var userId = (string?)ViewBag.UserId ?? "";
     var completed = (string?)ViewBag.Completed ?? "";
-    var infoMsg = TempData["Info"] as string;
-    var errMsg = TempData["Error"] as string;
 }
 
 <partial name="~/Views/Shared/_AdminNav.cshtml" />
-
-@if (!string.IsNullOrWhiteSpace(infoMsg) || !string.IsNullOrWhiteSpace(errMsg))
-{
-    <div class="toast-container position-fixed top-0 end-0 p-3 z-3" style="pointer-events: none;">
-        @if (!string.IsNullOrWhiteSpace(infoMsg))
-        {
-            <div class="toast text-bg-success border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000" style="pointer-events: auto;">
-                <div class="toast-header bg-success text-white">
-                    <strong class="me-auto">Sukces</strong>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    @infoMsg
-                </div>
-            </div>
-        }
-        @if (!string.IsNullOrWhiteSpace(errMsg))
-        {
-            <div class="toast text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false" style="pointer-events: auto;">
-                <div class="toast-header bg-danger text-white">
-                    <strong class="me-auto">Błąd</strong>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    @errMsg
-                </div>
-            </div>
-        }
-    </div>
-
-    @section Scripts {
-        <script>
-            (function () {
-                var toasts = document.querySelectorAll('.toast');
-                toasts.forEach(function (el) {
-                    var t = new bootstrap.Toast(el);
-                    t.show();
-                });
-            })();
-        </script>
-    }
-}
 
 <div class="mb-3">
     <form method="get" asp-controller="Admin" asp-action="Reviews" class="d-flex gap-2">

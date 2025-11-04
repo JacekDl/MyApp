@@ -1,54 +1,12 @@
 ﻿@model IReadOnlyList<MyApp.Domain.Medicines.MedicineDto>
+
 @{
-    var infoMsg = TempData["Info"] as string;
-    var errMsg = TempData["Error"] as string;
+    ViewData["Title"] = "Leki";
 }
 
 <partial name="~/Views/Shared/_AdminNav.cshtml" />
 
 <div class="container mt-3">
-    @if (!string.IsNullOrWhiteSpace(infoMsg) || !string.IsNullOrWhiteSpace(errMsg))
-    {
-        <div class="toast-container position-fixed top-0 end-0 p-3 z-3" style="pointer-events: none;">
-            @if (!string.IsNullOrWhiteSpace(infoMsg))
-            {
-                <div class="toast text-bg-success border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000" style="pointer-events: auto;">
-                    <div class="toast-header bg-success text-white">
-                        <strong class="me-auto">Sukces</strong>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                    <div class="toast-body">
-                        @infoMsg
-                    </div>
-                </div>
-            }
-            @if (!string.IsNullOrWhiteSpace(errMsg))
-            {
-                <div class="toast text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false" style="pointer-events: auto;">
-                    <div class="toast-header bg-danger text-white">
-                        <strong class="me-auto">Błąd</strong>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                    <div class="toast-body">
-                        @errMsg
-                    </div>
-                </div>
-            }
-        </div>
-
-        @section Scripts {
-            <script>
-                (function () {
-                    var toasts = document.querySelectorAll('.toast');
-                    toasts.forEach(function (el) {
-                        var t = new bootstrap.Toast(el);
-                        t.show();
-                    });
-                })();
-            </script>
-        }
-    }
-
     <div class="mb-3">
         <form asp-action="AddMedicine" asp-controller="Medicine" method="post" class="row g-2">
             @Html.AntiForgeryToken()

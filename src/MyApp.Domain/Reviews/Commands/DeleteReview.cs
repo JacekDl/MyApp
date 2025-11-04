@@ -13,7 +13,7 @@ namespace MyApp.Domain.Reviews.Commands
         {
             var review = await db.Reviews.FirstOrDefaultAsync(r => r.Id == request.Id, ct);
             if (review is null)
-                return Result<bool>.Fail("Review not found.");
+                return Result<bool>.Fail("Nie znaleziono zaleceń.");
 
             db.Reviews.Remove(review);
 
@@ -24,7 +24,7 @@ namespace MyApp.Domain.Reviews.Commands
             }
             catch (DbUpdateException ex)
             {
-                return Result<bool>.Fail($"Could not delete review: {ex.InnerException?.Message ?? ex.Message}");
+                return Result<bool>.Fail($"Nie udało się usunąć zaleceń: {ex.InnerException?.Message ?? ex.Message}");
             }
         }
     }

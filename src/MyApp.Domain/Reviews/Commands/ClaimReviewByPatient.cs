@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
@@ -43,5 +44,21 @@ public class ClaimReviewByPatientHandler : IRequestHandler<ClaimReviewByPatientC
         review.PatientId = request.PatientId;
         await _db.SaveChangesAsync(ct);
         return Result<bool>.Ok(true);
+    }
+}
+
+public class ClaimReviewByPatientCommandValidator : AbstractValidator<ClaimReviewByPatientCommand>
+{
+    private const int ReviewNumberLen = 16;
+
+    public ClaimReviewByPatientCommandValidator()
+    {
+        RuleFor(x => x.Number)
+            .NotEmpty().WithMessage("Numer jest wymagany.")
+            .Length(ReviewNumberLen).WithMessage($"Numer musi mieć {ReviewNumberLen} znaków.")
+            .Matches("^[A-Za-z0-9]+$").WithMessage("Numer musi się składać z liter i cyfr.");
+
+        RuleFor(x => x.PatientId)
+            .NotEmpty().WithMessage("Id użytkownika jest wymagane.");
     }
 }
