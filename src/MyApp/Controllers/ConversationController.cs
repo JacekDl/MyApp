@@ -46,7 +46,7 @@ public class ConversationController(IMediator mediator) : Controller
                 return View(threadFail.Value);
             }
 
-            TempData["Info"] = "Message sent.";
+            TempData["Info"] = "Wiadomość wysłana.";
             return RedirectToAction(nameof(Display), new { number });
         }
         catch(FluentValidation.ValidationException ex)

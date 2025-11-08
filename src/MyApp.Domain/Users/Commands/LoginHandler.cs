@@ -25,10 +25,10 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user is null)
-            return new(LoginStatus.WrongCredentials, "Wrong email or password.");
+            return new(LoginStatus.WrongCredentials, "Nieprawidłowy email lub hasło.");
 
         if (_userManager.Options.SignIn.RequireConfirmedEmail && !user.EmailConfirmed)
-            return new(LoginStatus.NotAllowed, "Please confirm your email before logging in.");
+            return new(LoginStatus.NotAllowed, "Potwierdź swój email przed zalogowaniem.");
 
         var result = await _signInManager.PasswordSignInAsync(
             user.UserName!, request.Password, request.RememberMe, lockoutOnFailure: true);
@@ -40,12 +40,12 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
             return new(LoginStatus.Succeeded, UserId: user.Id, Role: effectiveRole);
         }
         if (result.IsLockedOut)
-            return new(LoginStatus.LockedOut, "Account locked. Try again later.");
+            return new(LoginStatus.LockedOut, "Konto zablokowane. Spróbuj ponownie później.");
 
         if (result.IsNotAllowed)
-            return new(LoginStatus.NotAllowed, "Login not allowed. Please confirm your email.");
+            return new(LoginStatus.NotAllowed, "Potwierdź swój email przed zalogowaniem.");
 
-        return new(LoginStatus.WrongCredentials, "Wrong email or password");
+        return new(LoginStatus.WrongCredentials, "Nieprawidłowy email lub hasło.");
     }
 
 }

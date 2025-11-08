@@ -2,31 +2,26 @@
 @model PublicReviewEditViewModel
 
 @{
-    ViewData["Title"] = "Edytuj opinię.";
+    ViewData["Title"] = "Wystaw opinię.";
 }
 
 <div class="container py-4">
     <div class="col-lg-8">
         @if (!string.IsNullOrWhiteSpace(Model.Advice))
         {
-            <div class="card mb-4">
-                <div class="card-header">Zalecenia farmaceuty</div>
-                <div class="card-body">
-                    <pre class="mb-0" style="white-space:pre-wrap;">@Model.Advice</pre>
-                </div>
+            <div class="mb-3">
+                <label class="form-label">Zalecenia farmaceuty</label>
+                <div class="form-control-plaintext">@Model.Advice</div>
             </div>
         }
-
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
         <form asp-action="PublicEdit" asp-route-number="@Model.Number" method="post" novalidate>
             @Html.AntiForgeryToken()
 
-
             <div class="mb-3">
                 <label asp-for="ReviewText" class="form-label">Twoja opinia</label>
-                <textarea asp-for="ReviewText" class="form-control" rows="6" placeholder="Napisz swoją opinię…"></textarea>
-                <span asp-validation-for="ReviewText" class="text-danger"></span>
+                <textarea asp-for="ReviewText" class="form-control" rows="6" placeholder="Napisz swoją opinię (maksymalnie 200 znaków). 
+Proszę nie zamieszczać danych osobowych."></textarea>
             </div>
 
             <input type="hidden" asp-for="Number" />

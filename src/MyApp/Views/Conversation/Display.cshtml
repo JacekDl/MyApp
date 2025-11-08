@@ -27,7 +27,7 @@
             <label for="Text" class="form-label">Dodaj wiadomość</label>
             <textarea id="Text" name="Text" class="form-control" rows="3"></textarea>
         </div>
-        <button type="submit" class="btn btn-primary">
+        <button type="submit" class="btn btn-outline-primary">
             Wyślij
         </button>
     }
@@ -48,18 +48,3 @@
         <a asp-controller="Patient" asp-action="Tokens" class="btn btn-outline-secondary">Powrót</a>
     }
 </form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            if (!window.bootstrap || !bootstrap.Toast) return;
-
-            document.querySelectorAll('.toast').forEach(function (el) {
-                const t = new bootstrap.Toast(el, { autohide: true, delay: 5000 });
-                t.show();
-            });
-        });
-    </script>
-}

@@ -156,7 +156,7 @@ public class ReviewPdfService : IReviewPdfService
                     col.Item().PaddingTop(150).Column(inner =>
                     {
                         inner.Spacing(12);
-                        inner.Item().Text(t => t.Span("Zostaw swoją opinię lub zadaj pytanie kopiując poniższy link lub skanując kod QR: ").Bold());
+                        inner.Item().AlignCenter().Text(t => t.Span("Zostaw swoją opinię lub zadaj pytanie kopiując poniższy link lub skanując kod QR: ").Bold());
                         inner.Item().AlignCenter().Text(t =>
                         {
                             t.Span(link)

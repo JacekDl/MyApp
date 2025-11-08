@@ -11,14 +11,14 @@
 
 <div class="mb-3">
     <form method="get" asp-controller="Admin" asp-action="Reviews" class="d-flex gap-2">
-        <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Wyszukaj..." />
+        <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Wyszukaj tekst..." />
         <input type="text" name="userId" value="@userId" class="form-control" placeholder="Wyszukaj użytkownika..." />
         <select name="completed" class="form-select">
             <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">Wszystkie</option>
             <option value="true" selected=@(completed == "true" ? "selected" : null)>Ukończone</option>
             <option value="false" selected=@(completed == "false" ? "selected" : null)>Nieukończone</option>
         </select>
-        <button type="submit" class="btn btn-primary">Filtruj</button>
+        <button type="submit" class="btn btn-outline-primary">Filtruj</button>
         <a asp-action="Reviews" class="btn btn-outline-secondary">Wyczyść</a>
     </form>
 </div>
@@ -33,22 +33,22 @@ else
         <table class="table table-sm table-striped align-middle mb-0">
             <thead class="table-light">
                 <tr>
-                    <th scope="col" class="text-nowrap">Utworzono</th>
-                    <th scope="col">Treść</th>
-                    <th scope="col" class="text-nowrap">Ukończone</th>
-                    <th scope="col" class="text-end" colspan="2"></th>
+                    <th scope="col" class="col-1 text-nowrap">Utworzono</th>
+                    <th scope="col" class="col-8">Treść</th>
+                    <th scope="col" class="col-1">Ukończone</th>
+                    <th scope="col" class="col-2" colspan="2"></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var rev in Model)
                 {
                     <tr>
-                        <td class="text-nowrap">@rev.DateCreated.ToString("yy-MM-dd")</td>
-                        <td class="text-break" style="white-space: pre-wrap;">@rev.Text</td>
+                        <td class="col-1 text-nowrap">@rev.DateCreated.ToString("yy-MM-dd")</td>
+                        <td class="col-8 text-break" style="white-space: pre-wrap;">@rev.Text</td>
 
-                        <td class="text-nowrap">@((rev.Completed) ? "Tak" : "Nie")</td>
+                        <td class="col-1">@((rev.Completed) ? "Tak" : "Nie")</td>
 
-                        <td class="text-end">
+                        <td class="col-1">
                             <div class="d-grid gap-2 d-md-inline">
                                 <a asp-action="Display"
                                    asp-controller="Conversation"
@@ -59,7 +59,7 @@ else
                             </div>
                         </td>
 
-                        <td class="text-start text-md-end">
+                        <td class="col-1">
                             <form asp-action="DeleteReview" asp-controller="Admin" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@rev.Id" />
