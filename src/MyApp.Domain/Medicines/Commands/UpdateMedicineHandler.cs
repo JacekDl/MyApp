@@ -24,15 +24,8 @@ namespace MyApp.Domain.Medicines.Commands
             {
                 return Result<bool>.Fail("Medicine not found.");
             }
-            entity.Code = (request.Code ?? string.Empty).Trim().ToUpper();
-            var trimmedName = (request.Name ?? string.Empty).Trim();
-            trimmedName = trimmedName.Length switch
-            {
-                0 => "",
-                1 => trimmedName.ToUpper(),
-                _ => char.ToUpper(trimmedName[0]) + trimmedName[1..].ToLower()
-            };
-            entity.Name = trimmedName;
+
+            (entity.Code, entity.Name) = FormatStringHelper.FormatCodeAndText(request.Code, request.Name);
 
             await _db.SaveChangesAsync(ct);
             return Result<bool>.Ok(true);

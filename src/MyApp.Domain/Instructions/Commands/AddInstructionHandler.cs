@@ -12,17 +12,8 @@ namespace MyApp.Domain.Instructions.Commands
     {
         public async Task<Result<bool>> Handle(AddInstructionCommand request, CancellationToken ct)
         {
-            var code = (request.Code ?? "").Trim().ToUpper();
-            var text = (request.Text ?? "").Trim();
-            text = text.Length switch
-            {
-                0 => "",
-                1 => text.ToUpper(),
-                _ => char.ToUpper(text[0]) + text[1..].ToLower()
-            };
 
-            if (string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(text))
-                return Result<bool>.Fail("Kod i dawkowanie są wymagane.");
+            (var code, var text) = FormatStringHelper.FormatCodeAndText(request.Code, request.Text);
 
             var exists = await db.Set<Instruction>()
                 .AnyAsync(i => i.Code == code, ct);

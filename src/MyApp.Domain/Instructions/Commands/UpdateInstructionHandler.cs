@@ -22,17 +22,10 @@ namespace MyApp.Domain.Instructions.Commands
             var entity = await _db.Set<Instruction>().FirstOrDefaultAsync(m => m.Id == request.Id, ct);
             if (entity is null)
             {
-                return Result<bool>.Fail("Instruction not found.");
+                return Result<bool>.Fail("Nie znaleziono dawkowania.");
             }
-            entity.Code = (request.Code ?? string.Empty).Trim().ToUpper();
-            var trimmedText = (request.Text ?? string.Empty).Trim();
-            trimmedText = trimmedText.Length switch
-            {
-                0 => "",
-                1 => trimmedText.ToUpper(),
-                _ => char.ToUpper(trimmedText[0]) + trimmedText[1..].ToLower()
-            };
-            entity.Text = trimmedText;
+
+            (entity.Code, entity.Text) = FormatStringHelper.FormatCodeAndText(request.Code, request.Text);
 
             await _db.SaveChangesAsync(ct);
             return Result<bool>.Ok(true);

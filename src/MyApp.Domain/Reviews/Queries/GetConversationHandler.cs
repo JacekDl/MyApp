@@ -26,7 +26,7 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, Resu
             .SingleOrDefaultAsync(r => r.Number == request.Number, ct);
 
         if (review is null)
-            return Result<ConversationDto>.Fail("Review not found.");
+            return Result<ConversationDto>.Fail("Nie znaleziono zaleceń.");
 
         var user = await _userManager.FindByIdAsync(request.RequestingUserId);
         var viewerIsAdmin = user != null && await _userManager.IsInRoleAsync(user, "Admin");
@@ -34,7 +34,7 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, Resu
         var viewerIsParticipant = review.PharmacistId == request.RequestingUserId || review.PatientId == request.RequestingUserId;
 
         if (!viewerIsParticipant && !viewerIsAdmin)
-            return Result<ConversationDto>.Fail("Forbidden.");
+            return Result<ConversationDto>.Fail("Brak dostępu.");
 
         var entries = new List<EntryDto>();
         foreach (var e in review.Entries.OrderBy(en => en.CreatedUtc))
@@ -51,34 +51,21 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, Resu
                     }
                     else if (entryUser.Role == "Pharmacist")
                     {
-                        displayName = "Pharmacist";
+                        displayName = "Farmaceuta";
                     }
                     else if (entryUser.Role == "Patient")
                     {
-                        displayName = "Patient";
+                        displayName = "Pacjent";
                     }
-
-                    var roles = await _userManager.GetRolesAsync(entryUser);
-                    if (string.IsNullOrEmpty(displayName) && roles.Count > 0)
+                    else
                     {
-                        displayName = roles[0];
+                        displayName = "Admin";
                     }
                 }
             }
             else
             {
-                if (review.PharmacistId == request.RequestingUserId)
-                {
-                    displayName = "Pharmacist";
-                }
-                else if(review.PatientId == request.RequestingUserId)
-                {
-                    displayName = "Patient";
-                }
-                else
-                {
-                    displayName = "Admin"; 
-                }
+                displayName = "Pacjent";
             }
 
             entries.Add(new EntryDto(e.UserId, e.Text, e.CreatedUtc, displayName));
@@ -86,6 +73,7 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, Resu
 
         var dto = new ConversationDto(
             review.Number,
+            review.Completed,
             entries);
             
 

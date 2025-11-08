@@ -21,11 +21,24 @@
     @Html.AntiForgeryToken()
 
     <input type="hidden" name="number" value="@Model.Number" />
-    <div class="mb-3">
-        <label for="Text" class="form-label">Dodaj wiadomość</label>
-        <textarea id="Text" name="Text" class="form-control" rows="3"></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Wyślij</button>
+    @if (!Model.Completed)
+    {
+        <div class="mb-3">
+            <label for="Text" class="form-label">Dodaj wiadomość</label>
+            <textarea id="Text" name="Text" class="form-control" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">
+            Wyślij
+        </button>
+    }
+    else
+    {
+        <div class="alert alert-info mt-3">
+            Ta rozmowa została zakończona.
+        </div>
+    }
+
+
     @if (User.IsInRole("Pharmacist"))
     {
         <a asp-controller="Pharmacist" asp-action="Tokens" class="btn btn-outline-secondary">Powrót</a>

@@ -11,9 +11,10 @@
         <table class="table table-sm table-striped align-middle">
             <thead>
                 <tr>
-                    <th scope="col" class="col-4">Email</th>
-                    <th scope="col" class="col-4">Rola</th>
-                    <th scope="col" class="col-3">Utworzono</th>
+                    <th scope="col" class="col-4">Id</th>
+                    <th scope="col" class="col-3">Email</th>
+                    <th scope="col" class="col-2">Rola</th>
+                    <th scope="col" class="col-2">Utworzono</th>
                     <th scope="col" class="col-1"></th>
                 </tr>
             </thead>
@@ -21,9 +22,10 @@
                 @foreach(var user in Model)
                 {
                     <tr>
-                        <td class="col-4">@user.Email</td>
-                        <td class="col-4">@user.Role</td>
-                        <td class="col-3">@user.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="col-4">@user.Id</td>
+                        <td class="col-3">@user.Email</td>
+                        <td class="col-2">@user.Role</td>
+                        <td class="col-2">@user.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
                         <td class="col-1">
                             @if (!string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
                             {
