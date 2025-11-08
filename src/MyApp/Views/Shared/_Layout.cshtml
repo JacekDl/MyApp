@@ -6,6 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - MyApp</title>
     <script type="importmap"></script>
+    <script>
+        (() => {
+          const saved = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.setAttribute('data-bs-theme', saved || (prefersDark ? 'dark' : 'light'));
+        })();
+    </script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
@@ -27,19 +34,27 @@
                                     type="button"
                                     class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
                                     aria-pressed="false"
-                                    aria-label="Przełącz tryb kontrastu"
-                                    title="Przełącz tryb kontrastu">
-                                
-                                <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                     viewBox="0 0 16 16" aria-hidden="true">
-                                    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0-10.5a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 8 1.5ZM3.22 3.22a.75.75 0 1 1 1.06-1.06l.35.35a.75.75 0 0 1-1.06 1.06l-.35-.35ZM1.5 8a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 1.5 8Zm1.72 4.78a.75.75 0 0 1 1.06 0l.35.35a.75.75 0 0 1-1.06 1.06l-.35-.35a.75.75 0 0 1 0-1.06ZM8 14.5a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 8 14.5Zm4.78-1.72a.75.75 0 0 1 0 1.06l-.35.35a.75.75 0 1 1-1.06-1.06l.35-.35a.75.75 0 0 1 1.06 0ZM14.5 8a.75.75 0 0 1-.75.75h-.5a.75.75 0 0 1 0-1.5h.5A.75.75 0 0 1 14.5 8Zm-1.72-4.78a.75.75 0 0 1-1.06 1.06l-.35-.35A.75.75 0 0 1 12.72 3.22Z" />
+                                    aria-label="Przełącz tryb motywu"
+                                    title="Przełącz tryb motywu">
+
+                                <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                     fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                                    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z
+                                             M8 1.5a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 8 1.5Z
+                                             M3.22 3.22a.75.75 0 1 1 1.06-1.06l.35.35a.75.75 0 0 1-1.06 1.06Z
+                                             M1.5 8a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 1.5 8Z
+                                             M8 14.5a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 8 14.5Z" />
                                 </svg>
-                                
-                                <svg id="icon-dark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                     viewBox="0 0 16 16" class="d-none" aria-hidden="true">
-                                    <path d="M8 0a8 8 0 1 0 0 16V0Z" />
+
+                                <svg id="icon-dark" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                     fill="currentColor" viewBox="0 0 16 16" class="d-none" aria-hidden="true">
+                                    <path d="M6 .278a7.5 7.5 0 1 0 9.416 9.416A7 7 0 0 1 6 .278Z" />
                                 </svg>
-                                
+
+                                <svg id="icon-contrast" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                     fill="currentColor" viewBox="0 0 16 16" class="d-none" aria-hidden="true">
+                                    <path d="M8 0a8 8 0 1 0 0 16V0z" />
+                                </svg>
                             </button>
                         </li>
                         @if (User.Identity?.IsAuthenticated ?? false)
@@ -94,35 +109,35 @@
         });
     </script>
     <script>
-        (function () {
-          const KEY = 'site-theme';
-          const root = document.documentElement;
-          const btn = document.getElementById('themeToggle');
-          const iconSun = document.getElementById('icon-sun');
-          const iconContrast = document.getElementById('icon-dark');
+        document.addEventListener('DOMContentLoaded', function () {
+            const html = document.documentElement;
+            const btn = document.getElementById('themeToggle');
+            const icons = {
+                light: document.getElementById('icon-sun'),
+                dark: document.getElementById('icon-dark'),
+                contrast: document.getElementById('icon-contrast')
+            };
 
-          // Resolve initial theme: localStorage → (optional) OS preference → 'light'
-          const stored = localStorage.getItem(KEY);
-          const initial = stored || 'light';
-          applyTheme(initial);
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setTheme(savedTheme);
 
-          btn?.addEventListener('click', () => {
-            const current = root.getAttribute('data-theme') || 'light';
-            const next = current === 'dark' ? 'light' : 'dark';
-            applyTheme(next);
-            localStorage.setItem(KEY, next);
-          });
+            btn.addEventListener('click', () => {
+                const current = html.getAttribute('data-bs-theme');
+                const next = current === 'light' ? 'dark'
+                           : current === 'dark' ? 'contrast'
+                           : 'light';
+                setTheme(next);
+                localStorage.setItem('theme', next);
+            });
 
-          function applyTheme(name) {
-            root.setAttribute('data-theme', name);
-            const isContrast = name === 'dark';
-            root.setAttribute('data-bs-theme', isContrast ? 'dark' : 'light');
-            btn.setAttribute('aria-pressed', String(isContrast));
-            iconSun.classList.toggle('d-none', isContrast);
-            iconContrast.classList.toggle('d-none', !isContrast);
-          }
-        })();
+            function setTheme(theme) {
+                html.setAttribute('data-bs-theme', theme);
+                Object.values(icons).forEach(i => i.classList.add('d-none'));
+                icons[theme]?.classList.remove('d-none');
+            }
+        });
     </script>
+
 
 </body>
 </html>
