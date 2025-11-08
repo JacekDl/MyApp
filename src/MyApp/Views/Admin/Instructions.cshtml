@@ -17,7 +17,7 @@
                 <input name="Text" class="form-control" placeholder="Dawkowanie" maxlength="1024" required />
             </div>
             <div class="col-sm-2 d-grid">
-                <button type="submit" class="btn btn-outline-primary">Dodaj</button>
+                <button type="submit" class="btn btn-secondary">Dodaj</button>
             </div>
         </form>
     </div>
@@ -41,7 +41,7 @@
                             <form asp-action="ModifyInstruction" asp-controller="Medicine" method="get" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@item.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-primary">
+                                <button type="submit" class="btn btn-sm btn-secondary">
                                     Zmień
                                 </button>
                             </form>
@@ -50,7 +50,7 @@
                             <form asp-action="DeleteInstruction" asp-controller="Medicine" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@item.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                <button type="submit" class="btn btn-sm btn-secondary"
                                         onclick="return confirm('Czy na pewno chcesz usunąć?');">
                                     Usuń
                                 </button>

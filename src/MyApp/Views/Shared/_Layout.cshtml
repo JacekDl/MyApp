@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,11 +8,11 @@
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/MyApp.styles.css" asp-append-version="true" />
 </head>
+
 <body class="d-flex flex-column min-vh-100">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MyApp</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -19,7 +20,28 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    
                     <ul class="navbar-nav ms-auto flex-row align-items-center gap-2">
+                        <li class="nav-item">
+                            <button id="themeToggle"
+                                    type="button"
+                                    class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+                                    aria-pressed="false"
+                                    aria-label="Przełącz tryb kontrastu"
+                                    title="Przełącz tryb kontrastu">
+                                
+                                <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     viewBox="0 0 16 16" aria-hidden="true">
+                                    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0-10.5a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 8 1.5ZM3.22 3.22a.75.75 0 1 1 1.06-1.06l.35.35a.75.75 0 0 1-1.06 1.06l-.35-.35ZM1.5 8a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 1.5 8Zm1.72 4.78a.75.75 0 0 1 1.06 0l.35.35a.75.75 0 0 1-1.06 1.06l-.35-.35a.75.75 0 0 1 0-1.06ZM8 14.5a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 8 14.5Zm4.78-1.72a.75.75 0 0 1 0 1.06l-.35.35a.75.75 0 1 1-1.06-1.06l.35-.35a.75.75 0 0 1 1.06 0ZM14.5 8a.75.75 0 0 1-.75.75h-.5a.75.75 0 0 1 0-1.5h.5A.75.75 0 0 1 14.5 8Zm-1.72-4.78a.75.75 0 0 1-1.06 1.06l-.35-.35A.75.75 0 0 1 12.72 3.22Z" />
+                                </svg>
+                                
+                                <svg id="icon-dark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     viewBox="0 0 16 16" class="d-none" aria-hidden="true">
+                                    <path d="M8 0a8 8 0 1 0 0 16V0Z" />
+                                </svg>
+                                
+                            </button>
+                        </li>
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
                             <li class="nav-item">
@@ -52,7 +74,7 @@
         </main>
     </div>
 
-    <footer class="bg-light text-center py-3 mt-auto">
+    <footer class="text-center py-3 mt-auto">
         <div class="container">
             &copy; 2025 - MyApp
         </div>
@@ -71,5 +93,36 @@
             });
         });
     </script>
+    <script>
+        (function () {
+          const KEY = 'site-theme';
+          const root = document.documentElement;
+          const btn = document.getElementById('themeToggle');
+          const iconSun = document.getElementById('icon-sun');
+          const iconContrast = document.getElementById('icon-dark');
+
+          // Resolve initial theme: localStorage → (optional) OS preference → 'light'
+          const stored = localStorage.getItem(KEY);
+          const initial = stored || 'light';
+          applyTheme(initial);
+
+          btn?.addEventListener('click', () => {
+            const current = root.getAttribute('data-theme') || 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            applyTheme(next);
+            localStorage.setItem(KEY, next);
+          });
+
+          function applyTheme(name) {
+            root.setAttribute('data-theme', name);
+            const isContrast = name === 'dark';
+            root.setAttribute('data-bs-theme', isContrast ? 'dark' : 'light');
+            btn.setAttribute('aria-pressed', String(isContrast));
+            iconSun.classList.toggle('d-none', isContrast);
+            iconContrast.classList.toggle('d-none', !isContrast);
+          }
+        })();
+    </script>
+
 </body>
 </html>

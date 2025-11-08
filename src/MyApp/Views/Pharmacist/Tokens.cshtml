@@ -17,8 +17,8 @@
             <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">Wszystkie</option>
             <option value="true" selected=@(completed == "true" ? "selected" : null)>Ukończone</option>
             <option value="false" selected=@(completed == "false" ? "selected" : null)>Nieukończone</option>
-        </select><button type="submit" class="btn btn-primary">Filtruj</button>
-        <a asp-action="Tokens" class="btn btn-outline-secondary">Wyczyść</a>
+        </select><button type="submit" class="btn btn-secondary">Filtruj</button>
+        <a asp-action="Tokens" class="btn btn-secondary">Wyczyść</a>
     </form>
 
 </div>
@@ -64,7 +64,7 @@ else
                                 <a asp-action="Display"
                                    asp-controller="Conversation"
                                    asp-route-number="@rev.Number"
-                                   class="btn btn-sm btn-outline-primary w-100 w-md-auto text-nowrap">
+                                   class="btn btn-sm btn-secondary w-100 w-md-auto text-nowrap">
                                     Podgląd
                                 </a>
                             </div>
@@ -74,7 +74,7 @@ else
                             <form asp-action="DeleteReview" method="post" asp-route-id="@rev.Id" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <button type="submit"
-                                        class="btn btn-sm btn-outline-danger w-100 w-md-auto text-nowrap"
+                                        class="btn btn-sm btn-secondary w-100 w-md-auto text-nowrap"
                                         onclick="return confirm('Czy na pewno chcesz usunąć ten wpis?');">
                                     Usuń
                                 </button>

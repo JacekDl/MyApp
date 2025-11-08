@@ -12,8 +12,8 @@
 <div class="mb-3">
     <form method="get" asp-action="Tokens" class="d-flex gap-2">
         <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Wyszukaj..." />
-        <button type="submit" class="btn btn-primary">Filtruj</button>
-        <a asp-action="Tokens" class="btn btn-outline-secondary">Wyczyść</a>
+        <button type="submit" class="btn btn-secondary">Filtruj</button>
+        <a asp-action="Tokens" class="btn btn-secondary">Wyczyść</a>
     </form>
 
 </div>
@@ -53,7 +53,7 @@ else
                     <td>@(rev.Completed ? "Tak" : "Nie")</td>
                     <td>
                         <a asp-action="Display" asp-controller="Conversation" asp-route-number="@rev.Number"
-                           class="btn btn-sm btn-primary">Podgląd</a>
+                           class="btn btn-sm btn-secondary">Podgląd</a>
                     </td>
                 </tr>
 

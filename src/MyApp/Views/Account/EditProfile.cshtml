@@ -13,13 +13,13 @@
     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
     <div class="mb-3">
-        <label asp-for="DisplayName" class="form-label"></label>
+        <label asp-for="DisplayName" class="form-label">Imię</label>
         <input asp-for="DisplayName" class="form-control" />
         <span asp-validation-for="DisplayName" class="text-danger"></span>
     </div>
 
-    <button class="btn btn-primary" type="submit">Zapisz</button>
-    <a class="btn btn-link" asp-action="Details">Anuluj</a>
+    <button class="btn btn-secondary" type="submit">Zapisz</button>
+    <a class="btn btn-secondary" asp-action="Details">Anuluj</a>
 
 </form>
 

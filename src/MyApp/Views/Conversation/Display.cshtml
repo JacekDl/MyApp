@@ -27,7 +27,7 @@
             <label for="Text" class="form-label">Dodaj wiadomość</label>
             <textarea id="Text" name="Text" class="form-control" rows="3"></textarea>
         </div>
-        <button type="submit" class="btn btn-outline-primary">
+        <button type="submit" class="btn btn-secondary">
             Wyślij
         </button>
     }
@@ -41,10 +41,10 @@
 
     @if (User.IsInRole("Pharmacist"))
     {
-        <a asp-controller="Pharmacist" asp-action="Tokens" class="btn btn-outline-secondary">Powrót</a>
+        <a asp-controller="Pharmacist" asp-action="Tokens" class="btn btn-secondary">Powrót</a>
     }
     else if (User.IsInRole("Patient"))
     {
-        <a asp-controller="Patient" asp-action="Tokens" class="btn btn-outline-secondary">Powrót</a>
+        <a asp-controller="Patient" asp-action="Tokens" class="btn btn-secondary">Powrót</a>
     }
 </form>
