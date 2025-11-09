@@ -6,20 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - MyApp</title>
     <script type="importmap"></script>
-    <script>
-        (() => {
-          const saved = localStorage.getItem('theme');
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          document.documentElement.setAttribute('data-bs-theme', saved || (prefersDark ? 'dark' : 'light'));
-        })();
-    </script>
+    <script src="~/js/theme.js" asp-append-version="true"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 
 <body class="d-flex flex-column min-vh-100">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom mb-3">
+        <nav class="navbar navbar-expand-sm sticky-top border-bottom mb-3 bg-body-tertiary" style=" z-index:1030">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MyApp</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -37,13 +31,8 @@
                                     aria-label="Przełącz tryb motywu"
                                     title="Przełącz tryb motywu">
 
-                                <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                     fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-                                    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z
-                                             M8 1.5a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 8 1.5Z
-                                             M3.22 3.22a.75.75 0 1 1 1.06-1.06l.35.35a.75.75 0 0 1-1.06 1.06Z
-                                             M1.5 8a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 1.5 8Z
-                                             M8 14.5a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 8 14.5Z" />
+                                <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                                    <path d="M8 0a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 8 0zm4.657 1.343a.5.5 0 1 1 .707.707l-.707.707a.5.5 0 0 1-.707-.707l.707-.707zM16 8a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1 0-1h1A.5.5 0 0 1 16 8zm-1.343 4.657a.5.5 0 1 1-.707.707l-.707-.707a.5.5 0 0 1 .707-.707l.707.707zM8 16a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 1 0v1A.5.5 0 0 1 8 16zm-4.657-1.343a.5.5 0 1 1-.707-.707l.707-.707a.5.5 0 0 1 .707.707l-.707.707zM0 8a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1A.5.5 0 0 1 0 8zm1.343-4.657a.5.5 0 1 1 .707-.707l.707.707a.5.5 0 0 1-.707.707l-.707-.707zM8 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />
                                 </svg>
 
                                 <svg id="icon-dark" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -83,6 +72,7 @@
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="flex-fill">
             @RenderBody()
@@ -98,7 +88,6 @@
     <partial name="~/Views/Shared/_ToastsPartial.cshtml" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
     <script>
         document.addEventListener('DOMContentLoaded', function () {

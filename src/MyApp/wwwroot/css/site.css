@@ -6,6 +6,7 @@
     --bs-btn-bg: #222;
     --bs-btn-color: #ffff00;
     --bs-btn-border-color: #ffff66;
+    --bs-tertiary-bg: #000000;
 }
 
 /* Apply yellow text to all common elements in contrast mode */
@@ -24,6 +25,7 @@
 [data-bs-theme="contrast"] button,
 [data-bs-theme="contrast"] border,
 [data-bs-theme="contrast"] a,
+[data-bs-theme="contrast"] strong,
 [data-bs-theme="contrast"] input,
 [data-bs-theme="contrast"] textarea,
 [data-bs-theme="contrast"] select {
@@ -31,12 +33,16 @@
     background-color: transparent;
 }
 
-    /* Keep links readable and distinguishable */
-    [data-bs-theme="contrast"] a:hover,
-    [data-bs-theme="contrast"] a:focus {
-        color: #ffcc00 !important;
-        text-decoration: underline;
-    }
+[data-bs-theme="contrast"] .bg-body-tertiary {
+    background-color: #000000 !important;
+}]
+
+/* Keep links readable and distinguishable */
+[data-bs-theme="contrast"] a:hover,
+[data-bs-theme="contrast"] a:focus {
+    color: #ffcc00 !important;
+    text-decoration: underline;
+}
 
 /* Optional: force form borders to stay visible */
 [data-bs-theme="contrast"] input,
@@ -52,6 +58,31 @@
     border-color: #ffff66 !important;
 }
 
+[data-bs-theme="contrast"] select,
+[data-bs-theme="contrast"] option {
+    background-color: #000000 !important;
+    color: #ffff00 !important;
+    border-color: #ffff66 !important;
+}
+
+[data-bs-theme="contrast"] input::placeholder,
+[data-bs-theme="contrast"] textarea::placeholder {
+    color: #ffff00 !important;
+    opacity: 1;
+}
+
+/* Contrast theme: make all button borders yellow */
+[data-bs-theme="contrast"] button,
+[data-bs-theme="contrast"] .btn {
+    border-color: #ffff66 !important;
+    color: #ffff00 !important;
+}
+
+[data-bs-theme="contrast"] .btn:hover {
+    background-color: #222 !important;
+    border-color: #ffcc00 !important;
+    color: #ffff00 !important;
+}
 
 html {
   font-size: 14px;

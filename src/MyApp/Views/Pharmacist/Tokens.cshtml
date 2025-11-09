@@ -17,7 +17,8 @@
             <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">Wszystkie</option>
             <option value="true" selected=@(completed == "true" ? "selected" : null)>Ukończone</option>
             <option value="false" selected=@(completed == "false" ? "selected" : null)>Nieukończone</option>
-        </select><button type="submit" class="btn btn-secondary">Filtruj</button>
+        </select>
+        <button type="submit" class="btn btn-secondary">Filtruj</button>
         <a asp-action="Tokens" class="btn btn-secondary">Wyczyść</a>
     </form>
 
@@ -33,19 +34,19 @@ else
         <table class="table table-sm align-middle mb-0">
             <thead>
                 <tr>
-                    <th scope="col" class="text-nowrap">Utworzono</th>
-                    <th scope="col">Treść</th>
-                    <th scope="col" class="text-nowrap">Status</th>
-                    <th scope="col" class="text-nowrap">Ukończone</th>
-                    <th scope="col" class="text-end" colspan="2"></th>
+                    <th scope="col" class="col-1 text-nowrap">Utworzono</th>
+                    <th scope="col" class="col-7">Treść</th>
+                    <th scope="col" class="col-1 text-nowrap">Status</th>
+                    <th scope="col" class="col-1">Ukończone</th>
+                    <th scope="col" class="col-2" colspan="2"></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var rev in Model)
                 {
                     <tr>
-                        <td class="text-nowrap">@rev.DateCreated.ToString("yy-MM-dd")</td>
-                        <td class="text-break" style="white-space: pre-wrap;">@rev.Text</td>
+                        <td class="col-1 text-nowrap">@rev.DateCreated.ToString("yy-MM-dd")</td>
+                        <td class="col-7 text-break" style="white-space: pre-wrap;">@rev.Text</td>
                         <td>
                             <span class="d-inline d-md-none text-muted me-2">Status:</span>
                             @if (rev.IsNewForViewer)
@@ -57,9 +58,9 @@ else
                                 <span class="badge bg-secondary">Obejrzane</span>
                             }
                         </td>
-                        <td class="text-nowrap">@((rev.Completed) ? "Tak" : "Nie")</td>
+                        <td class="col-1 text-nowrap">@((rev.Completed) ? "Tak" : "Nie")</td>
 
-                        <td class="text-end">
+                        <td class="col-1 text-end">
                             <div class="d-grid gap-2 d-md-inline">
                                 <a asp-action="Display"
                                    asp-controller="Conversation"
@@ -70,7 +71,7 @@ else
                             </div>
                         </td>
 
-                        <td class="text-start text-md-end">
+                        <td class="col-1 text-start text-md-end">
                             <form asp-action="DeleteReview" method="post" asp-route-id="@rev.Id" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <button type="submit"

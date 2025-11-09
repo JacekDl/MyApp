@@ -229,7 +229,7 @@ public class AccountController : Controller
             return View(vm);
         }
 
-        TempData["Info"] = "Profile updated.";
+        TempData["Info"] = "Dane konta zostały zmienione. ";
         return RedirectToAction(nameof(Details));
     }
     #endregion

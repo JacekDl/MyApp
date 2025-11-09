@@ -25,7 +25,7 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, Result<R
     {
         var user = await _userManager.FindByIdAsync(request.UserId); //user is Pharmacist
         if (user is null)
-            return Result<Review>.Fail("User not found.");
+            return Result<Review>.Fail("Nie znaleziono użytkownika.");
 
         string number = GenerateDigits();
         var review = Review.Create(request.UserId, request.Advice, number);
