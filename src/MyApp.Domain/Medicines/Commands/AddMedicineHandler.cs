@@ -8,9 +8,9 @@ using static System.Net.Mime.MediaTypeNames;
 namespace MyApp.Domain.Medicines.Commands
 {
 
-    public sealed record AddMedicineCommand(string Code, string Name) : IRequest<Result<bool>>;
+    public record AddMedicineCommand(string Code, string Name) : IRequest<Result<bool>>;
 
-    public sealed class AddMedicineHandler(ApplicationDbContext db) : IRequestHandler<AddMedicineCommand, Result<bool>>
+    public class AddMedicineHandler(ApplicationDbContext db) : IRequestHandler<AddMedicineCommand, Result<bool>>
     {
         public async Task<Result<bool>> Handle(AddMedicineCommand request, CancellationToken ct)
         {

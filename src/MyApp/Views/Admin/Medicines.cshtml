@@ -11,10 +11,11 @@
         <form asp-action="AddMedicine" asp-controller="Medicine" method="post" class="row g-2">
             @Html.AntiForgeryToken()
             <div class="col-sm-3">
-                <input name="Code" class="form-control" placeholder="Kod" maxlength="64" required />
+                <input name="Code" class="form-control" placeholder="Kod" maxlength="32" required /> 
+                
             </div>
             <div class="col-sm-7">
-                <input name="Name" class="form-control" placeholder="Nazwa" maxlength="256" required />
+                <input name="Name" class="form-control" placeholder="Nazwa" maxlength="128" required />
             </div>
             <div class="col-sm-2 d-grid">
                 <button type="submit" class="btn btn-secondary">Dodaj</button>

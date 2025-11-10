@@ -12,13 +12,21 @@ using MyApp.Domain.Instructions;
 namespace MyApp.Web.Controllers
 {
     [Authorize(Roles = "Admin, Pharmacist")]
-    public class MedicineController(IMediator mediator, IReviewPdfService pdfService) : Controller
+    public class MedicineController : Controller
     {
-        #region Medicines
+        private readonly IMediator _mediator;
+        private readonly IReviewPdfService _pdfService;
 
+        public MedicineController(IMediator mediator, IReviewPdfService pdfService)
+        {
+            _mediator = mediator;
+            _pdfService = pdfService;
+        }
+
+        #region Medicines
         public async Task<IActionResult> Medicines()
         {
-            var dto = await mediator.Send(new GetMedicinesQuery());
+            var dto = await _mediator.Send(new GetMedicinesQuery());
             if (User.IsInRole("Admin"))
                 return View("~/Views/Admin/Medicines.cshtml", dto);
 
@@ -30,9 +38,9 @@ namespace MyApp.Web.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddMedicine(MedicineDto item)
+        public async Task<IActionResult> AddMedicine(MedicineDto item, CancellationToken ct)
         {
-            var result = await mediator.Send(new AddMedicineCommand(item.Code, item.Name));
+            var result = await _mediator.Send(new AddMedicineCommand(item.Code, item.Name));
             TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Dodano lek." : result.Error;
             return RedirectToAction(nameof(Medicines));
         }
@@ -41,7 +49,7 @@ namespace MyApp.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteMedicine(int id)
         {
-            var result = await mediator.Send(new DeleteMedicineCommand(id));
+            var result = await _mediator.Send(new DeleteMedicineCommand(id));
             TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Usunięto lek." : result.Error;
             return RedirectToAction(nameof(Medicines));
         }
@@ -50,7 +58,7 @@ namespace MyApp.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> ModifyMedicine(int id)
         {
-            var result = await mediator.Send(new GetMedicineQuery(id));
+            var result = await _mediator.Send(new GetMedicineQuery(id));
             if (!result.IsSuccess)
             {
                 TempData["Error"] = "Lek nie został znaleziony.";
@@ -67,16 +75,16 @@ namespace MyApp.Web.Controllers
             {
                 return View(item);
             }
-            var result = await mediator.Send(new UpdateMedicineCommand(item.Id, item.Code, item.Name));
+            var result = await _mediator.Send(new UpdateMedicineCommand(item.Id, item.Code, item.Name));
             return RedirectToAction(nameof(Medicines));
         }
 
         [Authorize(Roles = "Pharmacist")]
         public async Task<IActionResult> PrintMedicines()
         {
-            var dto = await mediator.Send(new GetMedicinesQuery());
+            var dto = await _mediator.Send(new GetMedicinesQuery());
 
-            var pdfBytes = await pdfService.GenerateMedicinesPdf(dto);
+            var pdfBytes = await _pdfService.GenerateMedicinesPdf(dto);
             Response.Headers.ContentDisposition = "inline; filename=medicine.pdf";
             return File(pdfBytes, "medicine/pdf");
         }
@@ -87,7 +95,7 @@ namespace MyApp.Web.Controllers
 
         public async Task<IActionResult> Instructions()
         {
-            var model = await mediator.Send(new GetInstructionsQuery());
+            var model = await _mediator.Send(new GetInstructionsQuery());
             if (User.IsInRole("Admin"))
                 return View("~/Views/Admin/Instructions.cshtml", model);
 
@@ -101,7 +109,7 @@ namespace MyApp.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> AddInstruction(AddInstructionCommand command)
         {
-            var result = await mediator.Send(command);
+            var result = await _mediator.Send(command);
             TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Dodano dawkowanie." : result.Error;
             return RedirectToAction(nameof(Instructions));
         }
@@ -110,7 +118,7 @@ namespace MyApp.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteInstruction(int id)
         {
-            var result = await mediator.Send(new DeleteInstructionCommand(id));
+            var result = await _mediator.Send(new DeleteInstructionCommand(id));
             TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Usunięto dawkowanie." : result.Error;
             return RedirectToAction(nameof(Instructions));
         }
@@ -119,7 +127,7 @@ namespace MyApp.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> ModifyInstruction(int id)
         {
-            var result = await mediator.Send(new GetInstructionQuery(id));
+            var result = await _mediator.Send(new GetInstructionQuery(id));
             if (!result.IsSuccess)
             {
                 TempData["Error"] = "Dawkowanie nie zostało odnalezione.";
@@ -136,16 +144,16 @@ namespace MyApp.Web.Controllers
             {
                 return View(item);
             }
-            var result = await mediator.Send(new UpdateInstructionCommand(item.Id, item.Code, item.Text));
+            var result = await _mediator.Send(new UpdateInstructionCommand(item.Id, item.Code, item.Text));
             return RedirectToAction(nameof(Instructions));
         }
 
         [Authorize(Roles = "Pharmacist")]
         public async Task<IActionResult> PrintInstructions()
         {
-            var dto = await mediator.Send(new GetInstructionsQuery());
+            var dto = await _mediator.Send(new GetInstructionsQuery());
 
-            var pdfBytes = await pdfService.GenerateInstructionsPdf(dto);
+            var pdfBytes = await _pdfService.GenerateInstructionsPdf(dto);
             Response.Headers.ContentDisposition = "inline; filename=instruction.pdf";
             return File(pdfBytes, "instruction/pdf");
         }
