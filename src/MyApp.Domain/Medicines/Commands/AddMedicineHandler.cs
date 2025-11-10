@@ -1,18 +1,23 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
+using MyApp.Domain.Reviews.Commands;
 using MyApp.Model;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace MyApp.Domain.Medicines.Commands
 {
 
-    public record AddMedicineCommand(string Code, string Name) : IRequest<Result<bool>>;
+    public record class AddMedicineCommand(string Code, string Name) : IRequest<AddMedicineResult>;
 
-    public class AddMedicineHandler(ApplicationDbContext db) : IRequestHandler<AddMedicineCommand, Result<bool>>
+    public record class AddMedicineResult : HResult 
     {
-        public async Task<Result<bool>> Handle(AddMedicineCommand request, CancellationToken ct)
+    }
+
+    public class AddMedicineHandler(ApplicationDbContext db) : IRequestHandler<AddMedicineCommand, AddMedicineResult>
+    {
+        public async Task<AddMedicineResult> Handle(AddMedicineCommand request, CancellationToken ct)
         {
             (var code, var text) = FormatStringHelper.FormatCodeAndText(request.Code, request.Name);
 
@@ -20,12 +25,27 @@ namespace MyApp.Domain.Medicines.Commands
                 .AnyAsync(m => m.Code == code, ct);
 
             if (exists)
-                return Result<bool>.Fail($"Kod '{code}' jest już przypisany do leku.");
+            {
+                return new() { ErrorMessage = $"Kod '{code}' jest już używany." };
+            }
 
             db.Add(new Medicine { Code = code, Name = text });
             await db.SaveChangesAsync(ct);
 
-            return Result<bool>.Ok(true);
+            return new();
+        }
+    }
+
+    public class AddMedicineValidator : AbstractValidator<AddMedicineCommand>
+    {
+        public AddMedicineValidator()
+        {
+            RuleFor(x => x.Code)
+                .NotEmpty().WithMessage("Kod leku jest wymagany.")
+                .MaximumLength(32).WithMessage("Kod leku nie może być dłuższy niż 32 znaków.");
+            RuleFor(x => x.Name)
+                .NotEmpty().WithMessage("Nazwa leku jest wymagana.")
+                .MaximumLength(128).WithMessage("Nazwa leku nie może być dłuższa niż 128 znaków.");
         }
     }
 }

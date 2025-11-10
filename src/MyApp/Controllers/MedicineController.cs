@@ -33,7 +33,7 @@ namespace MyApp.Web.Controllers
             if (User.IsInRole("Pharmacist"))
                 return View("~/Views/Pharmacist/Medicines.cshtml", dto);
 
-            return Forbid();
+            return Forbid(); //TODO: change that
         }
 
         [Authorize(Roles = "Admin")]
@@ -41,7 +41,7 @@ namespace MyApp.Web.Controllers
         public async Task<IActionResult> AddMedicine(MedicineDto item, CancellationToken ct)
         {
             var result = await _mediator.Send(new AddMedicineCommand(item.Code, item.Name));
-            TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Dodano lek." : result.Error;
+            TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Dodano lek." : result.ErrorMessage;
             return RedirectToAction(nameof(Medicines));
         }
 
@@ -102,7 +102,7 @@ namespace MyApp.Web.Controllers
             if (User.IsInRole("Pharmacist"))
                 return View("~/Views/Pharmacist/Instructions.cshtml", model);
 
-            return Forbid();
+            return Forbid(); //TODO :change that
         }
 
         [Authorize(Roles = "Admin")]

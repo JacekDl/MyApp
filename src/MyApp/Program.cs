@@ -49,7 +49,7 @@ builder.Services.AddAuthorizationBuilder()
         .RequireAuthenticatedUser()
         .Build());
 
-builder.Services.AddValidatorsFromAssemblyContaining<CreateReviewCommandValidator>(); //czy inne assemblies tez trzeba zarejestrowac?
+builder.Services.AddValidatorsFromAssemblyContaining<CreateReviewValidator>(); //czy inne assemblies tez trzeba zarejestrowac?
 
 var app = builder.Build();
 

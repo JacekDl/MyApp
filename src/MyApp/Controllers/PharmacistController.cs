@@ -39,9 +39,9 @@ public class PharmacistController(IReviewPdfService pdfService, IMediator mediat
 
             var result = await mediator.Send(new CreateReviewCommand(currentUserId, vm.Advice));
 
-            if (!result.IsSuccess || result.Value is null)
+            if (!result.Succeeded)
             {
-                ModelState.AddModelError("", result.Error ?? "Nie udało się utworzyć zaleceń.");
+                TempData["Error"] = result.ErrorMessage;
                 return View(vm);
             }
 

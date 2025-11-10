@@ -8,9 +8,13 @@ using System.Security.Cryptography;
 
 namespace MyApp.Domain.Reviews.Commands;
 
-public record CreateReviewCommand(string UserId, string Advice) : IRequest<Result<Review>>;
+public record class CreateReviewCommand(string UserId, string Advice) : IRequest<CreateReviewResult<Review>>;
 
-public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, Result<Review>>
+public record class CreateReviewResult<Review> : HResult<Review>
+{
+}
+
+public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, CreateReviewResult<Review>>
 {
     private readonly UserManager<User> _userManager;
     private readonly ApplicationDbContext _db;
@@ -21,18 +25,18 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, Result<R
         _db = db;
     }
 
-    public async Task<Result<Review>> Handle(CreateReviewCommand request, CancellationToken ct)
+    public async Task<CreateReviewResult<Review>> Handle(CreateReviewCommand request, CancellationToken ct)
     {
         var user = await _userManager.FindByIdAsync(request.UserId); //user is Pharmacist
         if (user is null)
-            return Result<Review>.Fail("Nie znaleziono użytkownika.");
+            return new() { ErrorMessage="Nie znaleziono użytkownika." };
 
         string number = GenerateDigits();
         var review = Review.Create(request.UserId, request.Advice, number);
 
         _db.Add(review);
         await _db.SaveChangesAsync(ct);
-        return Result<Review>.Ok(review);
+        return new() { Value = review  };
     }
 
 
@@ -49,9 +53,9 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, Result<R
     }
 }
 
-public class CreateReviewCommandValidator : AbstractValidator<CreateReviewCommand>
+public class CreateReviewValidator : AbstractValidator<CreateReviewCommand>
 {
-    public CreateReviewCommandValidator()
+    public CreateReviewValidator()
     {
         RuleFor(x => x.UserId)
             .NotEmpty().WithMessage("UserId jest wymagany.");
