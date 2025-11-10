@@ -3,7 +3,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
-using MyApp.Domain.Reviews.Commands;
 using MyApp.Model;
 
 namespace MyApp.Domain.Medicines.Commands
@@ -19,6 +18,14 @@ namespace MyApp.Domain.Medicines.Commands
     {
         public async Task<AddMedicineResult> Handle(AddMedicineCommand request, CancellationToken ct)
         {
+            // o tyle fajne rozwiazanie ze nie trzeba obslugiwac wyjatkow w kontrolerze
+            var validation = new AddMedicineValidator().Validate(request);
+
+            if (!validation.IsValid)
+            {
+                return new() { ErrorMessage = string.Join("; ", validation.Errors.Select(e => e.ErrorMessage)) };
+            }
+
             (var code, var text) = FormatStringHelper.FormatCodeAndText(request.Code, request.Name);
 
             var exists = await db.Set<Medicine>()
