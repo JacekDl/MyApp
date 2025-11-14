@@ -129,7 +129,7 @@ namespace MyApp.Web.Controllers
         public async Task<IActionResult> ModifyInstruction(int id)
         {
             var result = await _mediator.Send(new GetInstructionQuery(id));
-            if (!result.IsSuccess)
+            if (!result.Succeeded)
             {
                 TempData["Error"] = "Dawkowanie nie zostało odnalezione.";
                 return RedirectToAction(nameof(Instructions));

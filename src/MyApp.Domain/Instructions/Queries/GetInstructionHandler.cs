@@ -7,22 +7,32 @@ using MyApp.Model;
 
 namespace MyApp.Domain.Instructions.Queries
 {
-    public sealed record GetInstructionQuery(int Id) : IRequest<Result<InstructionDto>>;
+    public record class GetInstructionQuery(int Id) : IRequest<GetInstructionResult>;
 
-    public sealed class GetInstructionHandler(ApplicationDbContext db) : IRequestHandler<GetInstructionQuery, Result<InstructionDto>>
+    public record class GetInstructionResult : HResult<InstructionDto>
     {
-        public async Task<Result<InstructionDto>> Handle(GetInstructionQuery request, CancellationToken ct)
+    }
+
+    public class GetInstructionHandler : IRequestHandler<GetInstructionQuery, GetInstructionResult>
+    {
+        private readonly ApplicationDbContext _db;
+
+        public GetInstructionHandler(ApplicationDbContext db)
         {
-            var result = await db.Set<Instruction>()
+            _db = db;
+        }
+        public async Task<GetInstructionResult> Handle(GetInstructionQuery request, CancellationToken ct)
+        {
+            var result = await _db.Set<Instruction>()
                 .Where(m => m.Id == request.Id)
                 .Select(m => new InstructionDto(m.Id, m.Code, m.Text))
                 .FirstOrDefaultAsync(ct);
 
             if (result is null)
             {
-                return Result<InstructionDto>.Fail("Nie znaleziono leku o podanym Id.");
+                return new() { ErrorMessage = "Nie znaleziono leku o podanym Id." };
             }
-            return Result<InstructionDto>.Ok(result);
+            return new() { Value = result };
         }
 
     }
