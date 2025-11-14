@@ -1,23 +1,29 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using MyApp.Domain.Common;
 using MyApp.Domain.Data;
 
 namespace MyApp.Domain.Medicines.Queries
 {
     
-    public sealed record GetMedicinesQuery : IRequest<IReadOnlyList<MedicineDto>>;
+    public record class GetMedicinesQuery : IRequest<GetMedicinesResult>;
 
-    public sealed class GetMedicinesQueryHandler : IRequestHandler<GetMedicinesQuery, IReadOnlyList<MedicineDto>>
+    public record class GetMedicinesResult : HResult<IReadOnlyList<MedicineDto>>;
+
+    public class GetMedicinesQueryHandler : IRequestHandler<GetMedicinesQuery, GetMedicinesResult>
     {
         private readonly ApplicationDbContext _db;
         public GetMedicinesQueryHandler(ApplicationDbContext db) => _db = db;
 
-        public async Task<IReadOnlyList<MedicineDto>> Handle(GetMedicinesQuery request, CancellationToken ct)
+        public async Task<GetMedicinesResult> Handle(GetMedicinesQuery request, CancellationToken ct)
         {
-            return await _db.Medicines
+
+            var result =  await _db.Medicines
                 .OrderBy(m => m.Code)
                 .Select(m => new MedicineDto(m.Id, m.Code, m.Name))
                 .ToListAsync(ct);
+
+            return new() { Value = result };
         }
     }
 }

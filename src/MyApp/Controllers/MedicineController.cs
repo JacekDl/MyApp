@@ -28,10 +28,10 @@ namespace MyApp.Web.Controllers
         {
             var dto = await _mediator.Send(new GetMedicinesQuery());
             if (User.IsInRole("Admin"))
-                return View("~/Views/Admin/Medicines.cshtml", dto);
+                return View("~/Views/Admin/Medicines.cshtml", dto.Value);
 
             if (User.IsInRole("Pharmacist"))
-                return View("~/Views/Pharmacist/Medicines.cshtml", dto);
+                return View("~/Views/Pharmacist/Medicines.cshtml", dto.Value);
 
             return Forbid(); //TODO: change that
         }
@@ -50,7 +50,7 @@ namespace MyApp.Web.Controllers
         public async Task<IActionResult> DeleteMedicine(int id)
         {
             var result = await _mediator.Send(new DeleteMedicineCommand(id));
-            TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Usunięto lek." : result.Error;
+            TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Usunięto lek." : result.ErrorMessage;
             return RedirectToAction(nameof(Medicines));
         }
 
@@ -59,7 +59,7 @@ namespace MyApp.Web.Controllers
         public async Task<IActionResult> ModifyMedicine(int id)
         {
             var result = await _mediator.Send(new GetMedicineQuery(id));
-            if (!result.IsSuccess)
+            if (!result.Succeeded)
             {
                 TempData["Error"] = "Lek nie został znaleziony.";
                 return RedirectToAction(nameof(Medicines));
@@ -76,6 +76,7 @@ namespace MyApp.Web.Controllers
                 return View(item);
             }
             var result = await _mediator.Send(new UpdateMedicineCommand(item.Id, item.Code, item.Name));
+            TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Zaktualizowano lek." : result.ErrorMessage;
             return RedirectToAction(nameof(Medicines));
         }
 
@@ -84,7 +85,7 @@ namespace MyApp.Web.Controllers
         {
             var dto = await _mediator.Send(new GetMedicinesQuery());
 
-            var pdfBytes = await _pdfService.GenerateMedicinesPdf(dto);
+            var pdfBytes = await _pdfService.GenerateMedicinesPdf(dto.Value!);
             Response.Headers.ContentDisposition = "inline; filename=medicine.pdf";
             return File(pdfBytes, "medicine/pdf");
         }

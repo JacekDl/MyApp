@@ -7,9 +7,13 @@ using MyApp.Model;
 
 namespace MyApp.Domain.Medicines.Commands
 {
-    public record UpdateMedicineCommand(int Id, string Code, string Name) : IRequest<Result<bool>>;
+    public record class UpdateMedicineCommand(int Id, string Code, string Name) : IRequest<UpdateMedicineResult>;
 
-    public class UpdateMedicineHandler : IRequestHandler<UpdateMedicineCommand, Result<bool>>
+    public record class UpdateMedicineResult : HResult
+    {
+    }
+
+    public class UpdateMedicineHandler : IRequestHandler<UpdateMedicineCommand, UpdateMedicineResult>
     {
         private readonly ApplicationDbContext _db;
 
@@ -17,18 +21,29 @@ namespace MyApp.Domain.Medicines.Commands
         {
             _db = db;
         }
-        public async Task<Result<bool>> Handle(UpdateMedicineCommand request, CancellationToken ct)
+        public async Task<UpdateMedicineResult> Handle(UpdateMedicineCommand request, CancellationToken ct)
         {
             var entity = await _db.Set<Medicine>().FirstOrDefaultAsync(m => m.Id == request.Id, ct);
             if (entity is null)
             {
-                return Result<bool>.Fail("Medicine not found.");
+                return new() { ErrorMessage = "Nie znaleziono leku w bazie." };
             }
 
-            (entity.Code, entity.Name) = FormatStringHelper.FormatCodeAndText(request.Code, request.Name);
+            var (code, name) = FormatStringHelper.FormatCodeAndText(request.Code, request.Name);
+
+            var exists = await _db.Set<Medicine>()
+                .FirstOrDefaultAsync(m => m.Code == code, ct);
+
+            if (exists != null && exists.Id != request.Id)
+            {
+                return new() { ErrorMessage = $"Kod '{code}' jest już używany." };
+            }
+
+            entity.Code = code;
+            entity.Name = name;
 
             await _db.SaveChangesAsync(ct);
-            return Result<bool>.Ok(true);
+            return new();
         }
     }
 }

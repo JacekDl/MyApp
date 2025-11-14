@@ -6,19 +6,31 @@ using MyApp.Model;
 
 namespace MyApp.Domain.Medicines.Commands
 {
-    public sealed record DeleteMedicineCommand(int Id) : IRequest<Result<bool>>;
+    public record class DeleteMedicineCommand(int Id) : IRequest<DeleteMedicineResult>;
 
-    public sealed class DeleteMedicineHandler(ApplicationDbContext db) : IRequestHandler<DeleteMedicineCommand, Result<bool>>
+    public record class DeleteMedicineResult : HResult
     {
-        public async Task<Result<bool>> Handle(DeleteMedicineCommand request, CancellationToken ct)
-        {
-            var entity = await db.Set<Medicine>().FirstOrDefaultAsync(m => m.Id == request.Id, ct);
-            if (entity is null)
-                return Result<bool>.Fail("Medicine not found.");
 
-            db.Remove(entity);
-            await db.SaveChangesAsync(ct);
-            return Result<bool>.Ok(true);
+    }
+
+    public class DeleteMedicineHandler : IRequestHandler<DeleteMedicineCommand, DeleteMedicineResult>
+    {
+        private readonly ApplicationDbContext _db;
+
+        public DeleteMedicineHandler(ApplicationDbContext db)
+        {
+            _db = db;
+        }
+
+        public async Task<DeleteMedicineResult> Handle(DeleteMedicineCommand request, CancellationToken ct)
+        {
+            var entity = await _db.Set<Medicine>().FirstOrDefaultAsync(m => m.Id == request.Id, ct);
+            if (entity is null)
+                return new() { ErrorMessage = "Medicine not found." };
+
+            _db.Remove(entity);
+            await _db.SaveChangesAsync(ct);
+            return new();
         }
     }
 }

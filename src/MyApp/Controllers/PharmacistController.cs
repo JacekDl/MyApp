@@ -11,14 +11,22 @@ using MyApp.Domain.Dictionaries.Queries;
 namespace MyApp.Web.Controllers;
 
 [Authorize(Roles = "Pharmacist")]
-public class PharmacistController(IReviewPdfService pdfService, IMediator mediator) : Controller
+public class PharmacistController : Controller
 {
+    private readonly IReviewPdfService _pdfService;
+    private readonly IMediator _mediator;
+
+    public PharmacistController(IReviewPdfService pdfService, IMediator mediator)
+    {
+        _pdfService = pdfService;
+        _mediator = mediator;
+    }
 
     #region GenerateReview
     [HttpGet]
     public async Task<IActionResult> ReviewsAsync()
     {
-        var refData = await mediator.Send(new GetDictionariesQuery());
+        var refData = await _mediator.Send(new GetDictionariesQuery());
 
         ViewBag.InstructionMap = refData.InstructionMap;
         ViewBag.MedicineMap = refData.MedicineMap;
@@ -37,7 +45,7 @@ public class PharmacistController(IReviewPdfService pdfService, IMediator mediat
         try
         {
 
-            var result = await mediator.Send(new CreateReviewCommand(currentUserId, vm.Advice));
+            var result = await _mediator.Send(new CreateReviewCommand(currentUserId, vm.Advice));
 
             if (!result.Succeeded)
             {
@@ -45,7 +53,7 @@ public class PharmacistController(IReviewPdfService pdfService, IMediator mediat
                 return View(vm);
             }
 
-            var pdfBytes = await pdfService.GenerateReviewPdf(result.Value!);
+            var pdfBytes = await _pdfService.GenerateReviewPdf(result.Value!);
 
             Response.Headers.ContentDisposition = "inline; filename=review.pdf";
             return File(pdfBytes, "application/pdf");
@@ -66,7 +74,7 @@ public class PharmacistController(IReviewPdfService pdfService, IMediator mediat
     public async Task<IActionResult> Tokens(string? searchTxt, bool? completed)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var dto = await mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, completed));
+        var dto = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, completed));
 
         ViewBag.Query = searchTxt;
         ViewBag.Completed = completed?.ToString().ToLowerInvariant();

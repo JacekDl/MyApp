@@ -9,14 +9,21 @@ using System.Security.Claims;
 
 namespace MyApp.Web.Controllers;
 
-public class PatientController(IMediator mediator) : Controller
+public class PatientController : Controller
 {
+    private readonly IMediator _mediator;
+
+    public PatientController(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
     #region EditOrRegister
 
     [AllowAnonymous, HttpGet("/r/{number}")]
     public async Task<IActionResult> PublicAccess(string number)
     {
-        var result = await mediator.Send(new GetReviewQuery(number));
+        var result = await _mediator.Send(new GetReviewQuery(number));
 
         if (!result.IsSuccess)
         {
@@ -39,7 +46,7 @@ public class PatientController(IMediator mediator) : Controller
     [AllowAnonymous, HttpGet("/r/{number}/edit")]
     public async Task<IActionResult> PublicEdit(string number)
     {
-        var result = await mediator.Send(new GetReviewQuery(number));
+        var result = await _mediator.Send(new GetReviewQuery(number));
 
         if (!result.IsSuccess)
         {
@@ -67,12 +74,12 @@ public class PatientController(IMediator mediator) : Controller
 
         try
         {
-            var result = await mediator.Send(new UpdateReviewCommand(number, vm.ReviewText));
+            var result = await _mediator.Send(new UpdateReviewCommand(number, vm.ReviewText));
 
             if (!result.IsSuccess)
             {
                 ModelState.AddModelError(nameof(vm.ReviewText), result.Error!);
-                var data = await mediator.Send(new GetReviewQuery(number));
+                var data = await _mediator.Send(new GetReviewQuery(number));
                 if (data.IsSuccess && data.Value is not null)
                 {
                     vm.Advice = data.Value.Text;
@@ -94,7 +101,7 @@ public class PatientController(IMediator mediator) : Controller
                     ModelState.AddModelError(string.Empty, err.ErrorMessage);
             }
 
-            var data = await mediator.Send(new GetReviewQuery(number));
+            var data = await _mediator.Send(new GetReviewQuery(number));
             if (data.IsSuccess && data.Value is not null)
             {
                 vm.Advice = data.Value.Text;
@@ -132,7 +139,7 @@ public class PatientController(IMediator mediator) : Controller
 
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        var precheck = await mediator.Send(new GetReviewQuery(vm.Number));
+        var precheck = await _mediator.Send(new GetReviewQuery(vm.Number));
         if (!precheck.IsSuccess) 
         { 
             ModelState.AddModelError(nameof(vm.Number), precheck.Error!); return View(vm); 
@@ -140,7 +147,7 @@ public class PatientController(IMediator mediator) : Controller
 
         try
         {
-            var claim = await mediator.Send(new ClaimReviewByPatientCommand(vm.Number, currentUserId));
+            var claim = await _mediator.Send(new ClaimReviewByPatientCommand(vm.Number, currentUserId));
             if (!claim.IsSuccess)
             {
                 ModelState.AddModelError(nameof(vm.Number), claim.Error!);
@@ -166,7 +173,7 @@ public class PatientController(IMediator mediator) : Controller
     public async Task<IActionResult> Tokens(string? searchTxt)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var dto = await mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, null));
+        var dto = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, null));
 
         ViewBag.Query = searchTxt;
         return View(dto);

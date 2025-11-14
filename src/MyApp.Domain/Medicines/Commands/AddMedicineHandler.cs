@@ -10,15 +10,20 @@ namespace MyApp.Domain.Medicines.Commands
 
     public record class AddMedicineCommand(string Code, string Name) : IRequest<AddMedicineResult>;
 
-    public record class AddMedicineResult : HResult 
+    public record class AddMedicineResult : HResult
     {
     }
 
-    public class AddMedicineHandler(ApplicationDbContext db) : IRequestHandler<AddMedicineCommand, AddMedicineResult>
+    public class AddMedicineHandler : IRequestHandler<AddMedicineCommand, AddMedicineResult>
     {
+        private readonly ApplicationDbContext _db;
+
+        public AddMedicineHandler(ApplicationDbContext db)
+        {
+            _db = db;
+        }
         public async Task<AddMedicineResult> Handle(AddMedicineCommand request, CancellationToken ct)
         {
-            // o tyle fajne rozwiazanie ze nie trzeba obslugiwac wyjatkow w kontrolerze
             var validation = new AddMedicineValidator().Validate(request);
 
             if (!validation.IsValid)
@@ -28,7 +33,7 @@ namespace MyApp.Domain.Medicines.Commands
 
             (var code, var text) = FormatStringHelper.FormatCodeAndText(request.Code, request.Name);
 
-            var exists = await db.Set<Medicine>()
+            var exists = await _db.Set<Medicine>()
                 .AnyAsync(m => m.Code == code, ct);
 
             if (exists)
@@ -36,8 +41,8 @@ namespace MyApp.Domain.Medicines.Commands
                 return new() { ErrorMessage = $"Kod '{code}' jest już używany." };
             }
 
-            db.Add(new Medicine { Code = code, Name = text });
-            await db.SaveChangesAsync(ct);
+            _db.Add(new Medicine { Code = code, Name = text });
+            await _db.SaveChangesAsync(ct);
 
             return new();
         }

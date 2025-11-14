@@ -9,20 +9,26 @@ using MyApp.Domain.Users.Queries;
 namespace MyApp.Web.Controllers;
 
 [Authorize(Roles = "Admin")]
-public class AdminController(IMediator mediator) : Controller
+public class AdminController : Controller
 {
+    private readonly IMediator _mediator;
+
+    public AdminController(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
 
     #region Users
     public async Task<IActionResult> Users()
     {
-        var dto = await mediator.Send(new GetAllUsersQuery());
+        var dto = await _mediator.Send(new GetAllUsersQuery());
         return View(dto);
     }
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> RemoveUser(string id)
     {
-        var result = await mediator.Send(new RemoveUserCommand(id));
+        var result = await _mediator.Send(new RemoveUserCommand(id));
         TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Usunięto użytkownika." : result.Error;
         return RedirectToAction(nameof(Users));
     }
@@ -32,7 +38,7 @@ public class AdminController(IMediator mediator) : Controller
 
     public async Task<IActionResult> Reviews(string? searchTxt, string? userId, bool? completed, string? userEmail)
     {
-        var dto = await mediator.Send(new GetReviewsQuery(searchTxt, userId, completed, userEmail));
+        var dto = await _mediator.Send(new GetReviewsQuery(searchTxt, userId, completed, userEmail));
 
         ViewBag.Query = searchTxt;
         ViewBag.Completed = completed?.ToString().ToLowerInvariant();
@@ -47,7 +53,7 @@ public class AdminController(IMediator mediator) : Controller
     {
         try
         {
-            var result = await mediator.Send(new DeleteReviewCommand(id));
+            var result = await _mediator.Send(new DeleteReviewCommand(id));
             TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Usunięto zalecenia." : result.Error;
             return RedirectToAction(nameof(Reviews));
         }

@@ -7,22 +7,33 @@ using MyApp.Model;
 
 namespace MyApp.Domain.Medicines.Queries    
 {
-    public sealed record GetMedicineQuery(int Id) : IRequest<Result<MedicineDto>>;
+    public record class GetMedicineQuery(int Id) : IRequest<GetMedicineResult>;
 
-    public sealed class GetMedicineHandler(ApplicationDbContext db) : IRequestHandler<GetMedicineQuery, Result<MedicineDto>>
+    public record class GetMedicineResult : HResult<MedicineDto>
     {
-        public async Task<Result<MedicineDto>> Handle(GetMedicineQuery request, CancellationToken ct)
+    }
+
+    public class GetMedicineHandler : IRequestHandler<GetMedicineQuery, GetMedicineResult>
+    {
+        private readonly ApplicationDbContext _db;
+
+        public GetMedicineHandler(ApplicationDbContext db)
         {
-            var result = await db.Set<Medicine>()
+            _db = db;
+        }
+
+        public async Task<GetMedicineResult> Handle(GetMedicineQuery request, CancellationToken ct)
+        {
+            var result = await _db.Set<Medicine>()
                 .Where(m => m.Id == request.Id)
                 .Select(m => new MedicineDto(m.Id, m.Code, m.Name))
                 .FirstOrDefaultAsync(ct);
 
             if (result is null)
             {
-                return Result<MedicineDto>.Fail("Nie znaleziono leku o podanym Id.");
+                return new() { ErrorMessage = "Nie znaleziono leku o podanym Id." };
             }
-            return Result<MedicineDto>.Ok(result);
+            return new() { Value = result };
         }
 
     }

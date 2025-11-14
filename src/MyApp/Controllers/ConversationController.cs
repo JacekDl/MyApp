@@ -8,21 +8,29 @@ using System.Security.Claims;
 namespace MyApp.Web.Controllers;
 
 [Authorize]
-public class ConversationController(IMediator mediator) : Controller
+public class ConversationController : Controller
 {
+    private readonly IMediator _mediator;
+
+    public ConversationController(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
+
     #region ConversationDetails
     [HttpGet]
     public async Task<IActionResult> Display(string number)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var result = await mediator.Send(new GetConversationQuery(number, currentUserId));
+        var result = await _mediator.Send(new GetConversationQuery(number, currentUserId));
 
         if (!result.IsSuccess || result.Value is null)
         {
             return NotFound();
         }
 
-        await mediator.Send(new MarkConversationSeenCommand(number, currentUserId));
+        await _mediator.Send(new MarkConversationSeenCommand(number, currentUserId));
         return View(result.Value);
     }
 
@@ -34,10 +42,10 @@ public class ConversationController(IMediator mediator) : Controller
 
         try
         {
-            var add = await mediator.Send(new AddConversationEntryCommand(number, currentUserId, text));
+            var add = await _mediator.Send(new AddConversationEntryCommand(number, currentUserId, text));
             if (!add.IsSuccess)
             {
-                var threadFail = await mediator.Send(new GetConversationQuery(number, currentUserId));
+                var threadFail = await _mediator.Send(new GetConversationQuery(number, currentUserId));
                 if (!threadFail.IsSuccess || threadFail.Value is null)
                 {
                     return NotFound();
@@ -57,7 +65,7 @@ public class ConversationController(IMediator mediator) : Controller
                 ModelState.AddModelError(key, error.ErrorMessage);
             }
 
-            var thread = await mediator.Send(new GetConversationQuery(number, currentUserId));
+            var thread = await _mediator.Send(new GetConversationQuery(number, currentUserId));
             if (!thread.IsSuccess || thread.Value is null)
                 return NotFound();
 
