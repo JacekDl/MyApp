@@ -1,21 +1,33 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using MyApp.Domain.Common;
 using MyApp.Domain.Data;
 using MyApp.Model;
 
 namespace MyApp.Domain.Instructions.Queries
 {
-    public sealed record GetInstructionsQuery() : IRequest<IReadOnlyList<InstructionDto>>;
+    public record class GetInstructionsQuery() : IRequest<GetInstructionsResult>;
 
-    public sealed class GetInstructionsHandler(ApplicationDbContext db)
-        : IRequestHandler<GetInstructionsQuery, IReadOnlyList<InstructionDto>>
+    public record class GetInstructionsResult : HResult<IReadOnlyList<InstructionDto>>
     {
-        public async Task<IReadOnlyList<InstructionDto>> Handle(GetInstructionsQuery request, CancellationToken ct)
+    }
+
+    public class GetInstructionsHandler : IRequestHandler<GetInstructionsQuery, GetInstructionsResult>
+    {
+        private readonly ApplicationDbContext _db;
+
+        public GetInstructionsHandler(ApplicationDbContext db)
         {
-            return await db.Set<Instruction>()
+            _db = db;
+        }
+        public async Task<GetInstructionsResult> Handle(GetInstructionsQuery request, CancellationToken ct)
+        {
+            var result =  await _db.Set<Instruction>()
                 .OrderBy(i => i.Code)
                 .Select(i => new InstructionDto(i.Id, i.Code, i.Text))
                 .ToListAsync(ct);
+
+            return new() { Value = result };
         }
     }
 }

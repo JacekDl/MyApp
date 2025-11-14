@@ -98,10 +98,10 @@ namespace MyApp.Web.Controllers
         {
             var model = await _mediator.Send(new GetInstructionsQuery());
             if (User.IsInRole("Admin"))
-                return View("~/Views/Admin/Instructions.cshtml", model);
+                return View("~/Views/Admin/Instructions.cshtml", model.Value);
 
             if (User.IsInRole("Pharmacist"))
-                return View("~/Views/Pharmacist/Instructions.cshtml", model);
+                return View("~/Views/Pharmacist/Instructions.cshtml", model.Value);
 
             return Forbid(); //TODO :change that
         }
@@ -153,9 +153,9 @@ namespace MyApp.Web.Controllers
         [Authorize(Roles = "Pharmacist")]
         public async Task<IActionResult> PrintInstructions()
         {
-            var dto = await _mediator.Send(new GetInstructionsQuery());
+            var result = await _mediator.Send(new GetInstructionsQuery());
 
-            var pdfBytes = await _pdfService.GenerateInstructionsPdf(dto);
+            var pdfBytes = await _pdfService.GenerateInstructionsPdf(result.Value!);
             Response.Headers.ContentDisposition = "inline; filename=instruction.pdf";
             return File(pdfBytes, "instruction/pdf");
         }

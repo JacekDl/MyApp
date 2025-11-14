@@ -15,7 +15,7 @@ namespace MyApp.Domain.Migrations
     partial class InitialCreate
     {
         /// <inheritdoc />
-        protected void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
