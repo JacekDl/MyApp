@@ -6,24 +6,35 @@ using MyApp.Model;
 
 namespace MyApp.Domain.Instructions.Commands
 {
-    public sealed record AddInstructionCommand(string Code, string Text) : IRequest<Result<bool>>;
+    public record class AddInstructionCommand(string Code, string Text) : IRequest<AddInstructionResult>;
 
-    public sealed class AddInstructionHandler(ApplicationDbContext db) : IRequestHandler<AddInstructionCommand, Result<bool>>
+    public record class AddInstructionResult : HResult
     {
-        public async Task<Result<bool>> Handle(AddInstructionCommand request, CancellationToken ct)
+    }
+
+    public class AddInstructionHandler : IRequestHandler<AddInstructionCommand, AddInstructionResult>
+    {
+        private readonly ApplicationDbContext _db;
+
+        public AddInstructionHandler(ApplicationDbContext db)
+        {
+            _db = db;
+        }
+
+        public async Task<AddInstructionResult> Handle(AddInstructionCommand request, CancellationToken ct)
         {
 
-            (var code, var text) = FormatStringHelper.FormatCodeAndText(request.Code, request.Text);
+            var (code, text) = FormatStringHelper.FormatCodeAndText(request.Code, request.Text);
 
-            var exists = await db.Set<Instruction>()
+            var exists = await _db.Set<Instruction>()
                 .AnyAsync(i => i.Code == code, ct);
 
             if (exists)
-                return Result<bool>.Fail($"Kod '{code}' jest już używany.");
+                return new() { ErrorMessage = $"Kod '{code}' jest już używany." };
 
-            db.Add(new Instruction { Code = code, Text = text });
-            await db.SaveChangesAsync(ct);
-            return Result<bool>.Ok(true);
+            _db.Add(new Instruction { Code = code, Text = text });
+            await _db.SaveChangesAsync(ct);
+            return new();
         }
     }
 }

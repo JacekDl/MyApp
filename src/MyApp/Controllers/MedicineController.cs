@@ -111,7 +111,7 @@ namespace MyApp.Web.Controllers
         public async Task<IActionResult> AddInstruction(AddInstructionCommand command)
         {
             var result = await _mediator.Send(command);
-            TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Dodano dawkowanie." : result.Error;
+            TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Dodano dawkowanie." : result.ErrorMessage;
             return RedirectToAction(nameof(Instructions));
         }
 
