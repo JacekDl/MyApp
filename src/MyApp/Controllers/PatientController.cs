@@ -25,9 +25,9 @@ public class PatientController : Controller
     {
         var result = await _mediator.Send(new GetReviewQuery(number));
 
-        if (!result.IsSuccess)
+        if (!result.Succeeded)
         {
-            return NotFound(); //View with error message can be implemented here.
+            return NotFound(); //TODO: View with error message can be implemented here.
         }
 
         var review = result.Value!;
@@ -48,7 +48,7 @@ public class PatientController : Controller
     {
         var result = await _mediator.Send(new GetReviewQuery(number));
 
-        if (!result.IsSuccess)
+        if (!result.Succeeded)
         {
             return NotFound(); //View with error message can be implemented here.
         }
@@ -76,11 +76,11 @@ public class PatientController : Controller
         {
             var result = await _mediator.Send(new UpdateReviewCommand(number, vm.ReviewText));
 
-            if (!result.IsSuccess)
+            if (!result.Succeeded)
             {
-                ModelState.AddModelError(nameof(vm.ReviewText), result.Error!);
+                ModelState.AddModelError(nameof(vm.ReviewText), result.ErrorMessage!);
                 var data = await _mediator.Send(new GetReviewQuery(number));
-                if (data.IsSuccess && data.Value is not null)
+                if (data.Succeeded && data.Value is not null)
                 {
                     vm.Advice = data.Value.Text;
                     vm.Number = data.Value.Number;
@@ -102,7 +102,7 @@ public class PatientController : Controller
             }
 
             var data = await _mediator.Send(new GetReviewQuery(number));
-            if (data.IsSuccess && data.Value is not null)
+            if (data.Succeeded && data.Value is not null)
             {
                 vm.Advice = data.Value.Text;
                 vm.Number = data.Value.Number;
@@ -140,31 +140,21 @@ public class PatientController : Controller
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         var precheck = await _mediator.Send(new GetReviewQuery(vm.Number));
-        if (!precheck.IsSuccess) 
-        { 
-            ModelState.AddModelError(nameof(vm.Number), precheck.Error!); return View(vm); 
+        if (!precheck.Succeeded)
+        {
+            ModelState.AddModelError(nameof(vm.Number), precheck.ErrorMessage!); return View(vm);
         }
 
-        try
-        {
-            var claim = await _mediator.Send(new ClaimReviewByPatientCommand(vm.Number, currentUserId));
-            if (!claim.IsSuccess)
-            {
-                ModelState.AddModelError(nameof(vm.Number), claim.Error!);
-                return View(vm);
-            }
-            TempData["Info"] = "Token został przypisany do Twojego konta.";
-            return RedirectToAction(nameof(Tokens));
-        }
-        catch(FluentValidation.ValidationException ex)
-        {
-            foreach (var err in ex.Errors)
-                ModelState.AddModelError(nameof(vm.Number), err.ErrorMessage);
 
+        var result = await _mediator.Send(new ClaimReviewByPatientCommand(vm.Number, currentUserId));
+        if (!result.Succeeded)
+        {
+            ModelState.AddModelError(nameof(vm.Number), result.ErrorMessage!);
             return View(vm);
         }
+        TempData["Info"] = "Token został przypisany do Twojego konta.";
+        return RedirectToAction(nameof(Tokens));
     }
-
     #endregion
 
     #region ViewReviews
@@ -173,10 +163,10 @@ public class PatientController : Controller
     public async Task<IActionResult> Tokens(string? searchTxt)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var dto = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, null));
+        var result = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, null));
 
         ViewBag.Query = searchTxt;
-        return View(dto);
+        return View(result.Value);
     }
     #endregion
 }

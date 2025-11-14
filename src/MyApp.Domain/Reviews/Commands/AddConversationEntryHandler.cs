@@ -11,10 +11,7 @@ namespace MyApp.Domain.Reviews.Commands;
 public record class AddConversationEntryCommand(string Number, string RequestingUserId, string Text) 
     : IRequest<AddConversationEntryResult>;
 
-public record class AddConversationEntryResult : HResult
-{
-
-}
+public record class AddConversationEntryResult : Result;
 
 public class AddConversationEntryHandler : IRequestHandler<AddConversationEntryCommand, AddConversationEntryResult>
 {

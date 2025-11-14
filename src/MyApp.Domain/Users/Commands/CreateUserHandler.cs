@@ -5,20 +5,11 @@ using Microsoft.AspNetCore.Identity;
 
 namespace MyApp.Domain.Users.Commands;
 
-public record CreateUserCommand(string Email, string Password,string Role) : IRequest<Result<User>>;
+public record class CreateUserCommand(string Email, string Password,string Role) : IRequest<CreateUserResult>;
 
+public record class CreateUserResult : Result<User>;
 
-/// <summary>
-/// Handles the <see cref="CreateUserCommand"/> by creating a new user account.
-/// </summary>
-/// <param name="request">
-/// The command containing the user's email and password to create the account.
-/// </param>
-/// /// <returns>
-/// A <see cref="Result{User}"/> that contains the newly created <see cref="User"/> 
-/// if successful, or a failure result with an error message if the creation fails.
-/// </returns>
-public class CreateUserHandler : IRequestHandler<CreateUserCommand, Result<User>>
+public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserResult>
 {
     private static readonly string[] Allowed = { "Pharmacist", "Patient" };
 
@@ -30,20 +21,20 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, Result<User>
         _roleManager = roleManager;
     }
 
-    public async Task<Result<User>> Handle(CreateUserCommand request, CancellationToken ct)
+    public async Task<CreateUserResult> Handle(CreateUserCommand request, CancellationToken ct)
     {
         var email = request.Email.Trim();
         var existing = await _userManager.FindByEmailAsync(email);
 
         if (existing is not null)
         {
-            return Result<User>.Fail("Email is already registered.");
+            return new() { ErrorMessage = "Podany email jest już zarejestrowany." };
         }
 
         var role = Allowed.FirstOrDefault(r => r.Equals(request.Role, StringComparison.OrdinalIgnoreCase));
         if (role is null)
         {
-            return Result<User>.Fail("Unsupported role.");
+            return new() { ErrorMessage = "Nieobsługiwana rola." };
         }
 
         var user = new User
@@ -58,11 +49,11 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, Result<User>
         if (!create.Succeeded)
         {
             var message = string.Join(";", create.Errors.Select(e => $"{e.Code}: {e.Description}"));
-            return Result<User>.Fail(message);
+            return new() { ErrorMessage = message };
         }
 
         var addRole = await _userManager.AddToRoleAsync(user, role);
 
-        return Result<User>.Ok(user);
+        return new();
     }
 }

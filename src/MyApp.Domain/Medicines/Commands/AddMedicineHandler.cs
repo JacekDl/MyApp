@@ -10,7 +10,7 @@ namespace MyApp.Domain.Medicines.Commands
 
     public record class AddMedicineCommand(string Code, string Name) : IRequest<AddMedicineResult>;
 
-    public record class AddMedicineResult : HResult
+    public record class AddMedicineResult : Result
     {
     }
 

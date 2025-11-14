@@ -9,9 +9,7 @@ namespace MyApp.Domain.Medicines.Queries
 {
     public record class GetMedicineQuery(int Id) : IRequest<GetMedicineResult>;
 
-    public record class GetMedicineResult : HResult<MedicineDto>
-    {
-    }
+    public record class GetMedicineResult : Result<MedicineDto>;
 
     public class GetMedicineHandler : IRequestHandler<GetMedicineQuery, GetMedicineResult>
     {

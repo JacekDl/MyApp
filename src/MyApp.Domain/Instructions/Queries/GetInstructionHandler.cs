@@ -9,9 +9,7 @@ namespace MyApp.Domain.Instructions.Queries
 {
     public record class GetInstructionQuery(int Id) : IRequest<GetInstructionResult>;
 
-    public record class GetInstructionResult : HResult<InstructionDto>
-    {
-    }
+    public record class GetInstructionResult : Result<InstructionDto>;
 
     public class GetInstructionHandler : IRequestHandler<GetInstructionQuery, GetInstructionResult>
     {

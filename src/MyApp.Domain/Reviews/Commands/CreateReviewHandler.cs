@@ -10,9 +10,7 @@ namespace MyApp.Domain.Reviews.Commands;
 
 public record class CreateReviewCommand(string UserId, string Advice) : IRequest<CreateReviewResult>;
 
-public record class CreateReviewResult : HResult<Review>
-{
-}
+public record class CreateReviewResult : Result<Review>;
 
 public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, CreateReviewResult>
 {

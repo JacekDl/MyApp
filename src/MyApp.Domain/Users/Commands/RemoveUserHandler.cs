@@ -5,9 +5,11 @@ using MyApp.Model;
 
 namespace MyApp.Domain.Users.Commands;
 
-public record RemoveUserCommand(string Id) : IRequest<Result<bool>>;
+public record class RemoveUserCommand(string Id) : IRequest<RemoveUserResult>;
 
-public class RemoveUserHandler : IRequestHandler<RemoveUserCommand, Result<bool>>
+public record class RemoveUserResult : Result;
+
+public class RemoveUserHandler : IRequestHandler<RemoveUserCommand, RemoveUserResult>
 {
     private readonly UserManager<User> _userManager;
     public RemoveUserHandler(UserManager<User> userManager)
@@ -15,19 +17,21 @@ public class RemoveUserHandler : IRequestHandler<RemoveUserCommand, Result<bool>
         _userManager = userManager;
 
     }
-    public async Task<Result<bool>> Handle(RemoveUserCommand request, CancellationToken ct)
+    public async Task<RemoveUserResult> Handle(RemoveUserCommand request, CancellationToken ct)
     {
         var user = await _userManager.FindByIdAsync(request.Id);
         if (user is null)
-            return Result<bool>.Fail("User not found");
+        {
+            return new() { ErrorMessage = "Nie znaleziono użytkownika." };
+        }
 
         var result = await _userManager.DeleteAsync(user);
         if (!result.Succeeded)
         {
             var error = string.Join("; ", result.Errors.Select(e => $"{e.Code}: {e.Description}"));
-            return Result<bool>.Fail(error);
+            return new() { ErrorMessage = error };
         }
 
-        return Result<bool>.Ok(true);
+        return new();
     }
 }

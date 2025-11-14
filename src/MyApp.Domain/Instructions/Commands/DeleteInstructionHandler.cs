@@ -8,9 +8,7 @@ namespace MyApp.Domain.Instructions.Commands
 {
     public record class DeleteInstructionCommand(int Id) : IRequest<DeleteInstructionResult>;
 
-    public record class DeleteInstructionResult : HResult
-    {
-    }
+    public record class DeleteInstructionResult : Result;
 
     public class DeleteInstructionHandler : IRequestHandler<DeleteInstructionCommand, DeleteInstructionResult>
     {

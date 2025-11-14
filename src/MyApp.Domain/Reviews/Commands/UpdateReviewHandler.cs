@@ -7,43 +7,54 @@ using MyApp.Model;
 
 namespace MyApp.Domain.Reviews.Commands;
 
-public record UpdateReviewCommand(string Number, string ReviewText) : IRequest<Result<bool>>;
+public record class UpdateReviewCommand(string Number, string ReviewText) : IRequest<UpdateReviewResult>;
 
-public class UpdateReviewHandler : IRequestHandler<UpdateReviewCommand, Result<bool>>
+public record class UpdateReviewResult : Result;
+
+public class UpdateReviewHandler : IRequestHandler<UpdateReviewCommand, UpdateReviewResult>
 {
     private readonly ApplicationDbContext _db;
     public UpdateReviewHandler(ApplicationDbContext db)
     {
         _db = db;
     }
-    public async Task<Result<bool>> Handle(UpdateReviewCommand request, CancellationToken ct)
+
+    public async Task<UpdateReviewResult> Handle(UpdateReviewCommand request, CancellationToken ct)
     {
         var review = await _db.Reviews
             .Include(r => r.Entries)
             .SingleOrDefaultAsync(r => r.Number == request.Number, ct);
 
         if (review is null)
-            return Result<bool>.Fail("Review not found.");
+        {
+            return new() { ErrorMessage = "Nie znaleziono zaleceń." };
+        }
 
         if (review.Completed)
-            return Result<bool>.Fail("Review has been already submitted.");
+        {
+            return new() { ErrorMessage = "Review has been already submitted." };
+
+        }
 
         if (review.DateCreated.AddDays(7) < DateTime.Now)
-            return Result<bool>.Fail("Review has expired.");
+        {
+            return new() { ErrorMessage = "Review has expired." };
+        }
 
         var text = (request.ReviewText ?? string.Empty).Trim();
 
-        review.Entries.Add(new Entry
-        {
-            UserId = null,
-            Text = text,
-            ReviewId = review.Id
-        });
+        review.Entries.Add(
+            new Entry
+            {
+                UserId = null,
+                Text = text,
+                ReviewId = review.Id
+            });
 
         review.Completed = true;
 
-        await _db.SaveChangesAsync();
-        return Result<bool>.Ok(true);
+        await _db.SaveChangesAsync(ct);
+        return new();
     }
 
     public class UpdateReviewCommandValidator : AbstractValidator<UpdateReviewCommand>

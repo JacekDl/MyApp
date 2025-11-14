@@ -1,15 +1,17 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MyApp.Domain.Abstractions;
+using MyApp.Domain.Common;
 using MyApp.Model;
 
 
 namespace MyApp.Domain.Users.Queries;
 
-public record GetAllUsersQuery() : IRequest<List<UserDto>>;
+public record class GetAllUsersQuery() : IRequest<GetAllUsersResult>;
 
-public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, List<UserDto>>
+public record class GetAllUsersResult : Result<IReadOnlyList<UserDto>>; 
+
+public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, GetAllUsersResult>
 {
     private readonly UserManager<User> _userManager;
 
@@ -18,9 +20,9 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, List<UserDto
         _userManager = userManager;
     }
     
-    public async Task<List<UserDto>> Handle(GetAllUsersQuery request, CancellationToken ct)
+    public async Task<GetAllUsersResult> Handle(GetAllUsersQuery request, CancellationToken ct)
     {
-        return await _userManager.Users
+        var result =  await _userManager.Users
             .AsNoTracking()
             .OrderByDescending(u => u.CreatedUtc)
             .Select(u => new UserDto(
@@ -30,5 +32,7 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, List<UserDto
                 u.DisplayName ?? string.Empty,
                 u.CreatedUtc))
             .ToListAsync(ct);
+
+        return new() { Value = result };
     }
 }

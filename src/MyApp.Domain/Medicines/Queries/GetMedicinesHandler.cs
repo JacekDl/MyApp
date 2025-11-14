@@ -8,7 +8,7 @@ namespace MyApp.Domain.Medicines.Queries
     
     public record class GetMedicinesQuery : IRequest<GetMedicinesResult>;
 
-    public record class GetMedicinesResult : HResult<IReadOnlyList<MedicineDto>>;
+    public record class GetMedicinesResult : Result<IReadOnlyList<MedicineDto>>;
 
     public class GetMedicinesQueryHandler : IRequestHandler<GetMedicinesQuery, GetMedicinesResult>
     {

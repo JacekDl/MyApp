@@ -6,27 +6,34 @@ using MyApp.Domain.Data;
 
 namespace MyApp.Domain.Reviews.Commands
 {
-    public record DeleteReviewCommand(int Id) : IRequest<Result<bool>>;
+    public record class DeleteReviewCommand(int Id) : IRequest<DeleteReviewResult>;
 
-    public class DeleteReviewHandler(ApplicationDbContext db) : IRequestHandler<DeleteReviewCommand, Result<bool>>
+    public record class DeleteReviewResult : Result;
+
+    public class DeleteReviewHandler: IRequestHandler<DeleteReviewCommand, DeleteReviewResult>
     {
-        public async Task<Result<bool>> Handle(DeleteReviewCommand request, CancellationToken ct)
+        private readonly ApplicationDbContext _db;
+
+        public DeleteReviewHandler(ApplicationDbContext db)
         {
-            var review = await db.Reviews.FirstOrDefaultAsync(r => r.Id == request.Id, ct);
+            _db = db;
+        }
+        public async Task<DeleteReviewResult> Handle(DeleteReviewCommand request, CancellationToken ct)
+        {
+            var validator = new DeleteReviewCommandValidator().Validate(request);
+            if (!validator.IsValid)
+            {
+                return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+            }
+
+            var review = await _db.Reviews.FirstOrDefaultAsync(r => r.Id == request.Id, ct);
             if (review is null)
-                return Result<bool>.Fail("Nie znaleziono zaleceń.");
+                return new() { ErrorMessage = "Nie znaleziono zaleceń." };
 
-            db.Reviews.Remove(review);
+            _db.Reviews.Remove(review);
+            await _db.SaveChangesAsync(ct);
+            return new();
 
-            try
-            {
-                await db.SaveChangesAsync(ct);
-                return Result<bool>.Ok(true);
-            }
-            catch (DbUpdateException ex)
-            {
-                return Result<bool>.Fail($"Nie udało się usunąć zaleceń: {ex.InnerException?.Message ?? ex.Message}");
-            }
         }
     }
 

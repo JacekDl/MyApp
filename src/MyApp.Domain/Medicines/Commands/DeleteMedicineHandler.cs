@@ -8,10 +8,7 @@ namespace MyApp.Domain.Medicines.Commands
 {
     public record class DeleteMedicineCommand(int Id) : IRequest<DeleteMedicineResult>;
 
-    public record class DeleteMedicineResult : HResult
-    {
-
-    }
+    public record class DeleteMedicineResult : Result;
 
     public class DeleteMedicineHandler : IRequestHandler<DeleteMedicineCommand, DeleteMedicineResult>
     {

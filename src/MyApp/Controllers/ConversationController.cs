@@ -17,7 +17,6 @@ public class ConversationController : Controller
         _mediator = mediator;
     }
 
-
     #region ConversationDetails
     [HttpGet]
     public async Task<IActionResult> Display(string number)
@@ -25,12 +24,16 @@ public class ConversationController : Controller
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await _mediator.Send(new GetConversationQuery(number, currentUserId));
 
-        if (!result.IsSuccess || result.Value is null)
+        if (!result.Succeeded)
         {
-            return NotFound();
+            return NotFound(); //TODO: zmienić zamiast zwracać 404
         }
 
-        await _mediator.Send(new MarkConversationSeenCommand(number, currentUserId));
+        var markResult = await _mediator.Send(new MarkConversationSeenCommand(number, currentUserId));
+        if (!markResult.Succeeded)
+        {
+            return BadRequest(); //TODO: zmienić zamiast zwracać 400
+        }
         return View(result.Value);
     }
 

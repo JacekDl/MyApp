@@ -7,9 +7,11 @@ using MyApp.Model;
 
 namespace MyApp.Domain.Reviews.Queries;
 
-public record GetConversationQuery(string Number, string RequestingUserId) : IRequest<Result<ConversationDto>>;
+public record class GetConversationQuery(string Number, string RequestingUserId) : IRequest<GetConversationResult>;
 
-public class GetConversationHandler : IRequestHandler<GetConversationQuery, Result<ConversationDto>>
+public record class GetConversationResult : Result<ConversationDto>;
+
+public class GetConversationHandler : IRequestHandler<GetConversationQuery, GetConversationResult>
 {
     private readonly ApplicationDbContext _db;
     private readonly UserManager<User> _userManager;
@@ -19,14 +21,16 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, Resu
         _db = db;
         _userManager = userManager;
     }
-    public async Task<Result<ConversationDto>> Handle(GetConversationQuery request, CancellationToken ct)
+    public async Task<GetConversationResult> Handle(GetConversationQuery request, CancellationToken ct)
     {
         var review = await _db.Reviews
             .Include(r => r.Entries.OrderBy(e => e.CreatedUtc))
             .SingleOrDefaultAsync(r => r.Number == request.Number, ct);
 
         if (review is null)
-            return Result<ConversationDto>.Fail("Nie znaleziono zaleceń.");
+        {
+            return new() { ErrorMessage = "Nie znaleziono zaleceń." };
+        }
 
         var user = await _userManager.FindByIdAsync(request.RequestingUserId);
         var viewerIsAdmin = user != null && await _userManager.IsInRoleAsync(user, "Admin");
@@ -34,7 +38,9 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, Resu
         var viewerIsParticipant = review.PharmacistId == request.RequestingUserId || review.PatientId == request.RequestingUserId;
 
         if (!viewerIsParticipant && !viewerIsAdmin)
-            return Result<ConversationDto>.Fail("Brak dostępu.");
+        {
+            return new() { ErrorMessage = "Brak dostępu." };
+        }
 
         var entries = new List<EntryDto>();
         foreach (var e in review.Entries.OrderBy(en => en.CreatedUtc))
@@ -76,7 +82,6 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, Resu
             review.Completed,
             entries);
             
-
-        return Result<ConversationDto>.Ok(dto);
+        return new() { Value = dto };
     }
 }

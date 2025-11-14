@@ -38,9 +38,9 @@ public class AccountController : Controller
 
         var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password, "Pharmacist"));
 
-        if (!result.IsSuccess)
+        if (!result.Succeeded)
         {
-            ModelState.AddModelError(nameof(vm.Email), result.Error!);
+            ModelState.AddModelError(nameof(vm.Email), result.ErrorMessage!);
             return View(vm);
         }
 
@@ -93,9 +93,9 @@ public class AccountController : Controller
 
         var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password, "Patient"));
 
-        if (!result.IsSuccess)
+        if (!result.Succeeded)
         {
-            ModelState.AddModelError(nameof(vm.Email), result.Error!);
+            ModelState.AddModelError(nameof(vm.Email), result.ErrorMessage!);
             return View(vm);
         }
 
@@ -180,9 +180,9 @@ public class AccountController : Controller
 
         var result = await _mediator.Send(new GetUserByIdQuery(currentUserId));
 
-        if (!result.IsSuccess)
+        if (!result.Succeeded)
         {
-            ModelState.AddModelError(string.Empty, result.Error!);
+            ModelState.AddModelError(string.Empty, result.ErrorMessage!);
             return View();
         }
 
@@ -199,9 +199,9 @@ public class AccountController : Controller
 
         var result = await _mediator.Send(new GetUserByIdQuery(currentUserId));
 
-        if (!result.IsSuccess)
+        if (!result.Succeeded)
         {
-            ModelState.AddModelError(string.Empty, result.Error!);
+            ModelState.AddModelError(string.Empty, result.ErrorMessage!);
             return View();
         }
 
@@ -223,9 +223,9 @@ public class AccountController : Controller
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await _mediator.Send(new UpdateUserDetailsCommand(currentUserId, vm.DisplayName));
 
-        if (!result.IsSuccess)
+        if (!result.Succeeded)
         {
-            ModelState.AddModelError(string.Empty, result.Error!);
+            ModelState.AddModelError(string.Empty, result.ErrorMessage!);
             return View(vm);
         }
 
@@ -241,9 +241,9 @@ public class AccountController : Controller
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         var result = await _mediator.Send(new GetUserByIdQuery(currentUserId));
-        if (!result.IsSuccess)
+        if (!result.Succeeded)
         {
-            ModelState.AddModelError(string.Empty, result.Error!);
+            ModelState.AddModelError(string.Empty, result.ErrorMessage!);
             return View();
         }
 
@@ -264,9 +264,9 @@ public class AccountController : Controller
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         var result = await _mediator.Send(new UpdateUserEmailCommand(currentUserId, vm.Email, vm.CurrentPassword));
-        if (!result.IsSuccess)
+        if (!result.Succeeded)
         {
-            ModelState.AddModelError(string.Empty, result.Error!);
+            ModelState.AddModelError(string.Empty, result.ErrorMessage!);
             return View(vm);
         }
 
@@ -297,9 +297,9 @@ public class AccountController : Controller
         var CurrentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await _mediator.Send(new UpdateUserPasswordCommand(CurrentUserId, vm.CurrentPassword, vm.NewPassword));
 
-        if (!result.IsSuccess)
+        if (!result.Succeeded)
         {
-            ModelState.AddModelError(string.Empty, result.Error!);
+            ModelState.AddModelError(string.Empty, result.ErrorMessage!);
             return View(vm);
         }
 

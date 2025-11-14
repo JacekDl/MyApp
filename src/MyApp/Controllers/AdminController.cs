@@ -21,15 +21,15 @@ public class AdminController : Controller
     #region Users
     public async Task<IActionResult> Users()
     {
-        var dto = await _mediator.Send(new GetAllUsersQuery());
-        return View(dto);
+        var result = await _mediator.Send(new GetAllUsersQuery());
+        return View(result.Value);
     }
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> RemoveUser(string id)
     {
         var result = await _mediator.Send(new RemoveUserCommand(id));
-        TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Usunięto użytkownika." : result.Error;
+        TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Usunięto użytkownika." : result.ErrorMessage;
         return RedirectToAction(nameof(Users));
     }
     #endregion
@@ -38,14 +38,14 @@ public class AdminController : Controller
 
     public async Task<IActionResult> Reviews(string? searchTxt, string? userId, bool? completed, string? userEmail)
     {
-        var dto = await _mediator.Send(new GetReviewsQuery(searchTxt, userId, completed, userEmail));
+        var result = await _mediator.Send(new GetReviewsQuery(searchTxt, userId, completed, userEmail));
 
         ViewBag.Query = searchTxt;
         ViewBag.Completed = completed?.ToString().ToLowerInvariant();
         ViewBag.UserId = userId;
         ViewBag.UserEmail = userEmail;
 
-        return View(dto);
+        return View(result.Value);
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -54,7 +54,7 @@ public class AdminController : Controller
         try
         {
             var result = await _mediator.Send(new DeleteReviewCommand(id));
-            TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Usunięto zalecenia." : result.Error;
+            TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Usunięto zalecenia." : result.ErrorMessage;
             return RedirectToAction(nameof(Reviews));
         }
         catch (FluentValidation.ValidationException ex)

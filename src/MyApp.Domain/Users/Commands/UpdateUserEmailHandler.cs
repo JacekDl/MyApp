@@ -6,9 +6,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyApp.Domain.Users.Commands;
 
-public record UpdateUserEmailCommand(string Id, string Email, string Password) : IRequest<Result<User>>;
+public record class UpdateUserEmailCommand(string Id, string Email, string Password) : IRequest<UpdateUserEmailResult>;
 
-public class UpdateUserEmailHandler : IRequestHandler<UpdateUserEmailCommand, Result<User>>
+public record class UpdateUserEmailResult : Result<User>;
+
+public class UpdateUserEmailHandler : IRequestHandler<UpdateUserEmailCommand, UpdateUserEmailResult>
 {
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
@@ -19,29 +21,37 @@ public class UpdateUserEmailHandler : IRequestHandler<UpdateUserEmailCommand, Re
         _signInManager = signInManager;
     }
 
-    public async Task<Result<User>> Handle(UpdateUserEmailCommand request, CancellationToken ct)
+    public async Task<UpdateUserEmailResult> Handle(UpdateUserEmailCommand request, CancellationToken ct)
     {
         var user = await _userManager.FindByIdAsync(request.Id);
         if (user is null)
-            return Result<User>.Fail("User not found");
+        {
+            return new() {ErrorMessage = "Nie znaleziono użytkownika."};
+        }
 
         var emailAttr = new EmailAddressAttribute();
         if (!emailAttr.IsValid(request.Email))
-            return Result<User>.Fail("Please enter a valid email address.");
+        {
+            return new() { ErrorMessage = "Proszę wprowadzić prawidłowy adres e-mail." };
+        }
         
         if (!await _userManager.CheckPasswordAsync(user, request.Password))
-            return Result<User>.Fail("Wrong password");
+        {
+            return new() { ErrorMessage = "Nieprawidłowe hasło." };
+        }
 
         var newEmail = request.Email.Trim();
         var existingWithEmail = await _userManager.FindByEmailAsync(newEmail);
         if (existingWithEmail is not null && existingWithEmail.Id != user.Id)
-            return Result<User>.Fail("Email is already registered.");
+        {
+            return new() { ErrorMessage = "Podany email jest już zarejestrowany." };
+        }
 
         var setEmail = await _userManager.SetEmailAsync(user, newEmail);
         if (!setEmail.Succeeded)
         {
             var message = string.Join("; ", setEmail.Errors.Select(e => $"{e.Code}: {e.Description}"));
-            return Result<User>.Fail(message);
+            return new() { ErrorMessage = message };
         }
         
         user.UserName = newEmail;
@@ -53,6 +63,6 @@ public class UpdateUserEmailHandler : IRequestHandler<UpdateUserEmailCommand, Re
         }
 
         await _signInManager.RefreshSignInAsync(user);
-        return Result<User>.Ok(user);
+        return new() { Value = user };
     }
 }

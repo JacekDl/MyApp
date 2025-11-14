@@ -7,9 +7,11 @@ using MyApp.Domain.Users;
 
 namespace MyApp.Domain.Users.Queries;
 
-public record GetUserByIdQuery(string Id) : IRequest<Result<UserDto>>;
+public record class GetUserByIdQuery(string Id) : IRequest<GetUserByIdResult>;
 
-public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, Result<UserDto>>
+public record class GetUserByIdResult : Result<UserDto>;
+
+public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, GetUserByIdResult>
 {
     private readonly UserManager<User> _userManager;
 
@@ -18,11 +20,13 @@ public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, Result<UserD
         _userManager = userManager;
     }
 
-    public async Task<Result<UserDto>> Handle(GetUserByIdQuery request, CancellationToken ct)
+    public async Task<GetUserByIdResult> Handle(GetUserByIdQuery request, CancellationToken ct)
     {
         var user = await _userManager.FindByIdAsync(request.Id);
         if (user is null)
-            return Result<UserDto>.Fail("User not found");
+        {
+            return new() { ErrorMessage = "Nie znaleziono użytkownika." };
+        }
 
         var roles = await _userManager.GetRolesAsync(user);
         var role = roles.FirstOrDefault() ?? user.Role;
@@ -35,6 +39,6 @@ public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, Result<UserD
             user.CreatedUtc
         );
 
-        return Result<UserDto>.Ok(userDto);
+        return new() { Value = userDto };
     }
 }

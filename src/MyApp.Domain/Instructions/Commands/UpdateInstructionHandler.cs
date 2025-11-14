@@ -8,9 +8,7 @@ namespace MyApp.Domain.Instructions.Commands
 {
     public record class UpdateInstructionCommand(int Id, string Code, string Text) : IRequest<UpdateInstructionResult>;
 
-    public record class UpdateInstructionResult : HResult
-    {
-    }
+    public record class UpdateInstructionResult : Result;
 
     public class UpdateInstructionHandler : IRequestHandler<UpdateInstructionCommand, UpdateInstructionResult>
     {

@@ -26,10 +26,10 @@ public class PharmacistController : Controller
     [HttpGet]
     public async Task<IActionResult> ReviewsAsync()
     {
-        var refData = await _mediator.Send(new GetDictionariesQuery());
+        var result = await _mediator.Send(new GetDictionariesQuery());
 
-        ViewBag.InstructionMap = refData.InstructionMap;
-        ViewBag.MedicineMap = refData.MedicineMap;
+        ViewBag.InstructionMap = result.InstructionMap;
+        ViewBag.MedicineMap = result.MedicineMap;
         return View(new ReviewCreateViewModel());
     }
 
@@ -74,11 +74,11 @@ public class PharmacistController : Controller
     public async Task<IActionResult> Tokens(string? searchTxt, bool? completed)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var dto = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, completed));
+        var result = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, completed));
 
         ViewBag.Query = searchTxt;
         ViewBag.Completed = completed?.ToString().ToLowerInvariant();
-        return View(dto);
+        return View(result.Value);
     }
     #endregion  
 }

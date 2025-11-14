@@ -1,14 +1,18 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MyApp.Domain.Common;
 using MyApp.Domain.Data;
 using MyApp.Model;
 
 namespace MyApp.Domain.Reviews.Queries;
 
-public record GetReviewsQuery(string? SearchTxt, string? CurrentUserId, bool? Completed, string? UserEmail = null) : IRequest<List<ReviewDto>>;
+public record class GetReviewsQuery(string? SearchTxt, string? CurrentUserId, bool? Completed, string? UserEmail = null) 
+    : IRequest<GetReviewsResult>;
 
-public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, List<ReviewDto>>
+public record class GetReviewsResult : Result<IReadOnlyList<ReviewDto>>;
+
+public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, GetReviewsResult>
 {
     private readonly UserManager<User> _userManager;
     private readonly ApplicationDbContext _db;
@@ -18,7 +22,7 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, List<ReviewDto
         _userManager = userManager;
         _db = db;
     }
-    public async Task<List<ReviewDto>> Handle(GetReviewsQuery request, CancellationToken ct)
+    public async Task<GetReviewsResult> Handle(GetReviewsQuery request, CancellationToken ct)
     {
         string? effectiveUserId = request.CurrentUserId;
 
@@ -78,7 +82,7 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, List<ReviewDto
             .ThenByDescending(x => x.LatestEntryUtc)
             .ToListAsync(ct);
 
-        return rows
+        var result = rows
             .Select(r =>
                  new ReviewDto(
                     r.Id,
@@ -90,5 +94,7 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, List<ReviewDto
                     r.Completed,
                     r.IsNewForViewer))
             .ToList();
+
+        return new() { Value = result };
     }
 }

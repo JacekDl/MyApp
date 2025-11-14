@@ -8,9 +8,7 @@ namespace MyApp.Domain.Instructions.Queries
 {
     public record class GetInstructionsQuery() : IRequest<GetInstructionsResult>;
 
-    public record class GetInstructionsResult : HResult<IReadOnlyList<InstructionDto>>
-    {
-    }
+    public record class GetInstructionsResult : Result<IReadOnlyList<InstructionDto>>;
 
     public class GetInstructionsHandler : IRequestHandler<GetInstructionsQuery, GetInstructionsResult>
     {

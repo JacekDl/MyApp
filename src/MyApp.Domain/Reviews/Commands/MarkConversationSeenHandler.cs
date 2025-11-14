@@ -5,32 +5,37 @@ using MyApp.Domain.Data;
 
 namespace MyApp.Domain.Reviews.Commands;
 
-public record MarkConversationSeenCommand(string Number, string UserId) : IRequest<Result<bool>>;
+public record class MarkConversationSeenCommand(string Number, string UserId) : IRequest<MarkConversationSeenResult>;
 
-public class MarkConversationSeenHandler : IRequestHandler<MarkConversationSeenCommand, Result<bool>>
+public record class MarkConversationSeenResult : Result;
+
+public class MarkConversationSeenHandler : IRequestHandler<MarkConversationSeenCommand, MarkConversationSeenResult>
 {
     private readonly ApplicationDbContext _db;
     public MarkConversationSeenHandler(ApplicationDbContext db)
     {
         _db = db;
     }
-    public async Task<Result<bool>> Handle(MarkConversationSeenCommand request, CancellationToken ct)
+    public async Task<MarkConversationSeenResult> Handle(MarkConversationSeenCommand request, CancellationToken ct)
     {
         var review = await _db.Reviews
             .SingleOrDefaultAsync(r => r.Number == request.Number, ct);
 
         if (review is null)
         {
-            return Result<bool>.Fail("Review not found.");
+            return new() { ErrorMessage = "Nie znaleziono zaleceń." };
         }
 
-        var belongsToUser = review.PharmacistId == request.UserId || review.PatientId == request.UserId;
+
+        var currentUser = _db.Users.SingleOrDefault(u => u.Id == request.UserId);
+        var isAdmin = currentUser.Role == "Admin";
+        var belongsToUser = review.PharmacistId == request.UserId || review.PatientId == request.UserId || isAdmin;
         if (!belongsToUser)
         {
-            return Result<bool>.Fail("Forbidden.");
+            return new() { ErrorMessage = "Brak dostępu." };
         }
 
-        if(request.UserId == review.PharmacistId)
+        if (request.UserId == review.PharmacistId)
         {
             review.PatientModified = false;
         }
@@ -39,6 +44,6 @@ public class MarkConversationSeenHandler : IRequestHandler<MarkConversationSeenC
             review.PharmacistModified = false;
         }
         await _db.SaveChangesAsync(ct);
-        return Result<bool>.Ok(true);
+        return new();
     }
 }

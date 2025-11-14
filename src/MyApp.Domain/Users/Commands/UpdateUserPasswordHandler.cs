@@ -5,9 +5,11 @@ using MyApp.Model;
 
 namespace MyApp.Domain.Users.Commands;
 
-public record UpdateUserPasswordCommand(string Id, string CurrentPassword, string NewPassword) : IRequest<Result<User>>;
+public record class UpdateUserPasswordCommand(string Id, string CurrentPassword, string NewPassword) : IRequest<UpdateUserPasswordResult>;
 
-public class UpdateUserPasswordHandler : IRequestHandler<UpdateUserPasswordCommand, Result<User>>
+public record class UpdateUserPasswordResult : Result<User>;
+
+public class UpdateUserPasswordHandler : IRequestHandler<UpdateUserPasswordCommand, UpdateUserPasswordResult>
 {
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
@@ -18,20 +20,22 @@ public class UpdateUserPasswordHandler : IRequestHandler<UpdateUserPasswordComma
         _signInManager = signInManager;
     }
 
-    public async Task<Result<User>> Handle(UpdateUserPasswordCommand request, CancellationToken ct)
+    public async Task<UpdateUserPasswordResult> Handle(UpdateUserPasswordCommand request, CancellationToken ct)
     {
         var user = await _userManager.FindByIdAsync(request.Id);
         if (user is null)
-            return Result<User>.Fail("User not found");
+        {
+            return new() { ErrorMessage = "Nie znaleziono użytkownika." };
+        }
 
         var change = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
         if (!change.Succeeded)
         {
             var message = string.Join("; ", change.Errors.Select(e => $"{e.Code}: {e.Description}"));
-            return Result<User>.Fail("Wrong password");
+            return new() { ErrorMessage = message };
         }
 
         await _signInManager.RefreshSignInAsync(user);
-        return Result<User>.Ok(user);
+        return new() { Value = user };
     }
 }

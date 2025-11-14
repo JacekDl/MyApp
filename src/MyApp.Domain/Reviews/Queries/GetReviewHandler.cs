@@ -5,18 +5,20 @@ using MyApp.Domain.Data;
 
 namespace MyApp.Domain.Reviews.Queries;
 
-public record GetReviewQuery(string Number) : IRequest<Result<ReviewDto>>;
+public record class GetReviewQuery(string Number) : IRequest<GetReviewResult>;
 
-public class GetReviewHandler : IRequestHandler<GetReviewQuery, Result<ReviewDto>>
+public record class GetReviewResult : Result<ReviewDto>;
+
+public class GetReviewHandler : IRequestHandler<GetReviewQuery, GetReviewResult>
 {
 
     private readonly ApplicationDbContext _db;
-    
+
     public GetReviewHandler(ApplicationDbContext db)
     {
         _db = db;
     }
-    public async Task<Result<ReviewDto>> Handle(GetReviewQuery request, CancellationToken ct)
+    public async Task<GetReviewResult> Handle(GetReviewQuery request, CancellationToken ct)
     {
         var review = await _db.Reviews
            .Where(r => r.Number == request.Number)
@@ -35,13 +37,19 @@ public class GetReviewHandler : IRequestHandler<GetReviewQuery, Result<ReviewDto
            .SingleOrDefaultAsync(ct);
 
         if (review is null)
-            return Result<ReviewDto>.Fail("Review not found");
+        {
+            return new() { ErrorMessage = "Nie znaleziono zaleceń." };
+        }
 
         if (review.Completed)
-            return Result<ReviewDto>.Fail("Review already completed yet");
+        {
+            return new() { ErrorMessage = "Wykorzystano już kod zaleceń." };
+        }
 
         if (review.DateCreated.AddDays(60) < DateTime.UtcNow)
-            return Result<ReviewDto>.Fail("Review expired");
+        {
+            return new () {ErrorMessage = "Minął już termin wykorzystania kodu."};
+        }
 
         var dto = new ReviewDto(
             review.Id,
@@ -54,6 +62,6 @@ public class GetReviewHandler : IRequestHandler<GetReviewQuery, Result<ReviewDto
             true
             );
 
-        return Result<ReviewDto>.Ok(dto);
+        return new() { Value = dto  };
     }
 }

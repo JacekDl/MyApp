@@ -9,9 +9,7 @@ namespace MyApp.Domain.Medicines.Commands
 {
     public record class UpdateMedicineCommand(int Id, string Code, string Name) : IRequest<UpdateMedicineResult>;
 
-    public record class UpdateMedicineResult : HResult
-    {
-    }
+    public record class UpdateMedicineResult : Result;
 
     public class UpdateMedicineHandler : IRequestHandler<UpdateMedicineCommand, UpdateMedicineResult>
     {

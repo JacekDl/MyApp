@@ -6,10 +6,12 @@ using MyApp.Model;
 
 namespace MyApp.Domain.Users.Commands;
 
-public record UpdateUserDetailsCommand(string Id, string? Name) : IRequest<Result<User>>;
+public record class UpdateUserDetailsCommand(string Id, string? Name) : IRequest<UpdateUserDetailsResult>;
+
+public record class UpdateUserDetailsResult : Result<User>;
 
 
-public class UpdateUserDetailsHandler : IRequestHandler<UpdateUserDetailsCommand, Result<User>>
+public class UpdateUserDetailsHandler : IRequestHandler<UpdateUserDetailsCommand, UpdateUserDetailsResult>
 {
     private readonly UserManager<User> _userManager;
 
@@ -17,22 +19,26 @@ public class UpdateUserDetailsHandler : IRequestHandler<UpdateUserDetailsCommand
     {
         _userManager = userManager;
     }
-    public async Task<Result<User>> Handle(UpdateUserDetailsCommand request, CancellationToken ct)
+    public async Task<UpdateUserDetailsResult> Handle(UpdateUserDetailsCommand request, CancellationToken ct)
     {
         var user = await _userManager.FindByIdAsync(request.Id);
         if (user is null)
-            return Result<User>.Fail("User not found");
+        {
+            return new() { ErrorMessage = "Nie znaleziono użytkownika." };
+        }
 
         if (!string.IsNullOrWhiteSpace(request.Name))
+        {
             user.DisplayName = request.Name.Trim();
-
+        }
+            
         var update = await _userManager.UpdateAsync(user);
         if (!update.Succeeded)
         {
             var message = string.Join("; ", update.Errors.Select(e => $"{e.Code}: {e.Description}"));
-            return Result<User>.Fail(message);
+            return new() { ErrorMessage = message };
         }
 
-        return Result<User>.Ok(user);
+        return new() { Value = user };
     }
 }
