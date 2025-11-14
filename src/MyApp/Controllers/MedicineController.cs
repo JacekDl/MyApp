@@ -120,7 +120,7 @@ namespace MyApp.Web.Controllers
         public async Task<IActionResult> DeleteInstruction(int id)
         {
             var result = await _mediator.Send(new DeleteInstructionCommand(id));
-            TempData[result.IsSuccess ? "Info" : "Error"] = result.IsSuccess ? "Usunięto dawkowanie." : result.Error;
+            TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Usunięto dawkowanie." : result.ErrorMessage;
             return RedirectToAction(nameof(Instructions));
         }
 
