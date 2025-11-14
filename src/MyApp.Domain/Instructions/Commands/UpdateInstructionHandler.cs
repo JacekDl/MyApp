@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
@@ -7,9 +6,13 @@ using MyApp.Model;
 
 namespace MyApp.Domain.Instructions.Commands
 {
-    public record UpdateInstructionCommand(int Id, string Code, string Text) : IRequest<Result<bool>>;
+    public record class UpdateInstructionCommand(int Id, string Code, string Text) : IRequest<UpdateInstructionResult>;
 
-    public class UpdateInstructionHandler : IRequestHandler<UpdateInstructionCommand, Result<bool>>
+    public record class UpdateInstructionResult : HResult
+    {
+    }
+
+    public class UpdateInstructionHandler : IRequestHandler<UpdateInstructionCommand, UpdateInstructionResult>
     {
         private readonly ApplicationDbContext _db;
 
@@ -17,18 +20,35 @@ namespace MyApp.Domain.Instructions.Commands
         {
             _db = db;
         }
-        public async Task<Result<bool>> Handle(UpdateInstructionCommand request, CancellationToken ct)
+        public async Task<UpdateInstructionResult> Handle(UpdateInstructionCommand request, CancellationToken ct)
         {
-            var entity = await _db.Set<Instruction>().FirstOrDefaultAsync(m => m.Id == request.Id, ct);
+            var entity = await _db.Set<Instruction>()
+                .FirstOrDefaultAsync(m => m.Id == request.Id, ct);
+
             if (entity is null)
             {
-                return Result<bool>.Fail("Nie znaleziono dawkowania.");
+                return new() { ErrorMessage = "Nie znaleziono dawkowania." };
             }
 
-            (entity.Code, entity.Text) = FormatStringHelper.FormatCodeAndText(request.Code, request.Text);
+            var (code, text) = FormatStringHelper.FormatCodeAndText(request.Code, request.Text);
 
-            await _db.SaveChangesAsync(ct);
-            return Result<bool>.Ok(true);
+            var exists = await _db.Set<Instruction>()
+                .FirstOrDefaultAsync(m => m.Code == code, ct);
+
+            if (exists != null && exists.Id != request.Id)
+            {
+                return new() { ErrorMessage = $"Kod '{code}' jest już używany." };
+            }
+
+            entity.Code = code;
+            entity.Text = text;
+
+            var result = await _db.SaveChangesAsync(ct);
+            if (result == 0)
+            {
+                return new() { ErrorMessage = "Nie udało się zaktualizować dawkowania." };
+            }
+            return new();
         }
     }
 }

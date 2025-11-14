@@ -146,6 +146,7 @@ namespace MyApp.Web.Controllers
                 return View(item);
             }
             var result = await _mediator.Send(new UpdateInstructionCommand(item.Id, item.Code, item.Text));
+            TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Zaktualizowano dawkowanie." : result.ErrorMessage;
             return RedirectToAction(nameof(Instructions));
         }
 
