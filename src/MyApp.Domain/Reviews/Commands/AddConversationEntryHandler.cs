@@ -8,9 +8,15 @@ using MyApp.Model;
 
 namespace MyApp.Domain.Reviews.Commands;
 
-public record AddConversationEntryCommand(string Number, string RequestingUserId, string Text) : IRequest<Result<bool>>;
+public record class AddConversationEntryCommand(string Number, string RequestingUserId, string Text) 
+    : IRequest<AddConversationEntryResult>;
 
-public class AddConversationEntryHandler : IRequestHandler<AddConversationEntryCommand, Result<bool>>
+public record class AddConversationEntryResult : HResult
+{
+
+}
+
+public class AddConversationEntryHandler : IRequestHandler<AddConversationEntryCommand, AddConversationEntryResult>
 {
     private readonly ApplicationDbContext _db;
     private readonly UserManager<User> _userManager;
@@ -21,13 +27,20 @@ public class AddConversationEntryHandler : IRequestHandler<AddConversationEntryC
         _userManager = userManager;
     }
 
-    public async Task<Result<bool>> Handle(AddConversationEntryCommand request, CancellationToken ct)
+    public async Task<AddConversationEntryResult> Handle(AddConversationEntryCommand request, CancellationToken ct)
     {
+        var validation = new AddConversationEntryValidator().Validate(request);
+
+        if (!validation.IsValid)
+        {
+            return new() { ErrorMessage = string.Join("; ", validation.Errors.Select(e => e.ErrorMessage)) };
+        }
+
         var text = (request.Text ?? string.Empty).Trim();
 
         if (string.IsNullOrWhiteSpace(text))
         {
-            return Result<bool>.Fail("Message cannot be empty.");   
+            return new() { ErrorMessage = "Wiadomość nie może być pusta." };   
         }
 
         var review = await _db.Reviews
@@ -36,7 +49,7 @@ public class AddConversationEntryHandler : IRequestHandler<AddConversationEntryC
 
         if (review is null)
         {
-            return Result<bool>.Fail("Review not found.");
+            return new() { ErrorMessage = "Nie znaleziono zaleceń." };
         }
 
 
@@ -46,7 +59,7 @@ public class AddConversationEntryHandler : IRequestHandler<AddConversationEntryC
         var viewerIsParticipant = review.PharmacistId == request.RequestingUserId || review.PatientId == request.RequestingUserId;
 
         if (!viewerIsParticipant && !viewerIsAdmin)
-            return Result<bool>.Fail("Forbidden.");
+            return new() { ErrorMessage = "Brak dostępu." };
 
         review.Entries.Add(new Entry
         {
@@ -71,16 +84,16 @@ public class AddConversationEntryHandler : IRequestHandler<AddConversationEntryC
         }
 
         await _db.SaveChangesAsync(ct);
-        return Result<bool>.Ok(true);
+        return new();
     }
 }
 
-public class AddConversationEntryCommandValidator : AbstractValidator<AddConversationEntryCommand>
+public class AddConversationEntryValidator : AbstractValidator<AddConversationEntryCommand>
 {
     private const int RequiredNumberLength = 16;
     private const int MaxTextLength = 200;
 
-    public AddConversationEntryCommandValidator()
+    public AddConversationEntryValidator()
     {
         RuleFor(x => x.Number)
             .NotEmpty().WithMessage("Review number is required.")

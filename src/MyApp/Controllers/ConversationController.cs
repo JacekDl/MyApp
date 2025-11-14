@@ -40,40 +40,9 @@ public class ConversationController : Controller
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        try
-        {
-            var add = await _mediator.Send(new AddConversationEntryCommand(number, currentUserId, text));
-            if (!add.IsSuccess)
-            {
-                var threadFail = await _mediator.Send(new GetConversationQuery(number, currentUserId));
-                if (!threadFail.IsSuccess || threadFail.Value is null)
-                {
-                    return NotFound();
-                }
-                ModelState.AddModelError("text", add.Error ?? "Nie można dodać wiadomości.");
-                return View(threadFail.Value);
-            }
-
-            TempData["Info"] = "Wiadomość wysłana.";
-            return RedirectToAction(nameof(Display), new { number });
-        }
-        catch(FluentValidation.ValidationException ex)
-        {
-            foreach (var error in ex.Errors)
-            {
-                var key = string.IsNullOrWhiteSpace(error.PropertyName) ? "text" : error.PropertyName;
-                ModelState.AddModelError(key, error.ErrorMessage);
-            }
-
-            var thread = await _mediator.Send(new GetConversationQuery(number, currentUserId));
-            if (!thread.IsSuccess || thread.Value is null)
-                return NotFound();
-
-            return View(thread.Value);
-        }
-
+        var result = await _mediator.Send(new AddConversationEntryCommand(number, currentUserId, text));
+        TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Wiadomość wysłana." : result.ErrorMessage;
+        return RedirectToAction(nameof(Display), new { number });
     }
     #endregion
-
-
 }
