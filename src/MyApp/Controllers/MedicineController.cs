@@ -26,12 +26,12 @@ namespace MyApp.Web.Controllers
         #region Medicines
         public async Task<IActionResult> Medicines()
         {
-            var dto = await _mediator.Send(new GetMedicinesQuery());
+            var result = await _mediator.Send(new GetMedicinesQuery());
             if (User.IsInRole("Admin"))
-                return View("~/Views/Admin/Medicines.cshtml", dto.Value);
+                return View("~/Views/Admin/Medicines.cshtml", result.Value);
 
             if (User.IsInRole("Pharmacist"))
-                return View("~/Views/Pharmacist/Medicines.cshtml", dto.Value);
+                return View("~/Views/Pharmacist/Medicines.cshtml", result.Value);
 
             return Forbid(); //TODO: change that
         }
@@ -83,9 +83,9 @@ namespace MyApp.Web.Controllers
         [Authorize(Roles = "Pharmacist")]
         public async Task<IActionResult> PrintMedicines()
         {
-            var dto = await _mediator.Send(new GetMedicinesQuery());
+            var result = await _mediator.Send(new GetMedicinesQuery());
 
-            var pdfBytes = await _pdfService.GenerateMedicinesPdf(dto.Value!);
+            var pdfBytes = await _pdfService.GenerateMedicinesPdf(result.Value!);
             Response.Headers.ContentDisposition = "inline; filename=medicine.pdf";
             return File(pdfBytes, "medicine/pdf");
         }
