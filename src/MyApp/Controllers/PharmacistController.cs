@@ -28,8 +28,8 @@ public class PharmacistController : Controller
     {
         var result = await _mediator.Send(new GetDictionariesQuery());
 
-        ViewBag.InstructionMap = result.InstructionMap;
-        ViewBag.MedicineMap = result.MedicineMap;
+        ViewBag.InstructionMap = result.Value!.InstructionMap;
+        ViewBag.MedicineMap = result.Value!.MedicineMap;
         return View(new ReviewCreateViewModel());
     }
 

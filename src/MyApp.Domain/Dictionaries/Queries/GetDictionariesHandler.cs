@@ -1,13 +1,16 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using MyApp.Domain.Common;
 using MyApp.Domain.Data;
 
 namespace MyApp.Domain.Dictionaries.Queries
 {
 
-    public record GetDictionariesQuery() : IRequest<DictionaryDto>;
+    public record class GetDictionariesQuery() : IRequest<GetDictionariesResult>;
 
-    public class GetDictionariesHandler : IRequestHandler<GetDictionariesQuery, DictionaryDto>
+    public record class GetDictionariesResult : Result<DictionaryDto>;
+
+    public class GetDictionariesHandler : IRequestHandler<GetDictionariesQuery, GetDictionariesResult>
     {
         private readonly ApplicationDbContext _db;
 
@@ -16,7 +19,7 @@ namespace MyApp.Domain.Dictionaries.Queries
             _db = db;
         }
 
-        public async Task<DictionaryDto> Handle(GetDictionariesQuery request, CancellationToken ct)
+        public async Task<GetDictionariesResult> Handle(GetDictionariesQuery request, CancellationToken ct)
         {
             var instructions = await _db.Instructions
                 .AsNoTracking()
@@ -28,11 +31,15 @@ namespace MyApp.Domain.Dictionaries.Queries
                 .Select(m => new { m.Code, m.Name })
                 .ToListAsync(ct);
 
-            return new DictionaryDto
+
+
+            var dictionary =  new DictionaryDto
             {
                 InstructionMap  = instructions.ToDictionary(x => x.Code, x => x.Text, StringComparer.OrdinalIgnoreCase),
                 MedicineMap     = medicines.ToDictionary(x => x.Code, x => x.Name, StringComparer.OrdinalIgnoreCase),
             };
+
+            return new() { Value = dictionary };
         }
     }
 }
