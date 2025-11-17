@@ -1,7 +1,9 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
+using MyApp.Domain.Instructions.Commands;
 
 namespace MyApp.Domain.Reviews.Commands;
 
@@ -18,6 +20,12 @@ public class MarkConversationSeenHandler : IRequestHandler<MarkConversationSeenC
     }
     public async Task<MarkConversationSeenResult> Handle(MarkConversationSeenCommand request, CancellationToken ct)
     {
+        var validator = new MarkConversationSeenValidator().Validate(request);
+        if (!validator.IsValid)
+        {
+            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+        }
+
         var review = await _db.Reviews
             .SingleOrDefaultAsync(r => r.Number == request.Number, ct);
 
@@ -28,7 +36,7 @@ public class MarkConversationSeenHandler : IRequestHandler<MarkConversationSeenC
 
 
         var currentUser = _db.Users.SingleOrDefault(u => u.Id == request.UserId);
-        var isAdmin = currentUser.Role == "Admin";
+        var isAdmin = currentUser!.Role == "Admin";
         var belongsToUser = review.PharmacistId == request.UserId || review.PatientId == request.UserId || isAdmin;
         if (!belongsToUser)
         {
@@ -45,5 +53,18 @@ public class MarkConversationSeenHandler : IRequestHandler<MarkConversationSeenC
         }
         await _db.SaveChangesAsync(ct);
         return new();
+    }
+
+    public class MarkConversationSeenValidator : AbstractValidator<MarkConversationSeenCommand>
+    {
+        public MarkConversationSeenValidator()
+        {
+            RuleFor(x => x.Number)
+                .NotEmpty().WithMessage("Numer rozmowy jest wymagany.")
+                .Length(16).WithMessage("Numer rozmowy musi mieć dokładnie 16 znaków.");
+
+            RuleFor(x => x.UserId)
+                .NotEmpty().WithMessage("Identyfikator użytkownika jest wymagany.");
+        }
     }
 }

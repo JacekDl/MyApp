@@ -1,8 +1,10 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
+using MyApp.Domain.Instructions.Commands;
 using MyApp.Model;
 
 namespace MyApp.Domain.Reviews.Queries;
@@ -23,6 +25,12 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, GetC
     }
     public async Task<GetConversationResult> Handle(GetConversationQuery request, CancellationToken ct)
     {
+        var validator = new GetConversationValidator().Validate(request);
+        if (!validator.IsValid)
+        {
+            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+        }
+
         var review = await _db.Reviews
             .Include(r => r.Entries.OrderBy(e => e.CreatedUtc))
             .SingleOrDefaultAsync(r => r.Number == request.Number, ct);
@@ -83,5 +91,23 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, GetC
             entries);
             
         return new() { Value = dto };
+    }
+
+    public class GetConversationValidator : AbstractValidator<GetConversationQuery>
+    {
+        public GetConversationValidator()
+        {
+            RuleFor(x => x.Number)
+                .NotEmpty()
+                    .WithMessage("Numer tokenu jest wymagany.")
+                .Length(16)
+                    .WithMessage("Numer tokenu musi mieć dokładnie 16 znaków.")
+                .Matches("^[a-zA-Z0-9]+$")
+                    .WithMessage("Numer tokenu może zawierać tylko litery i cyfry.");
+
+            RuleFor(x => x.RequestingUserId)
+                .NotEmpty()
+                    .WithMessage("Id użytkownika jest wymagane.");
+        }
     }
 }

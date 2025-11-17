@@ -24,11 +24,10 @@ namespace MyApp.Domain.Medicines.Commands
         }
         public async Task<AddMedicineResult> Handle(AddMedicineCommand request, CancellationToken ct)
         {
-            var validation = new AddMedicineValidator().Validate(request);
-
-            if (!validation.IsValid)
+            var validator = new AddMedicineValidator().Validate(request);
+            if (!validator.IsValid)
             {
-                return new() { ErrorMessage = string.Join("; ", validation.Errors.Select(e => e.ErrorMessage)) };
+                return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
             }
 
             (var code, var text) = FormatStringHelper.FormatCodeAndText(request.Code, request.Name);

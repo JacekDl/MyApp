@@ -1,25 +1,55 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
+using MyApp.Domain.Common;
 using MyApp.Model;
 
-namespace MyApp.Domain.Users.Commands;
-
-public record ConfirmEmailCommand(string UserId, string Token) : IRequest<bool>;
-
-public class ConfirmEmailHandler(UserManager<User> userManager) : IRequestHandler<ConfirmEmailCommand, bool>
+namespace MyApp.Domain.Users.Commands
 {
-    public async Task<bool> Handle(ConfirmEmailCommand request, CancellationToken ct)
+
+    public record class ConfirmEmailCommand(string UserId, string Token) : IRequest<ConfirmEmailResult>;
+
+    public record class ConfirmEmailResult : Result;
+
+    public class ConfirmEmailHandler(UserManager<User> userManager) : IRequestHandler<ConfirmEmailCommand, ConfirmEmailResult>
     {
-        var user = await userManager.FindByIdAsync(request.UserId);
+        public async Task<ConfirmEmailResult> Handle(ConfirmEmailCommand request, CancellationToken ct)
+        {
 
-        if (user is null)
-            return false;
+            var validator = new ConfirmEmailValidator().Validate(request);
+            if (!validator.IsValid)
+            {
+                return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+            }
 
-        if (user.EmailConfirmed)
-            return true;
+            var user = await userManager.FindByIdAsync(request.UserId);
+            if (user is null)
+            {
+                return new() { ErrorMessage = "Nie znaleziono użytkownika." };
+            }
 
-        var result = await userManager.ConfirmEmailAsync(user, request.Token);
+            if (user.EmailConfirmed)
+            {
+                return new();
+            }
 
-        return result.Succeeded;
+            var result = await userManager.ConfirmEmailAsync(user, request.Token);
+
+            return new();
+        }
+    }
+
+    public class ConfirmEmailValidator : AbstractValidator<ConfirmEmailCommand>
+    {
+        public ConfirmEmailValidator()
+        {
+            RuleFor(x => x.UserId)
+                .NotEmpty()
+                .WithMessage("Id użytkownika jest wymagane.");
+
+            RuleFor(x => x.Token)
+                .NotEmpty()
+                .WithMessage("Token jest wymagany.");
+        }
     }
 }

@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
+using MyApp.Domain.Instructions.Commands;
 using MyApp.Model;
 using System.Security.Cryptography;
 
@@ -25,6 +26,11 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, CreateRe
 
     public async Task<CreateReviewResult> Handle(CreateReviewCommand request, CancellationToken ct)
     {
+        var validator = new CreateReviewValidator().Validate(request);
+        if (!validator.IsValid)
+        {
+            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+        }
         var user = await _userManager.FindByIdAsync(request.UserId); //user is Pharmacist
         if (user is null)
             return new() { ErrorMessage="Nie znaleziono użytkownika." };

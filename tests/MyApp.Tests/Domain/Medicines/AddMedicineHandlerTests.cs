@@ -6,7 +6,7 @@ using MyApp.Domain.Medicines.Commands;
 using MyApp.Model;
 using MyApp.Tests.Common;
 
-namespace MyApp.Tests.Domain;
+namespace MyApp.Tests.Domain.Medicines;
 
 public class AddMedicineHandlerTests : TestBase
 {

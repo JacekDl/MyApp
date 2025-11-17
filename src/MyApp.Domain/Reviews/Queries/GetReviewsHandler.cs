@@ -1,8 +1,10 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
+using MyApp.Domain.Instructions.Commands;
 using MyApp.Model;
 
 namespace MyApp.Domain.Reviews.Queries;
@@ -24,6 +26,12 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, GetReviewsResu
     }
     public async Task<GetReviewsResult> Handle(GetReviewsQuery request, CancellationToken ct)
     {
+        var validator = new GetReviewsValidator().Validate(request);
+        if (!validator.IsValid)
+        {
+            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+        }
+
         string? effectiveUserId = request.CurrentUserId;
 
         if(string.IsNullOrWhiteSpace(effectiveUserId) && !string.IsNullOrWhiteSpace(request.UserEmail))
@@ -96,5 +104,29 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, GetReviewsResu
             .ToList();
 
         return new() { Value = result };
+    }
+
+    public class GetReviewsValidator : AbstractValidator<GetReviewsQuery>
+    {
+        public GetReviewsValidator()
+        {
+            RuleFor(x => x.SearchTxt)
+                .MaximumLength(100)
+                .WithMessage("Tekst wyszukiwania nie może przekraczać 100 znaków.");
+
+            RuleFor(x => x.CurrentUserId)
+                .Must(id => id is null || id.Trim().Length > 0)
+                .WithMessage("Id użytkownika nie może być puste.");
+
+            RuleFor(x => x.UserEmail)
+                .Must(email => string.IsNullOrWhiteSpace(email) || email.Contains("@"))
+                .WithMessage("Nieprawidłowy adres e-mail.");
+
+            RuleFor(x => x)
+                .Must(q =>
+                    !string.IsNullOrWhiteSpace(q.CurrentUserId) ||
+                    !string.IsNullOrWhiteSpace(q.UserEmail))
+                .WithMessage("Należy podać Id użytkownika lub adres e-mail.");
+        }
     }
 }

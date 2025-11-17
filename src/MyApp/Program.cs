@@ -8,7 +8,6 @@ using MyApp.Domain.Data;
 using MyApp.Domain.Extensions;
 using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Users.Queries;
-using MyApp.Domain.Validation;
 using MyApp.Model;
 using MyApp.Web.Services;
 using QuestPDF.Infrastructure;
@@ -30,7 +29,6 @@ builder.Services.AddSingleton<IReviewPdfService, ReviewPdfService>();
 builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
 
 
-//builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblyContaining<GetAllUsersHandler>()); //mozna wybrac dowolna klase z assembly (Architecting ASP.NET Core Applications p.575)
 
@@ -49,7 +47,6 @@ builder.Services.AddAuthorizationBuilder()
         .RequireAuthenticatedUser()
         .Build());
 
-//builder.Services.AddValidatorsFromAssemblyContaining<CreateReviewValidator>(); //czy inne assemblies tez trzeba zarejestrowac?
 
 var app = builder.Build();
 

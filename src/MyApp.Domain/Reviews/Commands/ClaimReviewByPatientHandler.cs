@@ -21,26 +21,32 @@ public class ClaimReviewByPatientHandler : IRequestHandler<ClaimReviewByPatientC
 
     public async Task<ClaimReviewByPatientResult> Handle(ClaimReviewByPatientCommand request, CancellationToken ct)
     {
+        var validator = new ClaimReviewByPatientCommandValidator().Validate(request);
+        if (!validator.IsValid)
+        {
+            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+        }
+
         var review = await _db.Reviews.SingleOrDefaultAsync(r => r.Number == request.Number);
 
         if (review is null)
         {
-            return new() { ErrorMessage = "Review not found." };
+            return new() { ErrorMessage = "Nie znaleziono zaleceń." };
         }
 
         if (review.Completed)
         {
-            return new() { ErrorMessage = "Review already completed." };
+            return new() { ErrorMessage = "Zalecenia zostały już pobrane." };
         }
 
         if (review.DateCreated.AddDays(60) < DateTime.UtcNow)
         {
-            return new() { ErrorMessage = "Review expired." };
+            return new() { ErrorMessage = "Upłynął termin ważności zaleceń." };
         }
 
         if (review.PatientId is not null && review.PatientId != request.PatientId)
         {
-            return new() { ErrorMessage = "This review is already assigned to another patient." };
+            return new() { ErrorMessage = "Zalecenia zostały już użyte." };
         }
 
         review.PatientId = request.PatientId;

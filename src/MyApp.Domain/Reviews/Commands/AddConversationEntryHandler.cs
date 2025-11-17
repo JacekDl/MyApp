@@ -26,11 +26,11 @@ public class AddConversationEntryHandler : IRequestHandler<AddConversationEntryC
 
     public async Task<AddConversationEntryResult> Handle(AddConversationEntryCommand request, CancellationToken ct)
     {
-        var validation = new AddConversationEntryValidator().Validate(request);
+        var validator = new AddConversationEntryValidator().Validate(request);
 
-        if (!validation.IsValid)
+        if (!validator.IsValid)
         {
-            return new() { ErrorMessage = string.Join("; ", validation.Errors.Select(e => e.ErrorMessage)) };
+            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
         }
 
         var text = (request.Text ?? string.Empty).Trim();
@@ -93,22 +93,22 @@ public class AddConversationEntryValidator : AbstractValidator<AddConversationEn
     public AddConversationEntryValidator()
     {
         RuleFor(x => x.Number)
-            .NotEmpty().WithMessage("Review number is required.")
+            .NotEmpty().WithMessage("Numer zalecenia jest wymagany.")
             .Length(RequiredNumberLength)
-                .WithMessage($"Review number must be exactly {RequiredNumberLength} characters long.")
+                .WithMessage($"Numer zalecenia musi mieć długość {RequiredNumberLength} znaków.")
             .Matches("^[A-Za-z0-9]+$")
-                .WithMessage("Review number must contain only letters and digits.");
+                .WithMessage("Numer zalecenia może zawierać jedynie litery i cyfry.");
 
         RuleFor(x => x.RequestingUserId)
-            .NotEmpty().WithMessage("User ID is required.");
+            .NotEmpty().WithMessage("Id użytkownika jest wymagane.");
 
         RuleFor(x => x.Text)
             .Cascade(CascadeMode.Stop)
             .NotNull().WithMessage("Wiadomość nie może być pusta.")
             .Must(s => !string.IsNullOrWhiteSpace(s))
-                .WithMessage("Message cannot be empty.")
+                .WithMessage("Wiadomość nie może być pusta.")
             .Must(s => (s ?? string.Empty).Trim().Length <= MaxTextLength)
-                .WithMessage($"Message cannot exceed {MaxTextLength} characters.")
+                .WithMessage($"Długość wiadomości nie może być dłuższa niż {MaxTextLength} znaków.")
             .OverridePropertyName("text");
     }
 }

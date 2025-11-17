@@ -1,7 +1,9 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
+using MyApp.Domain.Instructions.Commands;
 using MyApp.Model;
 
 
@@ -22,6 +24,11 @@ namespace MyApp.Domain.Medicines.Queries
 
         public async Task<GetMedicineResult> Handle(GetMedicineQuery request, CancellationToken ct)
         {
+            var validator = new GetMedicineValidator().Validate(request);
+            if (!validator.IsValid)
+            {
+                return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+            }
             var result = await _db.Set<Medicine>()
                 .Where(m => m.Id == request.Id)
                 .Select(m => new MedicineDto(m.Id, m.Code, m.Name))
@@ -34,5 +41,15 @@ namespace MyApp.Domain.Medicines.Queries
             return new() { Value = result };
         }
 
+    }
+
+    public class GetMedicineValidator : AbstractValidator<GetMedicineQuery>
+    {
+        public GetMedicineValidator()
+        {
+            RuleFor(x => x.Id)
+                .GreaterThan(0)
+                .WithMessage("Id leku musi być dodatnie.");
+        }
     }
 }

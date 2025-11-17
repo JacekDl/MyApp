@@ -60,10 +60,16 @@ public class AccountController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> ConfirmEmail(string userId, string token, string? returnUrl = null)
     {
-        if (string.IsNullOrWhiteSpace(token)) return BadRequest();
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            return BadRequest();
+        }
 
         var result = await _mediator.Send(new ConfirmEmailCommand(userId, token));
-        if (!result) return View("ConfirmEmailFailed");
+        if (!result.Succeeded)
+        {
+            return View("ConfirmEmailFailed");
+        }
 
         if(!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
         {
@@ -127,43 +133,39 @@ public class AccountController : Controller
 
         var result = await _mediator.Send(new LoginCommand(vm.Email, vm.Password, vm.RememberMe));
 
-        switch(result.Status)
+        if(!result.Succeeded)
         {
-            case LoginStatus.Succeeded:
-                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-                {
-                    return Redirect(returnUrl);
-                }
-                    
-                if (string.Equals(result.Role, "Admin", StringComparison.OrdinalIgnoreCase))
-                {
-                    return RedirectToAction("Users", "Admin");
-                }
-                
-                if (string.Equals(result.Role, "Pharmacist", StringComparison.OrdinalIgnoreCase))
-                {
-                    return RedirectToAction("Reviews", "Pharmacist");
-                }
-
-                return RedirectToAction("Tokens", "Patient");
-                
-
-            case LoginStatus.NotAllowed:
-            case LoginStatus.LockedOut:
-            case LoginStatus.WrongCredentials:
-                ModelState.AddModelError(string.Empty, result.Message ?? "Login failed.");
-                return View(vm);
+            ModelState.AddModelError(string.Empty, result.ErrorMessage ?? "Nie udało się zalogować.");
+            return View(vm);
         }
 
-        ModelState.AddModelError(string.Empty, "Login failed.");
-        return View(vm);
+        var user = result.Value!;
+        var role = user.Role;
+
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+
+        if (role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+        {
+            return RedirectToAction("Users", "Admin");
+        }
+
+        if (role.Equals("Pharmacist", StringComparison.OrdinalIgnoreCase))
+        {
+            return RedirectToAction("Reviews", "Pharmacist");
+        }
+
+        return RedirectToAction("Tokens", "Patient");
+        
     }
 
     #endregion
 
     #region LogoutUser
 
-    [HttpPost, ValidateAntiForgeryToken]
+    [HttpGet]
     public async Task<IActionResult> Logout()
     {
         await _mediator.Send(new LogoutCommand());

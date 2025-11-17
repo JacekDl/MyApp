@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
+using MyApp.Domain.Instructions.Commands;
 using MyApp.Model;
 
 namespace MyApp.Domain.Reviews.Commands;
@@ -21,6 +22,12 @@ public class UpdateReviewHandler : IRequestHandler<UpdateReviewCommand, UpdateRe
 
     public async Task<UpdateReviewResult> Handle(UpdateReviewCommand request, CancellationToken ct)
     {
+        var validator = new UpdateReviewCommandValidator().Validate(request);
+        if (!validator.IsValid)
+        {
+            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+        }
+
         var review = await _db.Reviews
             .Include(r => r.Entries)
             .SingleOrDefaultAsync(r => r.Number == request.Number, ct);
@@ -32,13 +39,12 @@ public class UpdateReviewHandler : IRequestHandler<UpdateReviewCommand, UpdateRe
 
         if (review.Completed)
         {
-            return new() { ErrorMessage = "Review has been already submitted." };
-
+            return new() { ErrorMessage = "Opinia została już przesłana." };
         }
 
-        if (review.DateCreated.AddDays(7) < DateTime.Now)
+        if (review.DateCreated.AddDays(60) < DateTime.Now)
         {
-            return new() { ErrorMessage = "Review has expired." };
+            return new() { ErrorMessage = "Zalecenia już wygasły." };
         }
 
         var text = (request.ReviewText ?? string.Empty).Trim();

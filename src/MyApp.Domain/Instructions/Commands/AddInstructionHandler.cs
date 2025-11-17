@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
@@ -21,6 +22,12 @@ namespace MyApp.Domain.Instructions.Commands
 
         public async Task<AddInstructionResult> Handle(AddInstructionCommand request, CancellationToken ct)
         {
+            var validator = new AddInstructionValidator().Validate(request);
+            if(!validator.IsValid)
+            {
+                var errors = string.Join(" ", validator.Errors.Select(e => e.ErrorMessage));
+                return new() { ErrorMessage = errors };
+            }
 
             var (code, text) = FormatStringHelper.FormatCodeAndText(request.Code, request.Text);
 
@@ -35,4 +42,24 @@ namespace MyApp.Domain.Instructions.Commands
             return new();
         }
     }
+
+    public class AddInstructionValidator : AbstractValidator<AddInstructionCommand>
+    {
+        public AddInstructionValidator()
+        {
+            RuleFor(x => x.Code)
+                .NotEmpty().WithMessage("Kod instrukcji jest wymagany.")
+                .MaximumLength(32).WithMessage("Kod instrukcji nie może być dłuższy niż 32 znaki.")
+                .Must(code => !string.IsNullOrWhiteSpace(code))
+                .WithMessage("Kod instrukcji nie może być pusty.");
+
+            RuleFor(x => x.Text)
+                .NotEmpty().WithMessage("Treść instrukcji jest wymagana.")
+                .MaximumLength(256).WithMessage("Treść instrukcji nie może być dłuższa niż 256 znaków.")
+                .Must(text => !string.IsNullOrWhiteSpace(text))
+                .WithMessage("Treść instrukcji nie może być pusta.");
+        }
+    }
+
+
 }

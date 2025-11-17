@@ -1,7 +1,9 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
+using MyApp.Domain.Instructions.Commands;
 
 namespace MyApp.Domain.Reviews.Queries;
 
@@ -20,6 +22,12 @@ public class GetReviewHandler : IRequestHandler<GetReviewQuery, GetReviewResult>
     }
     public async Task<GetReviewResult> Handle(GetReviewQuery request, CancellationToken ct)
     {
+        var validator = new GetReviewValidator().Validate(request);
+        if (!validator.IsValid)
+        {
+            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+        }
+
         var review = await _db.Reviews
            .Where(r => r.Number == request.Number)
            .Select(x => new
@@ -63,5 +71,19 @@ public class GetReviewHandler : IRequestHandler<GetReviewQuery, GetReviewResult>
             );
 
         return new() { Value = dto  };
+    }
+
+    public class GetReviewValidator : AbstractValidator<GetReviewQuery>
+    {
+        public GetReviewValidator()
+        {
+            RuleFor(x => x.Number)
+                .NotEmpty()
+                    .WithMessage("Numer tokenu jest wymagany.")
+                .Length(16)
+                    .WithMessage("Numer tokenu musi mieć dokładnie 16 znaków.")
+                .Matches("^[a-zA-Z0-9]+$")
+                    .WithMessage("Numer tokenu może zawierać tylko litery i cyfry.");
+        }
     }
 }

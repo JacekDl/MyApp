@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
@@ -40,6 +41,14 @@ namespace MyApp.Domain.Dictionaries.Queries
             };
 
             return new() { Value = dictionary };
+        }
+    }
+
+    public class GetDictionariesValidator : AbstractValidator<GetDictionariesQuery>
+    {
+        public GetDictionariesValidator()
+        {
+
         }
     }
 }

@@ -1,8 +1,10 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
 using MyApp.Model;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 
 namespace MyApp.Domain.Instructions.Commands
 {
@@ -20,6 +22,12 @@ namespace MyApp.Domain.Instructions.Commands
         }
         public async Task<UpdateInstructionResult> Handle(UpdateInstructionCommand request, CancellationToken ct)
         {
+            var validator = new UpdateInstructionValidator().Validate(request);
+            if (!validator.IsValid)
+            {
+                return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+            }
+
             var entity = await _db.Set<Instruction>()
                 .FirstOrDefaultAsync(m => m.Id == request.Id, ct);
 
@@ -47,6 +55,28 @@ namespace MyApp.Domain.Instructions.Commands
                 return new() { ErrorMessage = "Nie udało się zaktualizować dawkowania." };
             }
             return new();
+        }
+    }
+
+    public class UpdateInstructionValidator : AbstractValidator<UpdateInstructionCommand>
+    {
+        public UpdateInstructionValidator()
+        {
+            RuleFor(x => x.Id)
+                .GreaterThan(0)
+                .WithMessage("Id dawkowania musi być dodatnie.");
+
+            RuleFor(x => x.Code)
+                .NotEmpty().WithMessage("Kod instrukcji jest wymagany.")
+                .MaximumLength(32).WithMessage("Kod instrukcji nie może być dłuższy niż 32 znaki.")
+                .Must(code => !string.IsNullOrWhiteSpace(code))
+                .WithMessage("Kod instrukcji nie może być pusty.");
+
+            RuleFor(x => x.Text)
+                .NotEmpty().WithMessage("Treść instrukcji jest wymagana.")
+                .MaximumLength(256).WithMessage("Treść instrukcji nie może być dłuższa niż 256 znaków.")
+                .Must(text => !string.IsNullOrWhiteSpace(text))
+                .WithMessage("Treść instrukcji nie może być pusta.");
         }
     }
 }
