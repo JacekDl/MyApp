@@ -1,6 +1,6 @@
 namespace MyApp.Web.ViewModels;
 
-public class ErrorViewModel
+public class ErrorViewModel : ViewModelBase
 {
     public string? RequestId { get; set; }
 

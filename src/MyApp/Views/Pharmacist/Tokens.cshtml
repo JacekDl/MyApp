@@ -1,11 +1,10 @@
-﻿@using MyApp.Domain.Reviews
-@using MyApp.Web.ViewModels
-@model List<ReviewDto>
+﻿@model MyApp.Web.ViewModels.ReviewsViewModel;
 
 @{
     ViewData["Title"] = "Wystawione zalecenia";
     var searchTxt = (string?)ViewBag.Query ?? "";
     var completed = (string?)ViewBag.Completed ?? "";
+    var reviews = Model.Reviews;
 }
 
 <partial name="~/Views/Shared/_PharmacistNav.cshtml" />
@@ -24,7 +23,7 @@
 
 </div>
 
-@if (!Model.Any())
+@if (!reviews.Any())
 {
     <div class="alert alert-light">Nie dodałeś jeszcze żadnych zaleceń. Zrób to w zakładce Zalecenia.</div>
 }
@@ -42,7 +41,7 @@ else
                 </tr>
             </thead>
             <tbody>
-                @foreach (var rev in Model)
+                @foreach (var rev in reviews)
                 {
                     <tr>
                         <td class="col-1 text-nowrap">@rev.DateCreated.ToString("yy-MM-dd")</td>

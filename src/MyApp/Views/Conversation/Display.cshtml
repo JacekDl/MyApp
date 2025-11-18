@@ -1,17 +1,18 @@
-﻿@model MyApp.Domain.Reviews.ConversationDto
+﻿@model MyApp.Web.ViewModels.DisplayConversationViewModel;
 
 @{
     ViewData["Title"] = "Conversation";
+    var conversation = Model.Conversation;
 }
 
 <div>
     <ul class="list-group mb-3">
-        @foreach(var e in Model.Entries)
+        @foreach(var entry in conversation.Entries)
         {
             <li class="list-group-item">
-                <strong>@e.DisplayName</strong>
-                <div class="small text-muted">@e.CreatedUtc.ToLocalTime()</div>
-                <div>@e.Text</div>
+                <strong>@entry.DisplayName</strong>
+                <div class="small text-muted">@entry.CreatedUtc.ToLocalTime()</div>
+                <div>@entry.Text</div>
             </li>
         }
     </ul>
@@ -20,8 +21,8 @@
 <form asp-controller="Conversation" asp-action="Display" method="post">
     @Html.AntiForgeryToken()
 
-    <input type="hidden" name="number" value="@Model.Number" />
-    @if (!Model.Completed)
+    <input type="hidden" name="number" value="@conversation.Number" />
+    @if (!conversation.Completed)
     {
         <div class="mb-3">
             <label for="Text" class="form-label">Dodaj wiadomość</label>
@@ -39,11 +40,7 @@
     }
 
 
-    @if (User.IsInRole("Pharmacist"))
-    {
-        <a asp-controller="Pharmacist" asp-action="Tokens" class="btn btn-secondary">Powrót</a>
-    }
-    else if (User.IsInRole("Patient"))
+    @if (User.IsInRole("Patient"))
     {
         <a asp-controller="Patient" asp-action="Tokens" class="btn btn-secondary">Powrót</a>
     }

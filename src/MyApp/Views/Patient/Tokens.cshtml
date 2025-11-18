@@ -1,10 +1,9 @@
-﻿@using MyApp.Domain.Reviews
-@using MyApp.Web.ViewModels
-@model List<ReviewDto>
+﻿@model MyApp.Web.ViewModels.ReviewsViewModel;
 
 @{
     ViewData["Title"] = "Twoje zalecenia";
     var searchTxt = (string?)ViewBag.Query ?? "";
+    var reviews = Model.Reviews;
 }
 
 <partial name="~/Views/Shared/_PatientNav.cshtml" />
@@ -18,7 +17,7 @@
 
 </div>
 
-@if (!Model.Any())
+@if (!reviews.Any())
 {
     <div class="alert alert-info">Nie masz jeszcze żadnych zaleceń.</div>
 }
@@ -35,7 +34,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var rev in Model)
+            @foreach (var rev in reviews)
             {
                 <tr class="@(rev.IsNewForViewer ? "table-warning" : "")">
                     <td>@rev.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>

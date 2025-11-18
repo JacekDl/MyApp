@@ -1,0 +1,25 @@
+﻿@model MyApp.Web.ViewModels.ViewModelBase;
+@{
+    
+    var length = Model is null ? 0 : Model.Breadcrumbs.Count;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        @if (Model is not null)
+        {
+            @foreach (var crumb in Model.Breadcrumbs)
+            {
+                var pair = crumb.Split('|');
+                if (crumb != Model.Breadcrumbs.Last())
+                {
+                    <li class="breadcrumb-item"><a asp-action="@pair[1]" asp-controller="@pair[2]">@pair[0]</a></li>
+                }
+                else
+                {
+                    <li class="breadcrumb-item active" aria-current="page">@pair[0]</li>
+                }
+            }
+        }
+    </ol>
+</nav>

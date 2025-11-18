@@ -1,13 +1,14 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyApp.Domain.Abstractions;
+using MyApp.Domain.Instructions;
 using MyApp.Domain.Instructions.Commands;
 using MyApp.Domain.Instructions.Queries;
 using MyApp.Domain.Medicines;
 using MyApp.Domain.Medicines.Commands;
 using MyApp.Domain.Medicines.Queries;
-using MyApp.Domain.Abstractions;
-using MyApp.Domain.Instructions;
+using MyApp.Web.ViewModels;
 
 namespace MyApp.Web.Controllers
 {
@@ -27,11 +28,23 @@ namespace MyApp.Web.Controllers
         public async Task<IActionResult> Medicines()
         {
             var result = await _mediator.Send(new GetMedicinesQuery());
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = result.ErrorMessage;
+                return View();
+            }
+
+            var vm = new MedicinesViewModel();
+            if (result.Value is not null)
+            {
+                vm.Medicines = result.Value;
+            }
+
             if (User.IsInRole("Admin"))
-                return View("~/Views/Admin/Medicines.cshtml", result.Value);
+                return View("~/Views/Admin/Medicines.cshtml", vm);
 
             if (User.IsInRole("Pharmacist"))
-                return View("~/Views/Pharmacist/Medicines.cshtml", result.Value);
+                return View("~/Views/Pharmacist/Medicines.cshtml", vm);
 
             return Forbid(); //TODO: change that
         }
@@ -61,21 +74,26 @@ namespace MyApp.Web.Controllers
             var result = await _mediator.Send(new GetMedicineQuery(id));
             if (!result.Succeeded)
             {
-                TempData["Error"] = "Lek nie został znaleziony.";
+                TempData["Error"] = result.ErrorMessage;
                 return RedirectToAction(nameof(Medicines));
             }
-            return View("~/Views/Admin/ModifyMedicine.cshtml", result.Value);
+
+            var vm = new ModifyMedicineViewModel();
+            vm.Medicine = result.Value!;
+            vm.Breadcrumbs.AddRange(["Leki|Medicines|Medicine", "Modyfikuj lek|"]);
+            return View("~/Views/Admin/ModifyMedicine.cshtml", vm);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPost,ValidateAntiForgeryToken]
-        public async Task<IActionResult> ModifyMedicine(MedicineDto item)
+        public async Task<IActionResult> ModifyMedicine(ModifyMedicineViewModel item)
         {
             if (!ModelState.IsValid)
             {
                 return View(item);
             }
-            var result = await _mediator.Send(new UpdateMedicineCommand(item.Id, item.Code, item.Name));
+            var medicine = item.Medicine;
+            var result = await _mediator.Send(new UpdateMedicineCommand(medicine.Id, medicine.Code, medicine.Name));
             TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Zaktualizowano lek." : result.ErrorMessage;
             return RedirectToAction(nameof(Medicines));
         }
@@ -96,12 +114,24 @@ namespace MyApp.Web.Controllers
 
         public async Task<IActionResult> Instructions()
         {
-            var model = await _mediator.Send(new GetInstructionsQuery());
+            var result = await _mediator.Send(new GetInstructionsQuery());
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = result.ErrorMessage;
+                return View();
+            }
+
+            var vm = new InstructionsViewModel();
+            if(result.Value is not null)
+            {
+                vm.Instructions = result.Value;
+            }
+
             if (User.IsInRole("Admin"))
-                return View("~/Views/Admin/Instructions.cshtml", model.Value);
+                return View("~/Views/Admin/Instructions.cshtml", vm);
 
             if (User.IsInRole("Pharmacist"))
-                return View("~/Views/Pharmacist/Instructions.cshtml", model.Value);
+                return View("~/Views/Pharmacist/Instructions.cshtml", vm);
 
             return Forbid(); //TODO :change that
         }
@@ -131,23 +161,29 @@ namespace MyApp.Web.Controllers
             var result = await _mediator.Send(new GetInstructionQuery(id));
             if (!result.Succeeded)
             {
-                TempData["Error"] = "Dawkowanie nie zostało odnalezione.";
+                TempData["Error"] = result.ErrorMessage;
                 return RedirectToAction(nameof(Instructions));
             }
-            return View("~/Views/Admin/ModifyInstruction.cshtml", result.Value);
+            var vm = new ModifyInstructionViewModel();
+            vm.Instruction = result.Value!;
+            vm.Breadcrumbs.AddRange(["Dawkowanie|Instructions|Medicine", "Modyfikuj dawkowanie|"]);
+            return View("~/Views/Admin/ModifyInstruction.cshtml", vm);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> ModifyInstruction(InstructionDto item)
+        public async Task<IActionResult> ModifyInstruction(ModifyInstructionViewModel item)
         {
             if (!ModelState.IsValid)
             {
                 return View(item);
             }
-            var result = await _mediator.Send(new UpdateInstructionCommand(item.Id, item.Code, item.Text));
+            var instruction = item.Instruction;
+            var result = await _mediator.Send(new UpdateInstructionCommand(instruction.Id, instruction.Code, instruction.Text));
             TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Zaktualizowano dawkowanie." : result.ErrorMessage;
             return RedirectToAction(nameof(Instructions));
+
+
         }
 
         [Authorize(Roles = "Pharmacist")]

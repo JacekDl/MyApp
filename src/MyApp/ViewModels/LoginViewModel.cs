@@ -2,7 +2,7 @@
 
 namespace MyApp.Web.ViewModels;
 
-public class LoginViewModel
+public class LoginViewModel : ViewModelBase
 {
     [Required, EmailAddress]
     public string Email { get; set; } = string.Empty;

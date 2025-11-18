@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyApp.Web.ViewModels;
 
-public class RegisterViewModel
+public class RegisterViewModel : ViewModelBase
 {
     [Required(ErrorMessage = "Email is required.")]
     [EmailAddress(ErrorMessage = "Please enter a valid email address.")]

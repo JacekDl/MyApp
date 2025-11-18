@@ -1,31 +1,30 @@
-﻿@model MyApp.Domain.Medicines.MedicineDto
+﻿@model MyApp.Web.ViewModels.ModifyMedicineViewModel;
 
 @{
     ViewData["Title"] = "Zmiena leku";
+    var medicine = Model.Medicine;
 }
 
 <div class="container mt-3">
-    <h5 class="mb-3">Edytuj lek</h5>
 
     <form asp-action="ModifyMedicine" asp-controller="Medicine" method="post" class="row g-3">
         @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="@medicine.Id" />
 
         <div class="col-12 col-md-4">
-            <label asp-for="Code" class="form-label">Kod</label>
-            <input asp-for="Code" class="form-control" />
-            <span asp-validation-for="Code" class="text-danger"></span>
+            <label asp-for="@medicine.Code" class="form-label">Kod</label>
+            <input asp-for="@medicine.Code" class="form-control" />
+            <span asp-validation-for="@medicine.Code" class="text-danger"></span>
         </div>
 
         <div class="col-12 col-md-8">
-            <label asp-for="Name" class="form-label">Nazwa</label>
-            <input asp-for="Name" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
+            <label asp-for="@medicine.Name" class="form-label">Nazwa</label>
+            <input asp-for="@medicine.Name" class="form-control" />
+            <span asp-validation-for="@medicine.Name" class="text-danger"></span>
         </div>
 
         <div class="col-12 d-flex gap-2">
             <button type="submit" class="btn btn-secondary">Zapisz</button>
-            <a asp-action="Medicines" asp-controller="Medicine" class="btn btn-secondary">Anuluj</a>
         </div>
     </form>
 </div>

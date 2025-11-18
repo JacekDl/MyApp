@@ -1,7 +1,5 @@
-﻿// wwwroot/js/theme.js
-
-(function () {
-    const THEME_KEY = 'theme';            // persisted choice: 'light' | 'dark' | 'contrast'
+﻿(function () {
+    const THEME_KEY = 'theme';
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
 
     function systemTheme() {
@@ -22,14 +20,12 @@
         return document.documentElement.getAttribute('data-bs-theme') || systemTheme();
     }
 
-    // Cycle: light -> dark -> contrast -> light
     function nextTheme(t) {
         if (t === 'light') return 'dark';
         if (t === 'dark') return 'contrast';
         return 'light';
     }
 
-    // Keep button label/icon in sync
     function updateToggleUI(theme) {
         const btn = document.getElementById('theme-toggle');
         const label = document.getElementById('theme-toggle-label');
@@ -44,23 +40,20 @@
 
         label.textContent = text;
         btn.setAttribute('aria-label', `Switch theme (current: ${text})`);
-        // If you show an icon span:
+
         const iconSpan = btn.querySelector('[data-icon]');
         if (iconSpan) iconSpan.textContent = icon;
     }
 
-    // Initialize theme on load
     function initTheme() {
         const saved = getSavedTheme();
         setTheme(saved || systemTheme(), /*persist*/ !!saved);
 
-        // If user did NOT choose manually, follow system changes live
         if (!saved) {
             mq.addEventListener?.('change', () => setTheme(systemTheme(), /*persist*/ false));
         }
     }
 
-    // Wire up button
     function initToggle() {
         const btn = document.getElementById('theme-toggle');
         if (!btn) return;
@@ -70,7 +63,41 @@
         });
     }
 
-    // Run
     initTheme();
     document.addEventListener('DOMContentLoaded', initToggle);
+
+    document.addEventListener('DOMContentLoaded', function () {
+        if (!window.bootstrap || !bootstrap.Toast) return;
+        document.querySelectorAll('.toast').forEach(function (el) {
+            new bootstrap.Toast(el, { autohide: true, delay: 5000 }).show();
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const html = document.documentElement;
+        const btn = document.getElementById('themeToggle');
+        const icons = {
+            light: document.getElementById('icon-sun'),
+            dark: document.getElementById('icon-dark'),
+            contrast: document.getElementById('icon-contrast')
+        };
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+
+        btn.addEventListener('click', () => {
+            const current = html.getAttribute('data-bs-theme');
+            const next = current === 'light' ? 'dark'
+                : current === 'dark' ? 'contrast'
+                    : 'light';
+            setTheme(next);
+            localStorage.setItem('theme', next);
+        });
+
+        function setTheme(theme) {
+            html.setAttribute('data-bs-theme', theme);
+            Object.values(icons).forEach(i => i.classList.add('d-none'));
+            icons[theme]?.classList.remove('d-none');
+        }
+    });
 })();

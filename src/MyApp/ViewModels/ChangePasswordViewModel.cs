@@ -2,7 +2,7 @@
 
 namespace MyApp.Web.ViewModels;
 
-public class ChangePasswordViewModel
+public class ChangePasswordViewModel : ViewModelBase
 {
     [Required, DataType(DataType.Password)]
     [Display(Name = "Current password")]

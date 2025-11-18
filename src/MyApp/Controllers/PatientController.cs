@@ -164,9 +164,20 @@ public class PatientController : Controller
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, null));
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = result.ErrorMessage;
+            return View();
+        }
+
+        var vm = new ReviewsViewModel();
+        if (result.Value is not null)
+        {
+            vm.Reviews = result.Value;
+        }
 
         ViewBag.Query = searchTxt;
-        return View(result.Value);
+        return View(vm);
     }
     #endregion
 }

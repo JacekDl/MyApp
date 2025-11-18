@@ -1,4 +1,9 @@
-﻿@model IReadOnlyList<MyApp.Domain.Medicines.MedicineDto>
+﻿@model MyApp.Web.ViewModels.MedicinesViewModel;
+
+@{
+    ViewData["Title"] = "Lista leków";
+    var medicines = Model.Medicines;
+}
 
 <partial name="~/Views/Shared/_PharmacistNav.cshtml" />
 
@@ -12,7 +17,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
+                @foreach (var item in medicines)
                 {
                     <tr>
                         <td class="col-3">@item.Code</td>

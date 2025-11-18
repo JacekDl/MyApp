@@ -1,4 +1,4 @@
-﻿@model List<MyApp.Domain.Users.UserDto>
+﻿@model MyApp.Web.ViewModels.UsersViewModel;
 
 @{
     ViewData["Title"] = "Użytkownicy";
@@ -19,7 +19,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach(var user in Model)
+                @foreach(var user in Model.Users)
                 {
                     <tr>
                         <td class="col-4">@user.Id</td>

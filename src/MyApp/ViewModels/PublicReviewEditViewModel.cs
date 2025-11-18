@@ -1,6 +1,6 @@
 ﻿namespace MyApp.Web.ViewModels;
 
-public class PublicReviewEditViewModel
+public class PublicReviewEditViewModel : ViewModelBase
 {
     public string Number { get; set; } = string.Empty;
 

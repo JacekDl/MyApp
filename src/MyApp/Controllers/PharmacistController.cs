@@ -75,10 +75,21 @@ public class PharmacistController : Controller
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, completed));
-
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = result.ErrorMessage;
+            return View(); //TODO: czy to jest dobrze?
+        }
+        
         ViewBag.Query = searchTxt;
         ViewBag.Completed = completed?.ToString().ToLowerInvariant();
-        return View(result.Value);
+
+        var vm = new ReviewsViewModel();
+        if (result.Value is not null)
+        {
+            vm.Reviews = result.Value;
+        }
+        return View(vm);
     }
     #endregion  
 }

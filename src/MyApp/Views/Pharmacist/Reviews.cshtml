@@ -136,14 +136,14 @@
                     });
 
                     buttonGroup.append(
-                        makeBtn('Zmień', 'btn-outline-primary', () => {
+                        makeBtn('Zmień', 'btn-secondary', () => {
                             nameInput.value = p.name;
                             adviceInput.value = p.advice;
                             pairs.splice(idx, 1);
                             nameInput.focus();
                             render();
                         }),
-                        makeBtn('Usuń', 'btn-outline-danger', () => {
+                        makeBtn('Usuń', 'btn-secondary', () => {
                             pairs.splice(idx, 1);
                             render();
                         })
@@ -163,13 +163,13 @@
                     const buttonGroup = el(
                         'div',
                         { className: 'd-flex flex-column flex-md-row gap-2 justify-content-md-end' },
-                        makeBtn('Zmień', 'btn-outline-primary', () => {
+                        makeBtn('Zmień', 'btn-secondary', () => {
                             genAdviceInput.value = genAdvice;
                             genAdvice = '';
                             genAdviceInput?.focus();
                             render();
                         }),
-                        makeBtn('Usuń', 'btn-outline-danger', () => {
+                        makeBtn('Usuń', 'btn-secondary', () => {
                             genAdvice = '';
                             render();
                         })

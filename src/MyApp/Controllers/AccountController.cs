@@ -181,15 +181,30 @@ public class AccountController : Controller
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         var result = await _mediator.Send(new GetUserByIdQuery(currentUserId));
-
+       
         if (!result.Succeeded)
         {
             ModelState.AddModelError(string.Empty, result.ErrorMessage!);
             return View();
         }
 
-        var dto = result.Value!;
-        return View(dto);
+        var vm = new DetailsViewModel();
+        var role = User.FindFirstValue(ClaimTypes.Role);
+        if (role == "Admin")
+        {
+            vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Szczegóły konta||"]);
+        }
+        else if (role == "Pharmacist")
+        {
+            vm.Breadcrumbs.AddRange(["Start|Reviews|Pharmacist", "Szczegóły konta||"]);
+        }
+        else
+        {
+            vm.Breadcrumbs.AddRange(["Start|Tokens|Patient", "Szczegóły konta||"]);
+        }
+        vm.User = result.Value!;
+
+        return View(vm);
     }
     #endregion
 
@@ -207,10 +222,21 @@ public class AccountController : Controller
             return View();
         }
 
-        var vm = new EditProfileViewModel
+        var vm = new EditProfileViewModel();
+        vm.DisplayName = result.Value!.DisplayName;
+        var role = User.FindFirstValue(ClaimTypes.Role);
+        if (role == "Admin")
         {
-            DisplayName = result.Value!.DisplayName,
-        };
+            vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Szczegóły konta|Details|Account", "Zmiana imienia||"]);
+        }
+        else if (role == "Pharmacist")
+        {
+            vm.Breadcrumbs.AddRange(["Start|Reviews|Pharmacist", "Szczegóły konta|Details|Account", "Zmiana imienia||"]);
+        }
+        else
+        {
+            vm.Breadcrumbs.AddRange(["Start|Tokens|Patient", "Szczegóły konta|Details|Account", "Zmiana imienia||"]);
+        }
         return View(vm);
     }
 
@@ -252,6 +278,19 @@ public class AccountController : Controller
         var user = result.Value!;
 
         var vm = new ChangeEmailViewModel { Email = user.Email };
+        var role = User.FindFirstValue(ClaimTypes.Role);
+        if (role == "Admin")
+        {
+            vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Szczegóły konta|Details|Account", "Zmiana email||"]);
+        }
+        else if (role == "Pharmacist")
+        {
+            vm.Breadcrumbs.AddRange(["Start|Reviews|Pharmacist", "Szczegóły konta|Details|Account", "Zmiana email||"]);
+        }
+        else
+        {
+            vm.Breadcrumbs.AddRange(["Start|Tokens|Patient", "Szczegóły konta|Details|Account", "Zmiana email||"]);
+        }
         return View(vm);
     }
 
@@ -285,7 +324,21 @@ public class AccountController : Controller
     [Authorize, HttpGet]
     public IActionResult ChangePassword()
     {
-        return View(new ChangePasswordViewModel());
+        var vm = new ChangePasswordViewModel();
+        var role = User.FindFirstValue(ClaimTypes.Role);
+        if (role == "Admin")
+        {
+            vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Szczegóły konta|Details|Account", "Zmiana hasła||"]);
+        }
+        else if (role == "Pharmacist")
+        {
+            vm.Breadcrumbs.AddRange(["Start|Reviews|Pharmacist", "Szczegóły konta|Details|Account", "Zmiana hasła||"]);
+        }
+        else
+        {
+            vm.Breadcrumbs.AddRange(["Start|Tokens|Patient", "Szczegóły konta|Details|Account", "Zmiana hasła||"]);
+        }
+        return View(vm);
     }
 
     [Authorize, HttpPost, ValidateAntiForgeryToken]

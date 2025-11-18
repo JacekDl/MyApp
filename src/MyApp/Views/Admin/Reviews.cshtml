@@ -1,10 +1,10 @@
-﻿@model List<MyApp.Domain.Reviews.ReviewDto>
-
+﻿@model MyApp.Web.ViewModels.ReviewsViewModel;
 @{
     ViewData["Title"] = "Zalecenia";
     var searchTxt = (string?)ViewBag.Query ?? "";
     var userId = (string?)ViewBag.UserId ?? "";
     var completed = (string?)ViewBag.Completed ?? "";
+    var reviews = Model.Reviews;
 }
 
 <partial name="~/Views/Shared/_AdminNav.cshtml" />
@@ -23,7 +23,7 @@
     </form>
 </div>
 
-@if (!Model.Any())
+@if (!reviews.Any())
 {
     <div class="alert alert-info">Nie znaleziono żadnych zaleceń.</div>
 }
@@ -40,7 +40,7 @@ else
                 </tr>
             </thead>
             <tbody>
-                @foreach (var rev in Model)
+                @foreach (var rev in reviews)
                 {
                     <tr>
                         <td class="col-1 text-nowrap">@rev.DateCreated.ToString("yyyy-MM-dd")</td>

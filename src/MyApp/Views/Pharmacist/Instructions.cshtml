@@ -1,7 +1,7 @@
-﻿@model IReadOnlyList<MyApp.Domain.Instructions.InstructionDto>
+﻿@model MyApp.Web.ViewModels.InstructionsViewModel;
 @{
-    var infoMsg = TempData["Info"] as string;
-    var errMsg = TempData["Error"] as string;
+    ViewData["Title"] = "Dawkowania leków";
+    var instructions = Model.Instructions;
 }
 
 <partial name="~/Views/Shared/_PharmacistNav.cshtml" />
@@ -17,7 +17,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
+                @foreach (var item in instructions)
                 {
                     <tr>
                         <td class="col-3">@item.Code</td>

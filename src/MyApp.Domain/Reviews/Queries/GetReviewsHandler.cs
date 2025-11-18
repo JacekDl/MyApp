@@ -121,12 +121,6 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, GetReviewsResu
             RuleFor(x => x.UserEmail)
                 .Must(email => string.IsNullOrWhiteSpace(email) || email.Contains("@"))
                 .WithMessage("Nieprawidłowy adres e-mail.");
-
-            RuleFor(x => x)
-                .Must(q =>
-                    !string.IsNullOrWhiteSpace(q.CurrentUserId) ||
-                    !string.IsNullOrWhiteSpace(q.UserEmail))
-                .WithMessage("Należy podać Id użytkownika lub adres e-mail.");
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace MyApp.Web.ViewModels;
 
-public class GetReviewViewModel
+public class GetReviewViewModel : ViewModelBase
 {
     [Required, MaxLength(128)]
     public string Number { get; set; } = string.Empty;

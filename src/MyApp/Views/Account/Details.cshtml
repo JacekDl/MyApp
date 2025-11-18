@@ -1,20 +1,20 @@
-﻿@model MyApp.Domain.Users.UserDto;
+﻿@using MyApp.Web.ViewModels
+@model DetailsViewModel;
 
 @{
     ViewData["Title"] = "Szczegóły konta";
+    var user = Model.User;
 }
-
-<h1 class="mb-3">@ViewData["Title"]</h1>
 
 <div class="card mb-4">
     <div class="card-body">
         <dl class="row mb-0">
             <dt class="col-sm-3">Email</dt>
-            <dd class="col-sm-9">@Model.Email</dd>
+            <dd class="col-sm-9">@user.Email</dd>
             <dt class="col-sm-3">Imię</dt>
-            <dd class="col-sm-9">@Model.DisplayName</dd>
+            <dd class="col-sm-9">@user.DisplayName</dd>
             <dt class="col-sm-3">Utworzono</dt>
-            <dd class="col-sm-9">@Model.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</dd>
+            <dd class="col-sm-9">@user.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</dd>
         </dl>
     </div>
 </div>
@@ -23,5 +23,4 @@
     <a class="btn btn-secondary" asp-action="ChangeEmail">Zmień email</a>
     <a class="btn btn-secondary" asp-action="ChangePassword">Zmień hasło</a>
     <a class="btn btn-secondary" asp-action="EditProfile">Zmień dane konta</a>
-    <a class="btn btn-secondary" asp-controller="Home" asp-action="Index">Powrót</a>
 </div>

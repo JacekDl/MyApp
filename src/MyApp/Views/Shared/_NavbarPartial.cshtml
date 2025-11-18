@@ -1,0 +1,64 @@
+﻿<nav class="navbar navbar-expand-sm border-bottom mb-3 bg-body-tertiary" style=" z-index:1030"> <!--Zmienić tło na jakiś kolor - bg-body-tertiary -->
+    <div class="container-fluid">
+
+        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MyApp</a>
+
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            <button id="themeToggle"
+                    type="button"
+                    class="btn btn-outline-secondary d-flex align-items-center gap-1"
+                    aria-pressed="false"
+                    aria-label="Przełącz tryb motywu"
+                    title="Przełącz tryb motywu">
+
+                <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" 
+                        fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M8 0a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 8 0zm4.657 1.343a.5.5 0 1 1 .707.707l-.707.707a.5.5 0 0 1-.707-.707l.707-.707zM16 8a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1 0-1h1A.5.5 0 0 1 16 8zm-1.343 4.657a.5.5 0 1 1-.707.707l-.707-.707a.5.5 0 0 1 .707-.707l.707.707zM8 16a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 1 0v1A.5.5 0 0 1 8 16zm-4.657-1.343a.5.5 0 1 1-.707-.707l.707-.707a.5.5 0 0 1 .707.707l-.707.707zM0 8a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1A.5.5 0 0 1 0 8zm1.343-4.657a.5.5 0 1 1 .707-.707l.707.707a.5.5 0 0 1-.707.707l-.707-.707zM8 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />
+                </svg>
+
+                <svg id="icon-dark" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                        fill="currentColor" viewBox="0 0 16 16" class="d-none" aria-hidden="true">
+                    <path d="M6 .278a7.5 7.5 0 1 0 9.416 9.416A7 7 0 0 1 6 .278Z" />
+                </svg>
+
+                <svg id="icon-contrast" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                        fill="currentColor" viewBox="0 0 16 16" class="d-none" aria-hidden="true">
+                    <path d="M8 0a8 8 0 1 0 0 16V0z" />
+                </svg>
+            </button>
+            @if (User.Identity?.IsAuthenticated ?? false)
+            {
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Witaj @User.Identity?.Name
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li class="nav-item">
+                            <a class="dropdown-item" asp-controller="Account" asp-action="Details">Konto</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="dropdown-item" asp-controller="Account" asp-action="Logout">Wyloguj</a>
+                        </li>
+                    </ul>
+
+                </div>
+            }
+            else
+            {
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Załóż konto / Zaloguj
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li class="nav-item">
+                            <a class="dropdown-item" asp-controller="Account" asp-action="Register">Załóż konto</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="dropdown-item" asp-controller="Account" asp-action="Login">Zaloguj</a>
+                        </li>
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+</nav>

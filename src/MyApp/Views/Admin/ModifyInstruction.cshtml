@@ -1,31 +1,30 @@
-﻿@model MyApp.Domain.Instructions.InstructionDto
+﻿@model MyApp.Web.ViewModels.ModifyInstructionViewModel
 
 @{
-    ViewData["Title"] = "Zmiana dawkowania";
+    ViewData["Title"] = "Zmiena dawkowania";
+    var instruction = Model.Instruction;
 }
 
 <div class="container mt-3">
-    <h5 class="mb-3">Edytuj dawkowanie</h5>
 
     <form asp-action="ModifyInstruction" asp-controller="Medicine" method="post" class="row g-3">
         @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="@instruction.Id" />
 
         <div class="col-12 col-md-4">
-            <label asp-for="Code" class="form-label">Kod</label>
-            <input asp-for="Code" class="form-control" />
-            <span asp-validation-for="Code" class="text-danger"></span>
+            <label asp-for="@instruction.Code" class="form-label">Kod</label>
+            <input asp-for="@instruction.Code" class="form-control" />
+            <span asp-validation-for="@instruction.Code" class="text-danger"></span>
         </div>
 
         <div class="col-12 col-md-8">
-            <label asp-for="Text" class="form-label">Dawkowanie</label>
-            <input asp-for="Text" class="form-control" />
-            <span asp-validation-for="Text" class="text-danger"></span>
+            <label asp-for="@instruction.Text" class="form-label">Dawkowanie</label>
+            <input asp-for="@instruction.Text" class="form-control" />
+            <span asp-validation-for="@instruction.Text" class="text-danger"></span>
         </div>
 
         <div class="col-12 d-flex gap-2">
             <button type="submit" class="btn btn-secondary">Zapisz</button>
-            <a asp-action="Instructions" asp-controller="Medicine" class="btn btn-secondary">Anuluj</a>
         </div>
     </form>
 </div>

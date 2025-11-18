@@ -1,11 +1,9 @@
-﻿@using MyApp.Web.ViewModels
-@model EditProfileViewModel
+﻿@model MyApp.Web.ViewModels.EditProfileViewModel
 
 @{
     ViewData["Title"] = "Edytuj Profil";
+    var name = Model.DisplayName;
 }
-
-<h1 class="mb-3">@ViewData["Title"]</h1>
 
 <form asp-action="EditProfile" method="post">
     @Html.AntiForgeryToken()

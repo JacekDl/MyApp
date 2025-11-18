@@ -2,7 +2,7 @@
 
 namespace MyApp.Web.ViewModels;
 
-public class ChangeEmailViewModel
+public class ChangeEmailViewModel : ViewModelBase
 {
     [Required, EmailAddress]
     [Display(Name = "New email")]

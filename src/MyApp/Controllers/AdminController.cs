@@ -5,6 +5,7 @@ using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
 using MyApp.Domain.Users.Commands;
 using MyApp.Domain.Users.Queries;
+using MyApp.Web.ViewModels;
 
 namespace MyApp.Web.Controllers;
 
@@ -22,7 +23,20 @@ public class AdminController : Controller
     public async Task<IActionResult> Users()
     {
         var result = await _mediator.Send(new GetAllUsersQuery());
-        return View(result.Value);
+        var vm = new UsersViewModel();
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = result.ErrorMessage;
+            return View(vm);
+        }
+        else if (result.Value is not null)
+        {
+            foreach (var user in result.Value)
+            {
+                vm.Users.Add(user);
+            }
+        }
+        return View(vm);
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -40,12 +54,23 @@ public class AdminController : Controller
     {
         var result = await _mediator.Send(new GetReviewsQuery(searchTxt, userId, completed, userEmail));
 
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = result.ErrorMessage;
+            return View(new ReviewsViewModel()); //TODO: is that correct?
+        }
+
         ViewBag.Query = searchTxt;
         ViewBag.Completed = completed?.ToString().ToLowerInvariant();
         ViewBag.UserId = userId;
         ViewBag.UserEmail = userEmail;
 
-        return View(result.Value);
+        var vm = new ReviewsViewModel();
+        if (result.Value is not null)
+        {
+            vm.Reviews = result.Value;
+        }
+        return View(vm);
     }
 
     [HttpPost, ValidateAntiForgeryToken]

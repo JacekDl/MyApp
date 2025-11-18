@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
+using MyApp.Web.ViewModels;
 using System.Security.Claims;
 
 namespace MyApp.Web.Controllers;
@@ -34,7 +35,25 @@ public class ConversationController : Controller
         {
             return BadRequest(); //TODO: zmienić zamiast zwracać 400
         }
-        return View(result.Value);
+        var vm = new DisplayConversationViewModel();
+        if (result.Value is not null)
+        {
+            vm.Conversation = result.Value;
+        }
+        var role = User.FindFirstValue(ClaimTypes.Role);
+        if (role == "Admin")
+        {
+            vm.Breadcrumbs.AddRange(["Zalecenia|Reviews|Admin", "Rozmowa||"]);
+        }
+        else if (role == "Pharmacist")
+        {
+            vm.Breadcrumbs.AddRange(["Moje zalecenia|Tokens|Pharmacist", "Rozmowa||"]);
+        }
+        else
+        {
+            vm.Breadcrumbs.AddRange(["Moje zalecenia|Tokens|Patient", "Rozmowa||"]);
+        }
+        return View(vm);
     }
 
 
