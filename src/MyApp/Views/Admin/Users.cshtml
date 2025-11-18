@@ -13,9 +13,9 @@
                 <tr>
                     <th scope="col" class="col-4">Id</th>
                     <th scope="col" class="col-3">Email</th>
-                    <th scope="col" class="col-2">Rola</th>
+                    <th scope="col" class="col-1">Rola</th>
                     <th scope="col" class="col-2">Utworzono</th>
-                    <th scope="col" class="col-1"></th>
+                    <th scope="col" class="col-2" colspan="2"></th>
                 </tr>
             </thead>
             <tbody>
@@ -24,11 +24,18 @@
                     <tr>
                         <td class="col-4">@user.Id</td>
                         <td class="col-3">@user.Email</td>
-                        <td class="col-2">@user.Role</td>
+                        <td class="col-1">@user.Role</td>
                         <td class="col-2">@user.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
-                        <td class="col-1 text-end">
-                            @if (!string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
-                            {
+                        
+                        @if (!string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
+                        {
+                            <td class="col-1 text-end">
+                                <form asp-action="Reviews" asp-route-userId="@user.Id" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-secondary">Zalecenia</button>
+                                </form>
+                            </td>
+                            <td class="col-1 text-start">
                                 <form asp-action="RemoveUser" method="post" asp-route-id="@user.Id" style="display:inline">
                                     @Html.AntiForgeryToken()
                                     <button 
@@ -38,8 +45,13 @@
                                         Usuń
                                     </button>
                                 </form>
-                            }
-                        </td>
+                            </td>
+                        }
+                        else
+                        {
+                            <td></td>
+                            <td></td>
+                        }
                     </tr>
                 }
             </tbody>
