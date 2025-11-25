@@ -24,7 +24,7 @@ public class PharmacistController : Controller
 
     #region GenerateReview
     [HttpGet]
-    public async Task<IActionResult> ReviewsAsync()
+    public async Task<IActionResult> Reviews()
     {
         var result = await _mediator.Send(new GetDictionariesQuery());
 
@@ -36,36 +36,26 @@ public class PharmacistController : Controller
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Reviews(ReviewCreateViewModel vm)
     {
-        if (!ModelState.IsValid)
-        {
-            return View(vm);
-        }
+        //if (!ModelState.IsValid) //TODO: czy to jest potrzebne, skoro walidacja jest w handlerze?
+        //{
+        //    return View(vm);
+        //}
 
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        try
+
+        var result = await _mediator.Send(new CreateReviewCommand(currentUserId, vm.Advice));
+
+        if (!result.Succeeded)
         {
-
-            var result = await _mediator.Send(new CreateReviewCommand(currentUserId, vm.Advice));
-
-            if (!result.Succeeded)
-            {
-                TempData["Error"] = result.ErrorMessage;
-                return View(vm);
-            }
-
-            var pdfBytes = await _pdfService.GenerateReviewPdf(result.Value!);
-
-            Response.Headers.ContentDisposition = "inline; filename=review.pdf";
-            return File(pdfBytes, "application/pdf");
-        }
-        catch (FluentValidation.ValidationException ex)
-        {
-            foreach(var error in ex.Errors)
-            {
-                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-            }
+            TempData["Error"] = result.ErrorMessage;
             return View(vm);
         }
+
+        var pdfBytes = await _pdfService.GenerateReviewPdf(result.Value!);
+
+        Response.Headers.ContentDisposition = "inline; filename=review.pdf";
+        return File(pdfBytes, "application/pdf");
+
     }
     #endregion
 
@@ -78,7 +68,7 @@ public class PharmacistController : Controller
         if (!result.Succeeded)
         {
             TempData["Error"] = result.ErrorMessage;
-            return View(); //TODO: czy to jest dobrze?
+            return View();
         }
         
         ViewBag.Query = searchTxt;
