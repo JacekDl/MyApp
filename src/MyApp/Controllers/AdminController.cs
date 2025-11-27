@@ -76,17 +76,9 @@ public class AdminController : Controller
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteReview(int id)
     {
-        try
-        {
-            var result = await _mediator.Send(new DeleteReviewCommand(id));
-            TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Usunięto zalecenia." : result.ErrorMessage;
-            return RedirectToAction(nameof(Reviews));
-        }
-        catch (FluentValidation.ValidationException ex)
-        {
-            TempData["Error"] = string.Join(" ", ex.Errors.Select(e => e.ErrorMessage));
-            return RedirectToAction(nameof(Reviews));
-        }
+        var result = await _mediator.Send(new DeleteReviewCommand(id));
+        TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Usunięto zalecenia." : result.ErrorMessage;
+        return RedirectToAction(nameof(Reviews));
     }
     #endregion
 }

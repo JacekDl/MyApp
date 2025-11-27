@@ -1,12 +1,14 @@
-﻿@using MyApp.Web.ViewModels
-@model PublicReviewAccessViewModel
+﻿@model MyApp.Web.ViewModels.PublicReviewAccessViewModel
 
-<h2>Twoje zalecenia</h2>
+<h2 class="d-flex justify-content-center gap-2">Twoje zalecenia</h2>
 
-<p>Zalecenia dostępne po wybraniu jednej z poniższych opcji:</p>
+<p class="d-flex justify-content-center gap-2">Zalecenia dostępne po wybraniu jednej z poniższych opcji:</p>
 
-<div>
-    <a asp-controller="Patient" asp-action="PublicEdit" asp-route-number="@Model.Number" class="btn btn-primary">
+<div class="d-flex justify-content-center gap-2">
+    <a asp-controller="Patient" 
+        asp-action="PublicEdit"
+        asp-route-number="@Model.Number" 
+        class="btn btn-secondary">
         Wystaw opinię
     </a>
     <a asp-controller="Account" 
