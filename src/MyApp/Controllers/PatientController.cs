@@ -27,7 +27,9 @@ public class PatientController : Controller
 
         if (!result.Succeeded)
         {
-            return NotFound(); //TODO: View with error message can be implemented here.
+            var em = new ErrorViewModel();
+            em.Message = result.ErrorMessage;
+            return View("Error", em);
         }
 
         var review = result.Value!;
@@ -50,7 +52,9 @@ public class PatientController : Controller
 
         if (!result.Succeeded)
         {
-            return NotFound(); //View with error message can be implemented here.
+           var em = new ErrorViewModel();
+           em.Message = result.ErrorMessage;
+           return View("Error", em);
         }
 
         var review = result.Value!;
@@ -67,49 +71,25 @@ public class PatientController : Controller
     [AllowAnonymous, HttpPost("/r/{number}/edit"), ValidateAntiForgeryToken]
     public async Task<IActionResult> PublicEdit(string number, PublicReviewEditViewModel vm)
     {
-        if (number != vm.Number)
+        if(!ModelState.IsValid)
         {
-            return BadRequest();
-        }
-
-        try
-        {
-            var result = await _mediator.Send(new UpdateReviewCommand(number, vm.ReviewText));
-
-            if (!result.Succeeded)
-            {
-                ModelState.AddModelError(nameof(vm.ReviewText), result.ErrorMessage!);
-                var data = await _mediator.Send(new GetReviewQuery(number));
-                if (data.Succeeded && data.Value is not null)
-                {
-                    vm.Advice = data.Value.Text;
-                    vm.Number = data.Value.Number;
-                }
-                return View(vm);
-            }   
-            return RedirectToAction("CompleteEdit", new { number });
-        }
-        catch(FluentValidation.ValidationException ex)
-        {
-            foreach (var err in ex.Errors)
-            {
-                if (string.Equals(err.PropertyName, nameof(UpdateReviewCommand.ReviewText), StringComparison.OrdinalIgnoreCase))
-                    ModelState.AddModelError(nameof(vm.ReviewText), err.ErrorMessage);
-                else if (string.Equals(err.PropertyName, nameof(UpdateReviewCommand.Number), StringComparison.OrdinalIgnoreCase))
-                    ModelState.AddModelError(nameof(vm.Number), err.ErrorMessage);
-                else
-                    ModelState.AddModelError(string.Empty, err.ErrorMessage);
-            }
-
-            var data = await _mediator.Send(new GetReviewQuery(number));
-            if (data.Succeeded && data.Value is not null)
-            {
-                vm.Advice = data.Value.Text;
-                vm.Number = data.Value.Number;
-            }
             return View(vm);
         }
 
+
+        if (number != vm.Number)
+        {
+            return BadRequest(); //TODO: odesłać do strony z błędem
+        }
+        
+        var result = await _mediator.Send(new UpdateReviewCommand(number, vm.ReviewText));
+
+        if (!result.Succeeded)
+        {
+            ModelState.AddModelError(nameof(vm.ReviewText), result.ErrorMessage!);
+            return View(vm);
+        }   
+        return RedirectToAction("CompleteEdit", new { number });
     }
 
     [AllowAnonymous, HttpGet("/r/complete")]

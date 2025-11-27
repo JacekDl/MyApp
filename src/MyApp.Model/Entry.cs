@@ -7,7 +7,7 @@ public class Entry
     public int Id { get; set; }
     public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
 
-    [Required]
+    [Required(ErrorMessage = "Wiadomość nie może być pusta.")]
     public string Text { get; set; } = default!;
 
     public string? UserId { get; set; }

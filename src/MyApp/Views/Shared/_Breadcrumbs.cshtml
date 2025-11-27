@@ -4,7 +4,7 @@
     var length = Model is null ? 0 : Model.Breadcrumbs.Count;
 }
 
-<nav aria-label="breadcrumb">
+<nav style="--bs-breadcrum-divider: '>';" aria-label="breadcrumb">
     <ol class="breadcrumb">
         @if (Model is not null)
         {
@@ -17,7 +17,7 @@
                 }
                 else
                 {
-                    <li class="breadcrumb-item active" aria-current="page">@pair[0]</li>
+                    <li class="breadcrumb-item" aria-current="page">@pair[0]</li>
                 }
             }
         }

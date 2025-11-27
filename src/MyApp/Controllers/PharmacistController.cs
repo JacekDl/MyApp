@@ -36,10 +36,10 @@ public class PharmacistController : Controller
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Reviews(ReviewCreateViewModel vm)
     {
-        //if (!ModelState.IsValid) //TODO: czy to jest potrzebne, skoro walidacja jest w handlerze?
-        //{
-        //    return View(vm);
-        //}
+        if (!ModelState.IsValid)
+        {
+            return View(vm);
+        }
 
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 

@@ -6,25 +6,23 @@
 }
 
 <div class="container py-4">
-    <div class="col-lg-8">
-        @if (!string.IsNullOrWhiteSpace(Model.Advice))
-        {
+    <div>
+        <form asp-action="PublicEdit" asp-route-number="@Model.Number" method="post">
+            @Html.AntiForgeryToken()
+
+            <input asp-for="Number" type="hidden" />
+            <input asp-for="Advice" type="hidden" />
+
             <div class="mb-3">
                 <label class="form-label">Zalecenia farmaceuty</label>
                 <div class="form-control-plaintext">@Model.Advice</div>
             </div>
-        }
-
-        <form asp-action="PublicEdit" asp-route-number="@Model.Number" method="post" novalidate>
-            @Html.AntiForgeryToken()
 
             <div class="mb-3">
                 <label asp-for="ReviewText" class="form-label">Twoja opinia</label>
                 <textarea asp-for="ReviewText" class="form-control" rows="6" placeholder="Napisz swoją opinię (maksymalnie 200 znaków). 
 Proszę nie zamieszczać danych osobowych."></textarea>
             </div>
-
-            <input type="hidden" asp-for="Number" />
 
             <div class="d-flex gap-2">
                 <button id="saveBtn" type="submit" class="btn btn-secondary">Zapisz</button>

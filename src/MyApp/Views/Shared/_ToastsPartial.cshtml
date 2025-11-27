@@ -24,12 +24,12 @@
             </div>
         </div>
     }
-
+    
     @if (!ViewData.ModelState.IsValid)
     {
         var errors = ViewData.ModelState
-        .SelectMany(kvp => kvp.Value!.Errors.Select(e => new { Key = kvp.Key, e.ErrorMessage }))
-        .ToList();
+            .SelectMany(kvp => kvp.Value!.Errors.Select(e => new { Key = kvp.Key, e.ErrorMessage }))
+            .ToList();
 
         foreach (var errMsg in errors)
         {
