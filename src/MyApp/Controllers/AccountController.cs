@@ -102,7 +102,8 @@ public class AccountController : Controller
         if (!result.Succeeded)
         {
             ModelState.AddModelError(nameof(vm.Email), result.ErrorMessage!);
-            return View(vm);
+            vm.PostAction = nameof(RegisterPatient);
+            return View("Register", vm);
         }
 
         var user = result.Value!;

@@ -122,7 +122,8 @@ public class PatientController : Controller
         var precheck = await _mediator.Send(new GetReviewQuery(vm.Number));
         if (!precheck.Succeeded)
         {
-            ModelState.AddModelError(nameof(vm.Number), precheck.ErrorMessage!); return View(vm);
+            ModelState.AddModelError(nameof(vm.Number), precheck.ErrorMessage!); 
+            return View(vm);
         }
 
 

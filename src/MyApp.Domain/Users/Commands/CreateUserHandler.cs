@@ -7,9 +7,9 @@ using MyApp.Model;
 
 namespace MyApp.Domain.Users.Commands;
 
-public record class CreateUserCommand(string Email, string Password,string Role) : IRequest<CreateUserResult>;
+public record class CreateUserCommand(string Email, string Password, string Role) : IRequest<CreateUserResult>;
 
-public record class CreateUserResult : Result<User>;
+public record class CreateUserResult : Result<UserDto>;
 
 public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserResult>
 {
@@ -36,7 +36,7 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserRe
 
         if (existing is not null)
         {
-            return new() { ErrorMessage = "Podany email jest już zarejestrowany." };
+            return new() { ErrorMessage = "Wybierz inny adres email." };
         }
 
         var role = Allowed.FirstOrDefault(r => r.Equals(request.Role, StringComparison.OrdinalIgnoreCase));
@@ -62,7 +62,16 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserRe
 
         var addRole = await _userManager.AddToRoleAsync(user, role);
 
-        return new();
+        var userToDto = await _userManager.FindByEmailAsync(request.Email);
+        var userDto = new UserDto(
+            userToDto.Id,
+            userToDto.Email ?? string.Empty,
+            userToDto.Role,
+            userToDto.DisplayName ?? string.Empty,
+            userToDto.CreatedUtc
+        );
+
+        return new() { Value = userDto };
     }
 
     public class CreateUserValidator : AbstractValidator<CreateUserCommand>
