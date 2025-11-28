@@ -5,18 +5,18 @@ namespace MyApp.Web.ViewModels;
 
 public class RegisterViewModel : ViewModelBase
 {
-    [Required(ErrorMessage = "Email is required.")]
-    [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+    [Required(ErrorMessage = "Pole nie może być puste.")]
+    [EmailAddress(ErrorMessage = "Podaj prawidłowy adres email.")]
     public string Email { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Password is required.")] 
+    [Required(ErrorMessage = "Wprowadź hasło.")] 
     [DataType(DataType.Password)] 
-    [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
+    [MinLength(8, ErrorMessage = "Hasło musi składać się z co najmniej 8 znaków.")]
     public string Password { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Please confirm your password.")]
+    [Required(ErrorMessage = "Potwierdź hasło.")]
     [DataType(DataType.Password)] 
-    [Compare(nameof(Password), ErrorMessage = "Passwords do not match.")]
+    [Compare(nameof(Password), ErrorMessage = "Podane hasła są różne.")]
     [Display(Name = "Confirm Password")]
     public string ConfirmPassword { get; set; } = string.Empty;
 

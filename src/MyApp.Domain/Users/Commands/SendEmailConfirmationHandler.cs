@@ -24,11 +24,11 @@ public class SendEmailConfirmationHandler(UserManager<User> userManager, IEmailS
         var url = $"{request.CallbackUrl}?userId={user.Id}&token={Uri.EscapeDataString(token)}";
 
         var body = $"""
-        <p>Confirm your email by clicking the link below:</p>
-        <p><a href="{System.Net.WebUtility.HtmlEncode(url)}">Confirm my email</a><p>
-        <p>This link expires in 24 hours.</p>
+        <p>Potwierdź swój email klikając poniższy link:</p>
+        <p><a href="{System.Net.WebUtility.HtmlEncode(url)}">Potwierdź swój email</a><p>
+        <p>Link jest ważny przez 24 godziny.</p>
         """;
 
-        await email.SendEmailAsync(user.Email!, "Confirm your email", body, ct);
+        await email.SendEmailAsync(user.Email!, "Potwierdź email", body, ct);
     }
 }

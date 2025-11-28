@@ -359,7 +359,7 @@ public class AccountController : Controller
             return View(vm);
         }
 
-        TempData["Info"] = "Password changed.";
+        TempData["Info"] = "Hasło zostało zmienione.";
         return RedirectToAction(nameof(Details));
     }
     #endregion
