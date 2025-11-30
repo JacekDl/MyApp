@@ -28,7 +28,7 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserRe
         var validator = new CreateUserValidator().Validate(request);
         if (!validator.IsValid)
         {
-            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+            return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
         }
 
         var email = request.Email.Trim();

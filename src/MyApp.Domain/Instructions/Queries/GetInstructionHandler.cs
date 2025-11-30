@@ -26,7 +26,7 @@ namespace MyApp.Domain.Instructions.Queries
             var validator = new GetInstructionValidator().Validate(request);
             if (!validator.IsValid)
             {
-                return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
             }
 
             var result = await _db.Set<Instruction>()

@@ -27,7 +27,7 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
         var validator = new LoginValidator().Validate(request);
         if (!validator.IsValid)
         {
-            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+            return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
         }
 
         var user = await _userManager.FindByEmailAsync(request.Email);

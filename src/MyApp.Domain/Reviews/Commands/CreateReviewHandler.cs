@@ -29,7 +29,7 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, CreateRe
         var validator = new CreateReviewValidator().Validate(request);
         if (!validator.IsValid)
         {
-            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+            return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
         }
         var user = await _userManager.FindByIdAsync(request.UserId); //user is Pharmacist
         if (user is null)

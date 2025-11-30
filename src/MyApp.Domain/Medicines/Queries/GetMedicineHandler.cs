@@ -27,7 +27,7 @@ namespace MyApp.Domain.Medicines.Queries
             var validator = new GetMedicineValidator().Validate(request);
             if (!validator.IsValid)
             {
-                return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
             }
             var result = await _db.Set<Medicine>()
                 .Where(m => m.Id == request.Id)

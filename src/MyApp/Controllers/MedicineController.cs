@@ -138,9 +138,9 @@ namespace MyApp.Web.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddInstruction(AddInstructionCommand command)
+        public async Task<IActionResult> AddInstruction(InstructionDto item)
         {
-            var result = await _mediator.Send(command);
+            var result = await _mediator.Send(new AddInstructionCommand(item.Code, item.Text));
             TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Dodano dawkowanie." : result.ErrorMessage;
             return RedirectToAction(nameof(Instructions));
         }

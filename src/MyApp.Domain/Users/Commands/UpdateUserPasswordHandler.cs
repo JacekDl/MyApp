@@ -31,7 +31,7 @@ public class UpdateUserPasswordHandler : IRequestHandler<UpdateUserPasswordComma
         var change = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
         if (!change.Succeeded)
         {
-            var message = string.Join("; ", change.Errors.Select(e => $"{e.Code}: {e.Description}"));
+            var message = string.Join(";", change.Errors.Select(e => $"{e.Code}: {e.Description}"));
             return new() { ErrorMessage = message };
         }
 

@@ -22,7 +22,7 @@ namespace MyApp.Domain.Medicines.Queries
             var validator = new GetMedicinesValidator().Validate(request);
             if (!validator.IsValid)
             {
-                return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
             }
             var result =  await _db.Medicines
                 .OrderBy(m => m.Code)

@@ -35,7 +35,7 @@ public class UpdateUserDetailsHandler : IRequestHandler<UpdateUserDetailsCommand
         var update = await _userManager.UpdateAsync(user);
         if (!update.Succeeded)
         {
-            var message = string.Join("; ", update.Errors.Select(e => $"{e.Code}: {e.Description}"));
+            var message = string.Join(";", update.Errors.Select(e => $"{e.Code}: {e.Description}"));
             return new() { ErrorMessage = message };
         }
 

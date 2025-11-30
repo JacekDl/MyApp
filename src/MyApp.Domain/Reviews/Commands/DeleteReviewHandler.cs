@@ -23,7 +23,7 @@ namespace MyApp.Domain.Reviews.Commands
             var validator = new DeleteReviewCommandValidator().Validate(request);
             if (!validator.IsValid)
             {
-                return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
             }
 
             var review = await _db.Reviews.FirstOrDefaultAsync(r => r.Id == request.Id, ct);

@@ -25,7 +25,7 @@ public class UpdateReviewHandler : IRequestHandler<UpdateReviewCommand, UpdateRe
         var validator = new UpdateReviewCommandValidator().Validate(request);
         if (!validator.IsValid)
         {
-            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+            return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
         }
 
         var review = await _db.Reviews

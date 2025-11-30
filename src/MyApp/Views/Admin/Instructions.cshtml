@@ -12,10 +12,10 @@
         <form asp-action="AddInstruction" asp-controller="Medicine" method="post" class="row g-2">
             @Html.AntiForgeryToken()
             <div class="col-sm-3">
-                <input name="Code" class="form-control" placeholder="Kod" maxlength="64" required />
+                <input name="Code" class="form-control" placeholder="Kod" maxlength="64" />
             </div>
             <div class="col-sm-7">
-                <input name="Text" class="form-control" placeholder="Dawkowanie" maxlength="1024" required />
+                <input name="Text" class="form-control" placeholder="Dawkowanie" maxlength="1024" />
             </div>
             <div class="col-sm-2 d-grid">
                 <button type="submit" class="btn btn-secondary">Dodaj</button>

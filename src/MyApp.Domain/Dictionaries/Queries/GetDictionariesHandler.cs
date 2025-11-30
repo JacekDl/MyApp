@@ -32,8 +32,6 @@ namespace MyApp.Domain.Dictionaries.Queries
                 .Select(m => new { m.Code, m.Name })
                 .ToListAsync(ct);
 
-
-
             var dictionary =  new DictionaryDto
             {
                 InstructionMap  = instructions.ToDictionary(x => x.Code, x => x.Text, StringComparer.OrdinalIgnoreCase),

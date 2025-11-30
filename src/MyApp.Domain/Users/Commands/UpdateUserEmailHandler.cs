@@ -50,7 +50,7 @@ public class UpdateUserEmailHandler : IRequestHandler<UpdateUserEmailCommand, Up
         var setEmail = await _userManager.SetEmailAsync(user, newEmail);
         if (!setEmail.Succeeded)
         {
-            var message = string.Join("; ", setEmail.Errors.Select(e => $"{e.Code}: {e.Description}"));
+            var message = string.Join(";", setEmail.Errors.Select(e => $"{e.Code}: {e.Description}"));
             return new() { ErrorMessage = message };
         }
         

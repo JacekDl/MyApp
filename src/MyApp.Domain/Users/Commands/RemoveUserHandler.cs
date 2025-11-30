@@ -28,7 +28,7 @@ public class RemoveUserHandler : IRequestHandler<RemoveUserCommand, RemoveUserRe
         var result = await _userManager.DeleteAsync(user);
         if (!result.Succeeded)
         {
-            var error = string.Join("; ", result.Errors.Select(e => $"{e.Code}: {e.Description}"));
+            var error = string.Join(";", result.Errors.Select(e => $"{e.Code}: {e.Description}"));
             return new() { ErrorMessage = error };
         }
 

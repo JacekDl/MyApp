@@ -4,7 +4,8 @@ namespace MyApp.Web.ViewModels;
 
 public class ChangePasswordViewModel : ViewModelBase
 {
-    [Required, DataType(DataType.Password)]
+    [Required(ErrorMessage="Pole nie może być puste.")]
+    [DataType(DataType.Password)]
     [Display(Name = "Current password")]
     public string CurrentPassword { get; set; } = string.Empty;
 

@@ -24,7 +24,7 @@ public class ClaimReviewByPatientHandler : IRequestHandler<ClaimReviewByPatientC
         var validator = new ClaimReviewByPatientCommandValidator().Validate(request);
         if (!validator.IsValid)
         {
-            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+            return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
         }
 
         var review = await _db.Reviews.SingleOrDefaultAsync(r => r.Number == request.Number);

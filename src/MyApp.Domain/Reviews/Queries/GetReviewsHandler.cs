@@ -29,7 +29,7 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, GetReviewsResu
         var validator = new GetReviewsValidator().Validate(request);
         if (!validator.IsValid)
         {
-            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+            return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
         }
 
         string? effectiveUserId = request.CurrentUserId;

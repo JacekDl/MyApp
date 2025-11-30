@@ -30,7 +30,7 @@ public class AddConversationEntryHandler : IRequestHandler<AddConversationEntryC
 
         if (!validator.IsValid)
         {
-            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+            return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
         }
 
         var text = (request.Text ?? string.Empty).Trim();

@@ -26,7 +26,7 @@ namespace MyApp.Domain.Medicines.Commands
             var validator = new DeleteMedicineValidator().Validate(request);
             if (!validator.IsValid)
             {
-                return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
             }
 
             var entity = await _db.Set<Medicine>().FirstOrDefaultAsync(m => m.Id == request.Id, ct);

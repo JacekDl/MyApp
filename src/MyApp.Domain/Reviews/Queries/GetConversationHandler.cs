@@ -28,7 +28,7 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, GetC
         var validator = new GetConversationValidator().Validate(request);
         if (!validator.IsValid)
         {
-            return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+            return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
         }
 
         var review = await _db.Reviews

@@ -19,7 +19,7 @@ namespace MyApp.Domain.Users.Commands
             var validator = new ConfirmEmailValidator().Validate(request);
             if (!validator.IsValid)
             {
-                return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
             }
 
             var user = await userManager.FindByIdAsync(request.UserId);

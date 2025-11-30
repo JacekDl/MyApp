@@ -25,7 +25,7 @@ namespace MyApp.Domain.Instructions.Commands
             var validator = new DeleteInstructionValidator().Validate(request);
             if (!validator.IsValid)
             {
-                return new() { ErrorMessage = string.Join("; ", validator.Errors.Select(e => e.ErrorMessage)) };
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
             }
             ;
 
