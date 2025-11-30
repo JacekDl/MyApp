@@ -4,6 +4,6 @@ namespace MyApp.Web.ViewModels
 {
     public class DisplayConversationViewModel : ViewModelBase
     {
-        public ConversationDto Conversation { get; set; } = null!;
+        public ConversationDto? Conversation { get; set; } = null!;
     }
 }

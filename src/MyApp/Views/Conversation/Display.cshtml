@@ -7,7 +7,7 @@
 
 <div>
     <ul class="list-group mb-3">
-        @foreach(var entry in conversation.Entries)
+        @foreach(var entry in conversation!.Entries)
         {
             <li class="list-group-item">
                 <strong>@entry.DisplayName</strong>
@@ -18,30 +18,48 @@
     </ul>
 </div>
 
-<form asp-controller="Conversation" asp-action="Display" method="post">
-    @Html.AntiForgeryToken()
+@if (conversation.Completed)
+{
+    <div class="alert alert-secondary mt-3">
+        Ta rozmowa została zakończona.
+    </div>
+}
+else
+{
+    <form asp-controller="Conversation"
+          asp-action="Display"
+          asp-route-number=@conversation.Number
+          method="post"
+          id="sendForm">
+        @Html.AntiForgeryToken()
 
-    <input type="hidden" name="number" value="@conversation.Number" />
-    @if (!conversation.Completed)
+        <textarea name="text" class="form-control"></textarea>
+    </form>
+    @if (User.IsInRole("Pharmacist"))
     {
-        <div class="mb-3">
-            <label for="Text" class="form-label">Dodaj wiadomość</label>
-            <textarea id="Text" name="Text" class="form-control" rows="3"></textarea>
+        <div class="d-flex justify-content-center gap-2 mt-3">
+            <button type="submit"
+                    form="sendForm"
+                    class="btn btn-secondary">
+                Wyślij
+            </button>
+
+            <form asp-controller="Conversation"
+                  asp-action="CloseConversation"
+                  asp-route-number=@conversation.Number
+                  method="post"
+                  class="mb-0">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-secondary"
+                        onclick="return confirm('Czy na pewno chcesz zamknąć rozmowę?');">
+                    Zakończ
+                </button>
+            </form>
         </div>
-        <button type="submit" class="btn btn-secondary">
-            Wyślij
-        </button>
     }
-    else
-    {
-        <div class="alert alert-info mt-3">
-            Ta rozmowa została zakończona.
-        </div>
-    }
+}
 
-
-    @if (User.IsInRole("Patient"))
-    {
-        <a asp-controller="Patient" asp-action="Tokens" class="btn btn-secondary">Powrót</a>
-    }
-</form>
+@if (User.IsInRole("Patient"))
+{
+    <a asp-controller="Patient" asp-action="Tokens" class="btn btn-secondary">Powrót</a>
+}

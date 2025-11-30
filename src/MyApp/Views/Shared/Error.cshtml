@@ -1,7 +1,11 @@
-﻿@model MyApp.Web.ViewModels.ErrorViewModel
+﻿@using MyApp.Web.ViewModels.Common
+@model ErrorViewModel
 @{
     ViewData["Title"] = "Błąd";
 }
 
-<h2 class="text-danger">Wystąpił błąd podczas przetwarzania Twojego żądania</h2>
-<p>@Model.Message</p>
+<div class="d-flex flex-column justify-content-center align-items-center"
+     style="min-height: 70vh; text-align: center;">
+    <h3 class="text-secondary">Wystąpił błąd podczas przetwarzania Twojego żądania</h3>
+    <p>@Model.Message</p>
+</div>

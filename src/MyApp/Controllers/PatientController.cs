@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
 using MyApp.Web.ViewModels;
+using MyApp.Web.ViewModels.Common;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
@@ -88,14 +89,17 @@ public class PatientController : Controller
         {
             ModelState.AddModelError(nameof(vm.ReviewText), result.ErrorMessage!);
             return View(vm);
-        }   
+        }
+        
         return RedirectToAction("CompleteEdit", new { number });
     }
 
     [AllowAnonymous, HttpGet("/r/complete")]
     public IActionResult CompleteEdit()
     {
-        return View();
+        var vm = new InfoViewModel();
+        vm.Message = "Opinia została przekazana Twojemu farmaceucie.";
+        return View("Info", vm);
     }
     #endregion
 

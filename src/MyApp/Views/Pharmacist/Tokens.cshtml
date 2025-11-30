@@ -69,81 +69,11 @@ else
                                 </a>
                             </div>
                         </td>
-
-                        <td class="col-1 text-start text-md-end">
-                            <form asp-action="DeleteReview" method="post" asp-route-id="@rev.Id" class="d-inline">
-                                @Html.AntiForgeryToken()
-                                <button type="submit"
-                                        class="btn btn-sm btn-secondary w-100 w-md-auto text-nowrap"
-                                        onclick="return confirm('Czy na pewno chcesz usunąć ten wpis?');">
-                                    Usuń
-                                </button>
-                            </form>
-                        </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
-
-
-    // Old version with responsive design
-    @* <div class="container-fluid">
-        <!-- Header: visible on md+ -->
-        <div class="row fw-bold border-bottom py-2 d-none d-md-flex">
-            <div class="col-md-2 text-center">Utworzono</div>
-            <div class="col-md-7 text-center">Treść</div>
-            <div class="col-md-1 text-center">Status</div>
-            <div class="col-md-1 text-center">Ukończone</div>
-            <div class="col-md-1 text-end">Akcje</div>
-        </div>
-
-        @foreach (var rev in Model)
-        {
-            <div class="row align-items-center border-bottom py-3 g-2 @(rev.IsNewForViewer ? "bg-warning-subtle" : "")">
-                <!-- Utworzono -->
-                <div class="col-12 col-md-2">
-                    <span class="d-inline d-md-none text-muted me-2">Utworzono:</span>
-                    @rev.DateCreated.ToString("yyyy-MM-dd HH:mm")
-                </div>
-
-                <!-- Tekst -->
-                <div class="col-12 col-md-7">
-                    <span class="d-inline d-md-none text-muted me-2">Tekst:</span>
-                    <span class="text-break" style="white-space: pre-wrap;">@rev.Text</span>
-                </div>
-
-                <!-- Status -->
-                <div class="col-6 col-md-1">
-                    <span class="d-inline d-md-none text-muted me-2">Status:</span>
-                    @if (rev.IsNewForViewer)
-                    {
-                        <span class="badge bg-success">Nowe</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary">Obejrzane</span>
-                    }
-                </div>
-
-                <div class="col-6 col-md-1">
-                    <span class="d-inline d-md-none text-muted me-2">Ukończone:</span>
-                    @((rev.Completed) ? "Tak" : "Nie")
-                </div>
-
-                <div class="col-12 col-md-1 text-md-end">
-                    <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end">
-                        <a asp-action="Display"
-                           asp-controller="Conversation"
-                           asp-route-number="@rev.Number"
-                           class="btn btn-sm btn-outline-primary text-nowrap w-100 w-md-auto">
-                            Podgląd
-                        </a>
-                    </div>
-                </div>
-            </div>
-        }
-    </div> *@
 }
 
 

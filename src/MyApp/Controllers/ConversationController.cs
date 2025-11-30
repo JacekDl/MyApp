@@ -66,5 +66,14 @@ public class ConversationController : Controller
         TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Wiadomość wysłana." : result.ErrorMessage;
         return RedirectToAction(nameof(Display), new { number });
     }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CloseConversation(string number)
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var result = await _mediator.Send(new CloseConversationCommand(number, currentUserId));
+        TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Rozmowa została zamknięta." : result.ErrorMessage;
+        return RedirectToAction(nameof(Display), new { number });
+    }
     #endregion
 }
