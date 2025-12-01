@@ -18,12 +18,18 @@
     </div>
 </div>
 
-<div class="d-grid gap-2 d-md-flex">
+<div class="d-grid gap-2 d-md-flex justify-content-center">
     <a class="btn btn-secondary" asp-action="ChangeEmail">Zmień email</a>
     <a class="btn btn-secondary" asp-action="ChangePassword">Zmień hasło</a>
     <a class="btn btn-secondary" asp-action="EditProfile">Zmień dane konta</a>
     @if(!User.IsInRole("Admin"))
     {
-        <a class="btn btn-secondary" asp-action="DeleteProfile">Usuń konto</a>
+        <form asp-action="DeleteProfile" method="post">
+            <button type="submit"
+                    class="btn btn-secondary"
+                    onclick="return confirm('Czy na pewno chcesz usunąć konto?');">
+                Usuń konto
+            </button>
+        </form>
     }
 </div>

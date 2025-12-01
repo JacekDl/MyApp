@@ -11,7 +11,7 @@
         {
             <li class="list-group-item">
                 <strong>@entry.DisplayName</strong>
-                <div class="small text-muted">@entry.CreatedUtc.ToLocalTime()</div>
+                <div class="small text-muted">@entry.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</div>
                 <div>@entry.Text</div>
             </li>
         }
@@ -33,7 +33,7 @@ else
           id="sendForm">
         @Html.AntiForgeryToken()
 
-        <textarea name="text" class="form-control"></textarea>
+        <textarea name="text" class="form-control" placeholder="Wpisz wiadomość tutaj..."></textarea>
     </form>
     @if (User.IsInRole("Pharmacist"))
     {
@@ -41,7 +41,7 @@ else
             <button type="submit"
                     form="sendForm"
                     class="btn btn-secondary">
-                Wyślij
+                Dodaj wiadomość
             </button>
 
             <form asp-controller="Conversation"
@@ -51,15 +51,20 @@ else
                   class="mb-0">
                 @Html.AntiForgeryToken()
                 <button type="submit" class="btn btn-secondary"
-                        onclick="return confirm('Czy na pewno chcesz zamknąć rozmowę?');">
-                    Zakończ
+                        onclick="return confirm('Czy na pewno chcesz zakończyć rozmowę?\nPo kliknięciu OK nie będzie możliwości dodawania nowych wpisów.');">
+                    Zakończ rozmowę
                 </button>
             </form>
         </div>
     }
-}
-
-@if (User.IsInRole("Patient"))
-{
-    <a asp-controller="Patient" asp-action="Tokens" class="btn btn-secondary">Powrót</a>
+    else
+    {
+         <div class="d-flex justify-content-center gap-2 mt-3">
+            <button type="submit"
+                    form="sendForm"
+                    class="btn btn-secondary">
+                Dodaj wiadomość
+            </button>
+        </div>
+    }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Users.Commands;
 using MyApp.Domain.Users.Queries;
 using MyApp.Web.ViewModels;
+using MyApp.Web.ViewModels.Common;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -54,8 +55,11 @@ public class AccountController : Controller
 
     [AllowAnonymous]
     public IActionResult ConfirmEmailSent()
-    { 
-        return View(); 
+    {
+        var vm = new InfoViewModel();
+        vm.Message = "Na podany adres email został wysłany link potwierdzający. " +
+            "Kliknij w niego, aby aktywować konto.";
+        return View("Info", vm);
     }
 
     [AllowAnonymous]

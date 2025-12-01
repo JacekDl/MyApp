@@ -5,7 +5,9 @@
     var returnUrl = (string?)ViewData["ReturnUrl"];
 }
 
-<h2>Login</h2>
+<div class="d-flex justify-content-center gap-2 mt-3">
+    <h2>Login</h2>
+</div>
 
 <form asp-action="Login" method="post">
     @Html.AntiForgeryToken()
@@ -28,7 +30,9 @@
         <label class="form-check-label">Zapamiętaj mnie</label>
     </div>
 
-    <button type="submit" class="btn btn-secondary">Zaloguj</button>
+    <div class="d-flex justify-content-center gap-2 mt-3">
+        <button type="submit" class="btn btn-secondary">Zaloguj</button>
+    </div>
 </form>
 
 @section Scripts {

@@ -5,7 +5,9 @@
     var returnUrl = (string?)ViewData["ReturnUrl"];
 }
 
-<h2>Rejestracja</h2>
+<div class="d-flex justify-content-center gap-2 mt-3">
+    <h2>Rejestracja</h2>
+</div>
 
 <form asp-controller="Account" asp-action=@Model.PostAction asp-route-returnUrl="@(returnUrl ?? string.Empty)" method="post">
     @Html.AntiForgeryToken()
@@ -28,7 +30,9 @@
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
     </div>
 
-    <button type="Submit" class="btn btn-secondary">Utwórz konto</button>
+    <div class="d-flex justify-content-center gap-2 mt-3">
+        <button type="Submit" class="btn btn-secondary">Utwórz konto</button>
+    </div>
 </form>
 
 @section Scripts {
