@@ -7,6 +7,7 @@ using MyApp.Domain.Users.Commands;
 using MyApp.Domain.Users.Queries;
 using MyApp.Web.ViewModels;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace MyApp.Web.Controllers;
 
@@ -361,6 +362,24 @@ public class AccountController : Controller
 
         TempData["Info"] = "Hasło zostało zmienione.";
         return RedirectToAction(nameof(Details));
+    }
+    #endregion
+
+    #region DeleteAccount
+    public async Task<IActionResult> DeleteProfile()
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+        var logoutResult = await _mediator.Send(new LogoutCommand());
+        if (!logoutResult.Succeeded)
+        {
+            TempData["Error"] = "Wystąpił błąd podczas wylogowywania.";
+            return RedirectToAction(nameof(Details));
+        }
+
+        var result = await _mediator.Send(new RemoveUserCommand(currentUserId));
+        TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Konto zostało usunięte." : result.ErrorMessage;
+        return RedirectToAction("Index", "Home");
     }
     #endregion
 }

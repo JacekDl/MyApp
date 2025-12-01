@@ -1,12 +1,15 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
+using MyApp.Domain.Common;
 using MyApp.Model;
 
 namespace MyApp.Domain.Users.Commands;
 
-public record LogoutCommand : IRequest;
+public record LogoutCommand() : IRequest<LogoutResult>;
 
-public class LogoutHandler : IRequestHandler<LogoutCommand>
+public record LogoutResult : Result;
+
+public class LogoutHandler : IRequestHandler<LogoutCommand, LogoutResult>
 {
     private readonly SignInManager<User> _signInManager;
 
@@ -15,9 +18,10 @@ public class LogoutHandler : IRequestHandler<LogoutCommand>
         _signInManager = signInManager;
     }
 
-    public async Task Handle(LogoutCommand request, CancellationToken ct)
+    public async Task<LogoutResult> Handle(LogoutCommand request, CancellationToken ct)
     {
         await _signInManager.SignOutAsync();
+        return new();
     }
 
 }

@@ -22,4 +22,8 @@
     <a class="btn btn-secondary" asp-action="ChangeEmail">Zmień email</a>
     <a class="btn btn-secondary" asp-action="ChangePassword">Zmień hasło</a>
     <a class="btn btn-secondary" asp-action="EditProfile">Zmień dane konta</a>
+    @if(!User.IsInRole("Admin"))
+    {
+        <a class="btn btn-secondary" asp-action="DeleteProfile">Usuń konto</a>
+    }
 </div>
