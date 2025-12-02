@@ -37,7 +37,7 @@ else
     </form>
     @if (User.IsInRole("Pharmacist"))
     {
-        <div class="d-flex justify-content-center gap-2 mt-3">
+        <div class="d-grid d-sm-flex justify-content-sm-center gap-2 mt-3">
             <button type="submit"
                     form="sendForm"
                     class="btn btn-secondary">
@@ -50,7 +50,7 @@ else
                   method="post"
                   class="mb-0">
                 @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-secondary"
+                <button type="submit" class="btn btn-secondary w-100"
                         onclick="return confirm('Czy na pewno chcesz zakończyć rozmowę?\nPo kliknięciu OK nie będzie możliwości dodawania nowych wpisów.');">
                     Zakończ rozmowę
                 </button>
@@ -59,7 +59,7 @@ else
     }
     else
     {
-         <div class="d-flex justify-content-center gap-2 mt-3">
+        <div class="d-grid d-sm-flex justify-content-sm-center mt-3">
             <button type="submit"
                     form="sendForm"
                     class="btn btn-secondary">

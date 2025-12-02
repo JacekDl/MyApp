@@ -9,7 +9,7 @@
 
 <div class="container mt-3">
     <div class="table-responsive">
-        <table class="table align-middle">
+        <table class="table align-middle mb-3">
             <thead>
                 <tr>
                     <th scope="col" class="col-3">Kod</th>
@@ -20,15 +20,15 @@
                 @foreach (var item in medicines)
                 {
                     <tr>
-                        <td class="col-3">@item.Code</td>
-                        <td class="col-9">@item.Name</td>
+                        <td>@item.Code</td>
+                        <td class="text-break">@item.Name</td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
 
-    <div class="text-center mt-4">
+    <div class="d-grid d-sm-flex justify-content-sm-center">
         <a asp-controller="Medicine" asp-action="PrintMedicines" class="btn btn-secondary">
             Drukuj
         </a>

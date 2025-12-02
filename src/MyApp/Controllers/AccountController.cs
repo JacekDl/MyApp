@@ -67,20 +67,23 @@ public class AccountController : Controller
     {
         if (string.IsNullOrWhiteSpace(token))
         {
-            return BadRequest();
+            return BadRequest(); //TODO: zmienić
         }
 
         var result = await _mediator.Send(new ConfirmEmailCommand(userId, token));
         if (!result.Succeeded)
         {
-            return View("ConfirmEmailFailed");
+            var error = new ErrorViewModel { Message = "Nie udało się potwierdzić adresu email." };
+            return View("Error", error);
         }
 
         if(!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
         {
             return Redirect(returnUrl);
         }
-        return View("EmailConfirmed");
+
+        var info = new InfoViewModel { Message = "Potwierdziliśmy Twój adres email. Możesz teraz zalogować się na swoje konto." };
+        return View("Info", info);
     }
     #endregion
 

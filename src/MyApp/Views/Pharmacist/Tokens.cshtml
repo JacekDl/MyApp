@@ -25,7 +25,7 @@
 
 @if (!reviews.Any())
 {
-    <div class="alert alert-light">Nie dodałeś jeszcze żadnych zaleceń.</div>
+    <div class="alert alert-light">Nie znaleziono zaleceń.</div>
 }
 else
 {
@@ -36,7 +36,7 @@ else
                     <th scope="col" class="col-1 text-nowrap">Utworzono</th>
                     <th scope="col" class="col-7">Treść</th>
                     <th scope="col" class="col-1 text-nowrap">Status</th>
-                    <th scope="col" class="col-1">Ukończone</th>
+                    <th scope="col" class="col-1">Ukończono</th>
                     <th scope="col" class="col-2" colspan="2"></th>
                 </tr>
             </thead>
@@ -44,10 +44,9 @@ else
                 @foreach (var rev in reviews)
                 {
                     <tr>
-                        <td class="col-1 text-nowrap">@rev.DateCreated.ToString("yy-MM-dd")</td>
-                        <td class="col-7 text-break" style="white-space: pre-wrap;">@rev.Text</td>
+                        <td class="text-nowrap">@rev.DateCreated.ToString("yy-MM-dd")</td>
+                        <td class="text-break" style="white-space: pre-wrap;">@rev.Text</td>
                         <td>
-                            <span class="d-inline d-md-none text-muted me-2">Status:</span>
                             @if (rev.IsNewForViewer)
                             {
                                 <span class="badge bg-success">Nowe</span>
@@ -57,9 +56,9 @@ else
                                 <span class="badge bg-secondary">Obejrzane</span>
                             }
                         </td>
-                        <td class="col-1 text-nowrap">@((rev.Completed) ? "Tak" : "Nie")</td>
+                        <td class="text-nowrap">@((rev.Completed) ? "Tak" : "Nie")</td>
 
-                        <td class="col-1 text-end">
+                        <td class="text-end">
                             <div class="d-grid gap-2 d-md-inline">
                                 <a asp-action="Display"
                                    asp-controller="Conversation"
