@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
@@ -33,7 +34,16 @@ public class AdminController : Controller
         {
             foreach (var user in result.Value)
             {
-                vm.Users.Add(user);
+                var role = user.Role switch
+                {
+                    "Admin" => "Admin",
+                    "Pharmacist" => "Farmaceuta",
+                    "Patient" => "Pacjent",
+                    _ => "Nieznana rola"
+                };
+
+                var updatedUser = user with { Role = role };
+                vm.Users.Add(updatedUser);
             }
         }
         return View(vm);

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Users.Commands;
 using MyApp.Domain.Users.Queries;
+using MyApp.Model;
 using MyApp.Web.ViewModels;
 using MyApp.Web.ViewModels.Common;
 using System.Security.Claims;
@@ -15,10 +16,12 @@ namespace MyApp.Web.Controllers;
 public class AccountController : Controller
 {
     private readonly IMediator _mediator;
+    private readonly SignInManager<User> _signInManager;
 
-    public AccountController(IMediator mediator)
+    public AccountController(IMediator mediator, SignInManager<User> signInManager)
     {
         _mediator = mediator;
+        _signInManager = signInManager;
     }
 
     #region RegisterPharmacist
@@ -266,6 +269,8 @@ public class AccountController : Controller
             return View(vm);
         }
 
+        await _signInManager.RefreshSignInAsync(result.Value!);
+
         TempData["Info"] = "Dane konta zostały zmienione. ";
         return RedirectToAction(nameof(Details));
     }
@@ -366,6 +371,8 @@ public class AccountController : Controller
             ModelState.AddModelError(string.Empty, result.ErrorMessage!);
             return View(vm);
         }
+
+        await _signInManager.RefreshSignInAsync(result.Value!);
 
         TempData["Info"] = "Hasło zostało zmienione.";
         return RedirectToAction(nameof(Details));

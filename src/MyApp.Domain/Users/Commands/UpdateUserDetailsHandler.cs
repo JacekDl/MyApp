@@ -31,7 +31,11 @@ public class UpdateUserDetailsHandler : IRequestHandler<UpdateUserDetailsCommand
         {
             user.DisplayName = request.Name.Trim();
         }
-            
+        else
+        {
+            user.DisplayName = null;
+        }
+
         var update = await _userManager.UpdateAsync(user);
         if (!update.Succeeded)
         {

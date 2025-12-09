@@ -41,8 +41,12 @@
             @if (User.Identity?.IsAuthenticated ?? false)
             {
                 <div class="dropdown">
+                    @{
+                        var displayName = User.FindFirst("DisplayName")?.Value;
+                        var nameToShow = string.IsNullOrWhiteSpace(displayName) ? User.Identity?.Name : displayName;
+                    }
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Witaj @User.Identity?.Name
+                        Witaj @nameToShow!
                     </button>
                     <ul class="dropdown-menu">
                         <li class="nav-item">
