@@ -6,55 +6,51 @@
 
 <partial name="~/Views/Shared/_AdminNav.cshtml" />
 
-<div class="container mt-3">
-    <div class="table-responsive">
-        <table class="table table-sm align-middle">
-            <thead>
+<div class="table-responsive-sm">
+    <table class="table table-sm align-middle mb-0">
+        <thead>
+            <tr>
+                <th scope="col" class="col-3">Email</th>
+                <th scope="col" class="col-1">Rola</th>
+                <th scope="col" class="col-2">Utworzono</th>
+                <th scope="col" class="col-2" colspan="2"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var user in Model.Users)
+            {
                 <tr>
-                    <th scope="col" class="col-4">Id</th>
-                    <th scope="col" class="col-3">Email</th>
-                    <th scope="col" class="col-1">Rola</th>
-                    <th scope="col" class="col-2">Utworzono</th>
-                    <th scope="col" class="col-2" colspan="2"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach(var user in Model.Users)
-                {
-                    <tr>
-                        <td class="col-4">@user.Id</td>
-                        <td class="col-3">@user.Email</td>
-                        <td class="col-1">@user.Role</td>
-                        <td class="col-2">@user.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td class="col-3">@user.Email</td>
+                    <td class="col-1">@user.Role</td>
+                    <td class="col-2">@user.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
                         
-                        @if (!string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
-                        {
-                            <td class="col-1 text-end">
-                                <form asp-action="Reviews" asp-route-userId="@user.Id" style="display:inline">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-secondary">Zalecenia</button>
-                                </form>
-                            </td>
-                            <td class="col-1 text-start">
-                                <form asp-action="RemoveUser" method="post" asp-route-id="@user.Id" style="display:inline">
-                                    @Html.AntiForgeryToken()
-                                    <button 
-                                        type="submit" 
-                                        class="btn btn-sm btn-secondary"
-                                        onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?');">
-                                        Usuń
-                                    </button>
-                                </form>
-                            </td>
-                        }
-                        else
-                        {
-                            <td></td>
-                            <td></td>
-                        }
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                    @if (!string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
+                    {
+                        <td class="col-1 text-end">
+                            <form asp-action="Reviews" asp-route-userId="@user.Id" style="display:inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-secondary">Zalecenia</button>
+                            </form>
+                        </td>
+                        <td class="col-1 text-start">
+                            <form asp-action="RemoveUser" method="post" asp-route-id="@user.Id" style="display:inline">
+                                @Html.AntiForgeryToken()
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-sm btn-secondary"
+                                    onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?');">
+                                    Usuń
+                                </button>
+                            </form>
+                        </td>
+                    }
+                    else
+                    {
+                        <td></td>
+                        <td></td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
