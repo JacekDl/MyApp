@@ -7,11 +7,20 @@ namespace MyApp.Domain.Users.Commands;
 
 public record SendEmailConfirmationCommand(string UserId, string CallbackUrl) : IRequest;
 
-public class SendEmailConfirmationHandler(UserManager<User> userManager, IEmailSender email) : IRequestHandler<SendEmailConfirmationCommand>
+public class SendEmailConfirmationHandler : IRequestHandler<SendEmailConfirmationCommand>
 {
+    private readonly IEmailSender _emailService;
+    private readonly UserManager<User> _userManager;
+
+    public SendEmailConfirmationHandler(IEmailSender emailService, UserManager<User> userManager)
+    {
+        _emailService = emailService;
+        _userManager = userManager;
+    }
+
     public async Task Handle(SendEmailConfirmationCommand request, CancellationToken ct)
     {
-        var user = await userManager.FindByIdAsync(request.UserId);
+        var user = await _userManager.FindByIdAsync(request.UserId);
 
         if (user is null)
             throw new KeyNotFoundException($"User {request.UserId} not found.");
@@ -19,7 +28,7 @@ public class SendEmailConfirmationHandler(UserManager<User> userManager, IEmailS
         if (user.EmailConfirmed)
             return;
 
-        var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
         var url = $"{request.CallbackUrl}?userId={user.Id}&token={Uri.EscapeDataString(token)}";
 
@@ -29,6 +38,6 @@ public class SendEmailConfirmationHandler(UserManager<User> userManager, IEmailS
         <p>Link jest ważny przez 24 godziny.</p>
         """;
 
-        await email.SendEmailAsync(user.Email!, "Potwierdź email", body, ct);
+        await _emailService.SendEmailAsync(user.Email!, "Potwierdź email", body, ct);
     }
 }

@@ -71,6 +71,16 @@
                     Zarejestruj się
                 </a>
             </div>
+
+            <div class="text-center mt-2">
+                <span>Zapomniałeś hasła?</span>
+                <a asp-controller="Account"
+                   asp-action="ResetPassword"
+                   asp-route-returnUrl="@ViewData["ReturnUrl"]"
+                   class="ms-1">
+                    Zresetuj hasło
+                </a>
+            </div>
         </div>
     </div>
 </div>

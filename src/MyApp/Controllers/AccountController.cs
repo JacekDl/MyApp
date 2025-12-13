@@ -515,6 +515,78 @@ public class AccountController : Controller
     }
     #endregion
 
+    #region ResetPassword
+    [HttpGet, AllowAnonymous]
+    public IActionResult ResetPassword(string? returnUrl = null)
+    {
+        ViewData["ReturnUrl"] = returnUrl;
+        return View(new ResetPasswordRequestViewModel());
+    }
+
+    [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(ResetPasswordRequestViewModel vm, string? returnUrl = null)
+    {
+        ViewData["ReturnUrl"] = returnUrl;
+        if (!ModelState.IsValid)
+        {
+            return View(vm);
+        }
+        var result = await _mediator.Send(new UserExistsByEmailQuery(vm.Email));
+
+        if (result.Succeeded)
+        {
+            var callbackBase = Url.Action(nameof(ResetPasswordConfirm), "Account", null, Request.Scheme)!;
+            await _mediator.Send(new SendPasswordResetEmailCommand(vm.Email, callbackBase, returnUrl));
+        }
+
+        return View("Info", new InfoViewModel() { Message = "Jeśli konto o podanym adresie istnieje, wyślemy instrukcje resetu hasła." });
+
+    }
+
+    [HttpGet, AllowAnonymous]
+    public IActionResult ResetPasswordConfirm(string userId, string token, string? returnUrl = null)
+    {
+        if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(userId))
+        {
+            return BadRequest();
+        }
+
+        var vm = new ResetPasswordConfirmViewModel
+        {
+            UserId = userId,
+            Token = token,
+            ReturnUrl = returnUrl
+        };
+
+        return View(vm);
+    }
+
+    [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPasswordConfirm(ResetPasswordConfirmViewModel vm)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(vm);
+        }
+        var result = await _mediator.Send(new ResetUserPasswordByTokenCommand(vm.UserId, vm.Token,  vm.NewPassword));
+
+        if (!result.Succeeded)
+        {
+            ModelState.AddModelError(string.Empty, result.ErrorMessage!);
+            return View(vm);
+        }
+
+        var info = new InfoViewModel
+        {
+            Message = "Hasło zostało ustawione. Możesz teraz zalogować się na swoje konto."
+        };
+
+        return View("Info", info);
+
+    }
+
+    #endregion
+
     #region DeleteAccount
     public async Task<IActionResult> DeleteProfile()
     {
@@ -533,6 +605,7 @@ public class AccountController : Controller
     }
     #endregion
 
+    #region Helpers
     private IActionResult RedirectAfterLogin(UserDto user, string? returnUrl)
     {
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
@@ -565,4 +638,5 @@ public class AccountController : Controller
 
         return View("Error", vm);
     }
+    #endregion
 }
