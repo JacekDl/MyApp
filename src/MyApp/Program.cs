@@ -1,12 +1,9 @@
-using FluentValidation;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Abstractions;
 using MyApp.Domain.Data;
 using MyApp.Domain.Extensions;
-using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Users.Queries;
 using MyApp.Model;
 using MyApp.Web.Services;
@@ -40,6 +37,14 @@ builder.Services
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services
+    .AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+    });
 
 builder.Services.AddScoped<IUserClaimsPrincipalFactory<User>, AppClaimsPrincipalFactory>();
 

@@ -63,17 +63,27 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, GetC
                     {
                         displayName = entryUser.DisplayName;
                     }
-                    else if (entryUser.Role == "Pharmacist")
-                    {
-                        displayName = "Farmaceuta";
-                    }
-                    else if (entryUser.Role == "Patient")
-                    {
-                        displayName = "Pacjent";
-                    }
                     else
                     {
-                        displayName = "Admin";
+                        var roles = await _userManager.GetRolesAsync(entryUser);
+                        var role = roles.FirstOrDefault() ?? string.Empty;
+
+                        if (role.Equals("Pharmacist", StringComparison.OrdinalIgnoreCase))
+                        {
+                            displayName = "Farmaceuta";
+                        }
+                        else if (role.Equals("Patient", StringComparison.OrdinalIgnoreCase))
+                        {
+                            displayName = "Pacjent";
+                        }
+                        else if (role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+                        {
+                            displayName = "Admin";
+                        }
+                        else
+                        {
+                            displayName = "Użytkownik";
+                        }
                     }
                 }
             }

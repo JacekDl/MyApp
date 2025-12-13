@@ -29,12 +29,12 @@ public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, GetUserByIdR
         }
 
         var roles = await _userManager.GetRolesAsync(user);
-        var role = roles.FirstOrDefault() ?? user.Role;
+        var primaryRole = roles.FirstOrDefault() ?? string.Empty;
 
         var userDto = new UserDto(
             user.Id,
             user.Email ?? string.Empty,
-            user.Role,
+            primaryRole,
             user.DisplayName ?? string.Empty,
             user.CreatedUtc
         );

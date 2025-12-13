@@ -47,11 +47,11 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
         if (result.Succeeded)
         {
             var roles = await _userManager.GetRolesAsync(user);
-            var effectiveRole = roles.FirstOrDefault() ?? user.Role;
+            var primaryRole = roles.FirstOrDefault() ?? string.Empty;
             var userDto = new UserDto(
                 user.Id,
                 user.Email!,
-                effectiveRole,
+                primaryRole,
                 "",
                 user.CreatedUtc
             );

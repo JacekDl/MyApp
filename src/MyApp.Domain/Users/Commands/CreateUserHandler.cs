@@ -49,7 +49,6 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserRe
         {
             UserName = email,
             Email = email,
-            Role = request.Role,
             EmailConfirmed = false
         };
 
@@ -61,14 +60,18 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserRe
         }
 
         var addRole = await _userManager.AddToRoleAsync(user, role);
+        if (!addRole.Succeeded)
+        {
+            var message = string.Join(";", addRole.Errors.Select(e => $"{e.Code}: {e.Description}"));
+            return new() { ErrorMessage = message };
+        }
 
-        var userToDto = await _userManager.FindByEmailAsync(request.Email);
         var userDto = new UserDto(
-            userToDto.Id,
-            userToDto.Email ?? string.Empty,
-            userToDto.Role,
-            userToDto.DisplayName ?? string.Empty,
-            userToDto.CreatedUtc
+            user.Id,
+            user.Email ?? string.Empty,
+            role,
+            user.DisplayName ?? string.Empty,
+            user.CreatedUtc
         );
 
         return new() { Value = userDto };

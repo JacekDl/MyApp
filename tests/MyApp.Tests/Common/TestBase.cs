@@ -21,6 +21,10 @@ public class TestBase
         return new ApplicationDbContext(options);
     }
 
+    /// <summary>
+    /// Creates a UserManager mock that always returns the given user from FindByIdAsync
+    /// and treats them as Admin/non-Admin according to isAdmin.
+    /// </summary>
     protected static UserManager<User> CreateUserManager(User? user, bool isAdmin)
     {
         var storeMock = new Mock<IUserStore<User>>();
@@ -46,13 +50,26 @@ public class TestBase
             .Setup(m => m.FindByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(user);
 
+        // Simulate roles
         userManagerMock
             .Setup(m => m.IsInRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
-            .ReturnsAsync(isAdmin);
+            .ReturnsAsync((User u, string role) => isAdmin && role == "Admin");
+
+        userManagerMock
+            .Setup(m => m.GetRolesAsync(It.IsAny<User>()))
+            .ReturnsAsync(isAdmin ? new List<string> { "Admin" } : new List<string>());
+
+        userManagerMock
+            .Setup(m => m.AddToRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
+            .ReturnsAsync(IdentityResult.Success);
 
         return userManagerMock.Object;
     }
 
+    /// <summary>
+    /// Creates a UserManager mock that returns userToReturn from FindByEmailAsync.
+    /// Roles are empty by default.
+    /// </summary>
     protected static UserManager<User> CreateUserManager(User? userToReturn)
     {
         var store = new Mock<IUserStore<User>>();
@@ -75,16 +92,31 @@ public class TestBase
             .Setup(m => m.FindByEmailAsync(It.IsAny<string>()))
             .ReturnsAsync(userToReturn);
 
+        userManager
+            .Setup(m => m.GetRolesAsync(It.IsAny<User>()))
+            .ReturnsAsync(new List<string>());
+
+        userManager
+            .Setup(m => m.AddToRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
+            .ReturnsAsync(IdentityResult.Success);
+
         return userManager.Object;
     }
 
+    /// <summary>
+    /// Creates a UserManager mock that can return multiple users by Id.
+    /// For simplicity: the first user in the array is treated as Admin.
+    /// </summary>
     protected static UserManager<User> CreateUserManagerForMultipleUsers(params User[] users)
     {
         var store = new Mock<IUserStore<User>>();
 
+        var options = new Mock<IOptions<IdentityOptions>>();
+        options.Setup(o => o.Value).Returns(new IdentityOptions());
+
         var userManager = new Mock<UserManager<User>>(
             store.Object,
-            new Mock<IOptions<IdentityOptions>>().Object,
+            options.Object,
             new PasswordHasher<User>(),
             Array.Empty<IUserValidator<User>>(),
             Array.Empty<IPasswordValidator<User>>(),
@@ -96,8 +128,29 @@ public class TestBase
         userManager.Setup(m => m.FindByIdAsync(It.IsAny<string>()))
             .ReturnsAsync((string id) => users.FirstOrDefault(u => u.Id == id));
 
-        userManager.Setup(m => m.IsInRoleAsync(It.IsAny<User>(), "Admin"))
-            .ReturnsAsync((User u, string role) => u.Role == "Admin");
+        // First user in the array is considered Admin
+        userManager.Setup(m => m.IsInRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
+            .ReturnsAsync((User u, string role) =>
+            {
+                if (role != "Admin") return false;
+                if (users.Length == 0) return false;
+                return u.Id == users[0].Id;
+            });
+
+        userManager.Setup(m => m.GetRolesAsync(It.IsAny<User>()))
+            .ReturnsAsync((User u) =>
+            {
+                if (users.Length > 0 && u.Id == users[0].Id)
+                {
+                    return new List<string> { "Admin" };
+                }
+
+                return new List<string>();
+            });
+
+        userManager
+            .Setup(m => m.AddToRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
+            .ReturnsAsync(IdentityResult.Success);
 
         return userManager.Object;
     }

@@ -3,13 +3,13 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MyApp.Domain.Users;
 using MyApp.Domain.Users.Commands;
 using MyApp.Domain.Users.Queries;
 using MyApp.Model;
 using MyApp.Web.ViewModels;
 using MyApp.Web.ViewModels.Common;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace MyApp.Web.Controllers;
 
@@ -17,11 +17,16 @@ public class AccountController : Controller
 {
     private readonly IMediator _mediator;
     private readonly SignInManager<User> _signInManager;
+    private readonly UserManager<User> _userManager;
 
-    public AccountController(IMediator mediator, SignInManager<User> signInManager)
+    public AccountController(
+        IMediator mediator, 
+        SignInManager<User> signInManager,
+        UserManager<User> userManager)
     {
         _mediator = mediator;
         _signInManager = signInManager;
+        _userManager = userManager;
     }
 
     #region RegisterPharmacist
@@ -152,25 +157,113 @@ public class AccountController : Controller
         }
 
         var user = result.Value!;
-        var role = user.Role;
+        return RedirectAfterLogin(user, returnUrl);
 
-        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+    }
+    #endregion
+
+    #region ExternalLogin
+
+    [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
+    public IActionResult ExternalLogin(string provider, string? returnUrl = null)
+    {
+        var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
+        var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+
+        return Challenge(properties, provider);
+    }
+
+    [HttpGet, AllowAnonymous]
+    public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null, string? remoteError = null)
+    {
+        returnUrl ??= Url.Content("~/");
+
+        if (remoteError != null)
         {
-            return Redirect(returnUrl);
+            TempData["Error"] = "Błąd logowania zewnętrznego: " + remoteError;
+            return RedirectToAction(nameof(Login), new {returnUrl});
         }
 
-        if (role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+        var info = await _signInManager.GetExternalLoginInfoAsync();
+        if (info == null)
         {
-            return RedirectToAction("Users", "Admin");
+            TempData["Error"] = "Nie udało się pobrać informacji o logowaniu zewnętrznym.";
+            return RedirectToAction(nameof(Login), new { returnUrl });
         }
 
-        if (role.Equals("Pharmacist", StringComparison.OrdinalIgnoreCase))
+        var signInResult = await _signInManager.ExternalLoginSignInAsync(
+            info.LoginProvider,
+            info.ProviderKey,
+            isPersistent: false);
+
+        if (signInResult.Succeeded)
         {
-            return RedirectToAction("Reviews", "Pharmacist");
+            var existingUser = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+            if (existingUser != null)
+            {
+                var roles = await _userManager.GetRolesAsync(existingUser);
+                var primaryRole = roles.FirstOrDefault() ?? string.Empty;
+
+                var dto = new UserDto(
+                    existingUser.Id,
+                    existingUser.Email ?? string.Empty,
+                    primaryRole,
+                    existingUser.DisplayName ?? string.Empty,
+                    existingUser.CreatedUtc);
+                return RedirectAfterLogin(dto, returnUrl);
+            }
+
+            return RedirectToAction(nameof(Login), new { returnUrl });
         }
 
-        return RedirectToAction("Tokens", "Patient");
-        
+        var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+        var name = info.Principal.Identity?.Name;
+
+        if (string.IsNullOrEmpty(email))
+        {
+            TempData["Error"] = "Dostawca logowania nie udostępnił adresu email.";
+            return RedirectToAction(nameof(Login), new { returnUrl });
+        }
+
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            user = new User
+            {
+                UserName = email,
+                Email = email,
+                EmailConfirmed = true,
+                DisplayName = name,
+            };
+
+            var createResult = await _userManager.CreateAsync(user);
+            if (!createResult.Succeeded)
+            {
+                TempData["Error"] = "Nie udało się utworzyć konta na podstawie danych Google.";
+                return RedirectToAction(nameof(Login), new { returnUrl });
+            }
+
+            await _userManager.AddToRoleAsync(user, "Patient");
+        }
+
+        var addLoginResult = await _userManager.AddLoginAsync(user, info);
+        if (!addLoginResult.Succeeded)
+        {
+            TempData["Error"] = "Nie udało się powiązać logowania zewnętrznego z kontem.";
+            return RedirectToAction(nameof(Login), new { returnUrl });
+        }
+
+        await _signInManager.SignInAsync(user, isPersistent: false);
+        var userRoles = await _userManager.GetRolesAsync(user);
+        var userPrimaryRole = userRoles.FirstOrDefault() ?? string.Empty;
+
+        var userDto = new UserDto(
+            user.Id,
+            user.Email ?? string.Empty,
+            userPrimaryRole,
+            user.DisplayName ?? string.Empty,
+            user.CreatedUtc);
+        return RedirectAfterLogin(userDto, returnUrl);
     }
 
     #endregion
@@ -396,4 +489,37 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Home");
     }
     #endregion
+
+    private IActionResult RedirectAfterLogin(UserDto user, string? returnUrl)
+    {
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return LocalRedirect(returnUrl);
+        }
+
+        var role = user.Role ?? string.Empty;
+
+        if (role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+        {
+            return RedirectToAction("Users", "Admin");
+        }
+
+        if (role.Equals("Pharmacist", StringComparison.OrdinalIgnoreCase))
+        {
+            return RedirectToAction("Reviews", "Pharmacist");
+        }
+
+        return RedirectToAction("Tokens", "Patient");
+    }
+
+    [AllowAnonymous]
+    public IActionResult AccessDenied(string? returnUrl = null)
+    {
+        var vm = new ErrorViewModel
+        {
+            Message = "Brak uprawnień do wyświetlenia tej strony."
+        };
+
+        return View("Error", vm);
+    }
 }

@@ -22,17 +22,26 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, GetAllUsersR
     
     public async Task<GetAllUsersResult> Handle(GetAllUsersQuery request, CancellationToken ct)
     {
-        var result =  await _userManager.Users
+        var users =  await _userManager.Users
             .AsNoTracking()
             .OrderByDescending(u => u.CreatedUtc)
-            .Select(u => new UserDto(
-                u.Id,
-                u.Email ?? string.Empty,
-                u.Role,
-                u.DisplayName ?? string.Empty,
-                u.CreatedUtc))
             .ToListAsync(ct);
 
-        return new() { Value = result };
+        var list = new List<UserDto>(users.Count);
+        foreach (var user in users)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            var primaryRole = roles.FirstOrDefault() ?? string.Empty;
+
+            list.Add(new UserDto(
+                user.Id,
+                user.Email ?? string.Empty,
+                primaryRole,
+                user.DisplayName ?? string.Empty,
+                user.CreatedUtc
+            ));
+        }
+
+        return new() { Value = list };
     }
 }

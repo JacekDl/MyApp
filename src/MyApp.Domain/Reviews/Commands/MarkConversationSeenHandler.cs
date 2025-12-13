@@ -1,9 +1,11 @@
 ﻿using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
 using MyApp.Domain.Instructions.Commands;
+using MyApp.Model;
 
 namespace MyApp.Domain.Reviews.Commands;
 
@@ -14,9 +16,12 @@ public record class MarkConversationSeenResult : Result;
 public class MarkConversationSeenHandler : IRequestHandler<MarkConversationSeenCommand, MarkConversationSeenResult>
 {
     private readonly ApplicationDbContext _db;
-    public MarkConversationSeenHandler(ApplicationDbContext db)
+    private readonly UserManager<User> _userManager;
+
+    public MarkConversationSeenHandler(ApplicationDbContext db, UserManager<User> userManager)
     {
         _db = db;
+        _userManager = userManager;
     }
     public async Task<MarkConversationSeenResult> Handle(MarkConversationSeenCommand request, CancellationToken ct)
     {
@@ -34,9 +39,13 @@ public class MarkConversationSeenHandler : IRequestHandler<MarkConversationSeenC
             return new() { ErrorMessage = "Nie znaleziono zaleceń." };
         }
 
-
         var currentUser = _db.Users.SingleOrDefault(u => u.Id == request.UserId);
-        var isAdmin = currentUser!.Role == "Admin";
+        if (currentUser is null)
+        {
+             return new() { ErrorMessage = "Nie znaleziono użytkownika." };
+        }    
+
+        var isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
         var belongsToUser = review.PharmacistId == request.UserId || review.PatientId == request.UserId || isAdmin;
         if (!belongsToUser)
         {

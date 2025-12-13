@@ -42,8 +42,8 @@ public static class HostExtensions
             {
                 UserName = adminEmail,
                 Email = adminEmail,
-                Role = adminRole,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                DisplayName = "Administrator"
             };
 
             var createResult = await userManager.CreateAsync(admin, adminPassword);
