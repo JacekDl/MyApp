@@ -28,6 +28,11 @@ public class UpdateUserPasswordHandler : IRequestHandler<UpdateUserPasswordComma
             return new() { ErrorMessage = "Nie znaleziono użytkownika." };
         }
 
+        if (!await _userManager.HasPasswordAsync(user))
+        {
+            return new() { ErrorMessage = "To konto loguje się przez Google, więc nie możesz zmienić hasła." };
+        }
+
         var change = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
         if (!change.Succeeded)
         {

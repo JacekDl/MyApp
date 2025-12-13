@@ -29,6 +29,11 @@ public class UpdateUserEmailHandler : IRequestHandler<UpdateUserEmailCommand, Up
             return new() {ErrorMessage = "Nie znaleziono użytkownika."};
         }
 
+        if (!await _userManager.HasPasswordAsync(user))
+        {
+            return new() { ErrorMessage = "To konto loguje się przez Google, więc nie możesz zmienić adresu e-mail." };
+        }
+
         var emailAttr = new EmailAddressAttribute();
         if (!emailAttr.IsValid(request.Email))
         {

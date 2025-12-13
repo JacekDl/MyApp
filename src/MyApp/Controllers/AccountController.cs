@@ -10,6 +10,7 @@ using MyApp.Model;
 using MyApp.Web.ViewModels;
 using MyApp.Web.ViewModels.Common;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace MyApp.Web.Controllers;
 
@@ -80,39 +81,6 @@ public class AccountController : Controller
             : "Patient";
     }
 
-    #endregion
-
-    #region RegisterPharmacist
-    //[HttpGet, AllowAnonymous]
-    //public IActionResult Register(string? returnUrl = null)
-    //{
-    //    ViewData["ReturnUrl"] = returnUrl;
-    //    var vm = new RegisterViewModel { PostAction = nameof(Register) };
-    //    return View(vm);
-    //}
-
-    //[HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-    //public async Task<IActionResult> Register(RegisterViewModel vm)
-    //{
-    //    if (!ModelState.IsValid)
-    //    {
-    //        return View(vm);
-    //    }
-
-    //    var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password, "Pharmacist"));
-
-    //    if (!result.Succeeded)
-    //    {
-    //        ModelState.AddModelError(nameof(vm.Email), result.ErrorMessage!);
-    //        return View(vm);
-    //    }
-
-    //    var user = result.Value!;
-    //    var callbackBase = Url.Action(nameof(ConfirmEmail), "Account", null, Request.Scheme)!;
-    //    await _mediator.Send(new SendEmailConfirmationCommand(user.Id, callbackBase));
-
-    //    return RedirectToAction(nameof(ConfirmEmailSent));
-    //}
 
     [AllowAnonymous]
     public IActionResult ConfirmEmailSent()
@@ -146,45 +114,9 @@ public class AccountController : Controller
         var info = new InfoViewModel { Message = "Potwierdziliśmy Twój adres email. Możesz teraz zalogować się na swoje konto." };
         return View("Info", info);
     }
-    #endregion
+#endregion
 
-    #region RegisterPatient
-    //[HttpGet, AllowAnonymous]
-    //public IActionResult RegisterPatient(string? returnUrl = null)
-    //{
-    //    ViewData["ReturnUrl"] = returnUrl;
-    //    var vm = new RegisterViewModel { PostAction = nameof(RegisterPatient) };
-    //    return View("Register", vm);
-    //}
-
-    //[HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-    //public async Task<IActionResult> RegisterPatient(RegisterViewModel vm)
-    //{
-        
-    //    if (!ModelState.IsValid)
-    //    {
-    //        return View("Register", vm);
-    //    }
-
-    //    var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password, "Patient"));
-
-    //    if (!result.Succeeded)
-    //    {
-    //        ModelState.AddModelError(nameof(vm.Email), result.ErrorMessage!);
-    //        vm.PostAction = nameof(RegisterPatient);
-    //        return View("Register", vm);
-    //    }
-
-    //    var user = result.Value!;
-    //    var callbackBase = Url.Action(nameof(ConfirmEmail), "Account", null, Request.Scheme)!;
-    //    await _mediator.Send(new SendEmailConfirmationCommand(user.Id, callbackBase));
-
-    //    return RedirectToAction(nameof(ConfirmEmailSent));
-    //}
-
-    #endregion
-
-    #region LoginUser
+    #region Login
     [HttpGet, AllowAnonymous]
     public IActionResult Login(string? returnUrl = null)
     {
@@ -334,7 +266,7 @@ public class AccountController : Controller
 
     #endregion
 
-    #region LogoutUser
+    #region Logout
 
     [HttpGet]
     public async Task<IActionResult> Logout()
@@ -440,6 +372,16 @@ public class AccountController : Controller
     public async Task<IActionResult> ChangeEmail()
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var user = await _userManager.FindByIdAsync(currentUserId);
+
+        if (user == null)
+            return RedirectToAction(nameof(Login));
+
+        if (!await _userManager.HasPasswordAsync(user))
+        {
+            TempData["Error"] = "To konto loguje się przez Google, więc nie możesz zmienić adresu email.";
+            return RedirectToAction(nameof(Details));
+        }
 
         var result = await _mediator.Send(new GetUserByIdQuery(currentUserId));
         if (!result.Succeeded)
@@ -448,9 +390,9 @@ public class AccountController : Controller
             return View();
         }
 
-        var user = result.Value!;
+        var userDto = result.Value!;
 
-        var vm = new ChangeEmailViewModel { Email = user.Email };
+        var vm = new ChangeEmailViewModel { Email = userDto.Email };
         var role = User.FindFirstValue(ClaimTypes.Role);
         if (role == "Admin")
         {
@@ -477,6 +419,17 @@ public class AccountController : Controller
 
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
+        var user = await _userManager.FindByIdAsync(currentUserId);
+
+        if (user == null)
+            return RedirectToAction(nameof(Login));
+
+        if (!await _userManager.HasPasswordAsync(user))
+        {
+            TempData["Error"] = "To konto loguje się przez Google, więc nie możesz zmienić hasła.";
+            return RedirectToAction(nameof(Details));
+        }
+
         var result = await _mediator.Send(new UpdateUserEmailCommand(currentUserId, vm.Email, vm.CurrentPassword));
         if (!result.Succeeded)
         {
@@ -495,10 +448,23 @@ public class AccountController : Controller
 
     #region ChangeUserPassword
     [Authorize, HttpGet]
-    public IActionResult ChangePassword()
+    public async Task<IActionResult> ChangePassword()
     {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var user = await _userManager.FindByIdAsync(currentUserId);
+
+        if (user == null)
+            return RedirectToAction(nameof(Login));
+
+        if (!await _userManager.HasPasswordAsync(user))
+        {
+            TempData["Error"] = "To konto loguje się przez Google, więc nie możesz zmienić hasła.";
+            return RedirectToAction(nameof(Details));
+        }
+
         var vm = new ChangePasswordViewModel();
         var role = User.FindFirstValue(ClaimTypes.Role);
+
         if (role == "Admin")
         {
             vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Szczegóły konta|Details|Account", "Zmiana hasła||"]);
@@ -522,8 +488,19 @@ public class AccountController : Controller
             return View(vm);
         }
 
-        var CurrentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var result = await _mediator.Send(new UpdateUserPasswordCommand(CurrentUserId, vm.CurrentPassword, vm.NewPassword));
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var user = await _userManager.FindByIdAsync(currentUserId);
+
+        if (user == null)
+            return RedirectToAction(nameof(Login));
+
+        if (!await _userManager.HasPasswordAsync(user))
+        {
+            TempData["Error"] = "To konto loguje się przez Google, więc nie możesz zmienić hasła.";
+            return RedirectToAction(nameof(Details));
+        }
+
+        var result = await _mediator.Send(new UpdateUserPasswordCommand(currentUserId, vm.CurrentPassword, vm.NewPassword));
 
         if (!result.Succeeded)
         {

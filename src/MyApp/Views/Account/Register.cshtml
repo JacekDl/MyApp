@@ -22,7 +22,7 @@
                     asp-action="Register"
                     asp-route-role="Pharmacist"
                     asp-route-returnUrl="@returnUrl"
-                    class="btn @(role == "Pharmacist" ? "btn-secondary" : "btn-outline-secondary") flex-fill text-center"
+                    class="btn role-btn @(role == "Pharmacist" ? "btn-secondary" : "btn-outline-secondary") flex-fill text-center"
                     style="max-width:220px;">
                     Farmaceuta
                 </a>
@@ -31,7 +31,7 @@
                     asp-action="Register"
                     asp-route-role="Patient"
                     asp-route-returnUrl="@returnUrl"
-                    class="btn @(role=="Patient" ? "btn-secondary" : "btn-outline-secondary") flex-fill text-center"
+                    class="btn role-btn @(role=="Patient" ? "btn-secondary" : "btn-outline-secondary") flex-fill text-center"
                     style="max-width:220px;">
                     Pacjent
                 </a>

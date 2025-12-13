@@ -113,6 +113,24 @@
     border-color: #ffff66 !important;
 }
 
+[data-bs-theme="contrast"] .role-btn.btn-secondary {
+    background-color: #ffff00 !important;
+    color: #000000 !important;
+    border-color: #ffff00 !important;
+}
+
+[data-bs-theme="contrast"] .role-btn.btn-outline-secondary {
+    background-color: #000000 !important;
+    color: #ffff00 !important;
+    border-color: #ffff66 !important;
+}
+
+[data-bs-theme="contrast"] .role-btn.btn-outline-secondary:hover {
+    background-color: #222 !important;
+    color: #ffff00 !important;
+    border-color: #ffff00 !important;
+}
+
 html {
   font-size: 14px;
 }
