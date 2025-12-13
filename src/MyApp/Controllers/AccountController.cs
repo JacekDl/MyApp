@@ -218,7 +218,7 @@ public class AccountController : Controller
     #region ExternalLogin
 
     [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-    public IActionResult ExternalLogin(string provider, string? role = "Patient", string? returnUrl = null)
+    public IActionResult ExternalLogin(string provider, string? role = null, string? returnUrl = null)
     {
         var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl, role });
         var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
@@ -233,10 +233,10 @@ public class AccountController : Controller
     }
 
     [HttpGet, AllowAnonymous]
-    public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null, string? remoteError = null, string role = "Patient")
+    public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null, string? remoteError = null, string? role = null)
     {
         returnUrl ??= Url.Content("~/");
-        role = NormalizeRole(role);
+        role = string.IsNullOrWhiteSpace(role) ? null : NormalizeRole(role);
 
         if (remoteError != null)
         {
@@ -286,6 +286,12 @@ public class AccountController : Controller
         }
 
         var user = await _userManager.FindByEmailAsync(email);
+        if (user == null && string.IsNullOrWhiteSpace(role))
+        {
+            TempData["Info"] = "Wybierz rolę, aby dokończyć rejestrację przez Google.";
+            return RedirectToAction(nameof(Register), new { returnUrl });
+        }
+
         if (user == null)
         {
             user = new User
