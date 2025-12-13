@@ -12,7 +12,6 @@
 /* Apply yellow text to all common elements in contrast mode */
 [data-bs-theme="contrast"] p,
 [data-bs-theme="contrast"] span,
-[data-bs-theme="contrast"] div,
 [data-bs-theme="contrast"] th,
 [data-bs-theme="contrast"] td,
 [data-bs-theme="contrast"] h1,
@@ -31,6 +30,11 @@
 [data-bs-theme="contrast"] select {
     color: #ffff00 !important;
     background-color: transparent;
+}
+
+[data-bs-theme="contrast"] .app-panel {
+    background-color: #000 !important;
+    border-color: #ffff66 !important;
 }
 
 /* Custom yellow hamburger icon */

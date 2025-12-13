@@ -29,24 +29,36 @@ public class AccountController : Controller
         _userManager = userManager;
     }
 
-    #region RegisterPharmacist
+    #region Register
     [HttpGet, AllowAnonymous]
-    public IActionResult Register(string? returnUrl = null)
+    public IActionResult Register(string role = "Patient", string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
-        var vm = new RegisterViewModel { PostAction = nameof(Register) };
+        ViewData["Role"] = role;
+
+        var vm = new RegisterViewModel
+        {
+            PostAction = nameof(Register),
+            // if you can: add Role to VM instead of ViewData
+            // Role = role
+        };
+
         return View(vm);
     }
 
     [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(RegisterViewModel vm)
+    public async Task<IActionResult> Register(RegisterViewModel vm , string role = "Patient", string? returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
+        ViewData["Role"] = role;
+
         if (!ModelState.IsValid)
         {
             return View(vm);
         }
 
-        var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password, "Pharmacist"));
+        role = NormalizeRole(role);
+        var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password, role));
 
         if (!result.Succeeded)
         {
@@ -60,6 +72,47 @@ public class AccountController : Controller
 
         return RedirectToAction(nameof(ConfirmEmailSent));
     }
+
+    private static string NormalizeRole(string? role)
+    {
+        return role?.Equals("Pharmacist", StringComparison.OrdinalIgnoreCase) == true
+            ? "Pharmacist"
+            : "Patient";
+    }
+
+    #endregion
+
+    #region RegisterPharmacist
+    //[HttpGet, AllowAnonymous]
+    //public IActionResult Register(string? returnUrl = null)
+    //{
+    //    ViewData["ReturnUrl"] = returnUrl;
+    //    var vm = new RegisterViewModel { PostAction = nameof(Register) };
+    //    return View(vm);
+    //}
+
+    //[HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
+    //public async Task<IActionResult> Register(RegisterViewModel vm)
+    //{
+    //    if (!ModelState.IsValid)
+    //    {
+    //        return View(vm);
+    //    }
+
+    //    var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password, "Pharmacist"));
+
+    //    if (!result.Succeeded)
+    //    {
+    //        ModelState.AddModelError(nameof(vm.Email), result.ErrorMessage!);
+    //        return View(vm);
+    //    }
+
+    //    var user = result.Value!;
+    //    var callbackBase = Url.Action(nameof(ConfirmEmail), "Account", null, Request.Scheme)!;
+    //    await _mediator.Send(new SendEmailConfirmationCommand(user.Id, callbackBase));
+
+    //    return RedirectToAction(nameof(ConfirmEmailSent));
+    //}
 
     [AllowAnonymous]
     public IActionResult ConfirmEmailSent()
@@ -96,38 +149,38 @@ public class AccountController : Controller
     #endregion
 
     #region RegisterPatient
-    [HttpGet, AllowAnonymous]
-    public IActionResult RegisterPatient(string? returnUrl = null)
-    {
-        ViewData["ReturnUrl"] = returnUrl;
-        var vm = new RegisterViewModel { PostAction = nameof(RegisterPatient) };
-        return View("Register", vm);
-    }
+    //[HttpGet, AllowAnonymous]
+    //public IActionResult RegisterPatient(string? returnUrl = null)
+    //{
+    //    ViewData["ReturnUrl"] = returnUrl;
+    //    var vm = new RegisterViewModel { PostAction = nameof(RegisterPatient) };
+    //    return View("Register", vm);
+    //}
 
-    [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-    public async Task<IActionResult> RegisterPatient(RegisterViewModel vm)
-    {
+    //[HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
+    //public async Task<IActionResult> RegisterPatient(RegisterViewModel vm)
+    //{
         
-        if (!ModelState.IsValid)
-        {
-            return View("Register", vm);
-        }
+    //    if (!ModelState.IsValid)
+    //    {
+    //        return View("Register", vm);
+    //    }
 
-        var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password, "Patient"));
+    //    var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password, "Patient"));
 
-        if (!result.Succeeded)
-        {
-            ModelState.AddModelError(nameof(vm.Email), result.ErrorMessage!);
-            vm.PostAction = nameof(RegisterPatient);
-            return View("Register", vm);
-        }
+    //    if (!result.Succeeded)
+    //    {
+    //        ModelState.AddModelError(nameof(vm.Email), result.ErrorMessage!);
+    //        vm.PostAction = nameof(RegisterPatient);
+    //        return View("Register", vm);
+    //    }
 
-        var user = result.Value!;
-        var callbackBase = Url.Action(nameof(ConfirmEmail), "Account", null, Request.Scheme)!;
-        await _mediator.Send(new SendEmailConfirmationCommand(user.Id, callbackBase));
+    //    var user = result.Value!;
+    //    var callbackBase = Url.Action(nameof(ConfirmEmail), "Account", null, Request.Scheme)!;
+    //    await _mediator.Send(new SendEmailConfirmationCommand(user.Id, callbackBase));
 
-        return RedirectToAction(nameof(ConfirmEmailSent));
-    }
+    //    return RedirectToAction(nameof(ConfirmEmailSent));
+    //}
 
     #endregion
 
@@ -165,18 +218,25 @@ public class AccountController : Controller
     #region ExternalLogin
 
     [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-    public IActionResult ExternalLogin(string provider, string? returnUrl = null)
+    public IActionResult ExternalLogin(string provider, string? role = "Patient", string? returnUrl = null)
     {
-        var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
+        var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl, role });
         var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+
+        if(!string.IsNullOrEmpty(role))
+        {
+            properties.Items["role"] = role;
+
+        }
 
         return Challenge(properties, provider);
     }
 
     [HttpGet, AllowAnonymous]
-    public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null, string? remoteError = null)
+    public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null, string? remoteError = null, string role = "Patient")
     {
         returnUrl ??= Url.Content("~/");
+        role = NormalizeRole(role);
 
         if (remoteError != null)
         {
@@ -243,7 +303,7 @@ public class AccountController : Controller
                 return RedirectToAction(nameof(Login), new { returnUrl });
             }
 
-            await _userManager.AddToRoleAsync(user, "Patient");
+            await _userManager.AddToRoleAsync(user, role);
         }
 
         var addLoginResult = await _userManager.AddLoginAsync(user, info);

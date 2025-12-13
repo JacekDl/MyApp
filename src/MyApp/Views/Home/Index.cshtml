@@ -8,3 +8,22 @@
         Najlepsza aplikacja do zarządzania zdrowiem!
     </p>
 </div>
+
+
+<div class="d-flex justify-content-center gap-3 mt-4">
+    <a asp-controller="Account"
+       asp-action="Register"
+       asp-route-role="Pharmacist"
+       class="btn btn-outline-secondary flex-fill text-center"
+       style="max-width:220px;">
+        Farmaceuta
+    </a>
+
+    <a asp-controller="Account"
+       asp-action="Register"
+       asp-route-role="Patient"
+       class="btn btn-outline-secondary flex-fill text-center"
+       style="max-width:220px;">
+        Pacjent
+    </a>
+</div>

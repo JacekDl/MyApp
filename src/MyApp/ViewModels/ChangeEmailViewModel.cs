@@ -4,11 +4,12 @@ namespace MyApp.Web.ViewModels;
 
 public class ChangeEmailViewModel : ViewModelBase
 {
-    [Required, EmailAddress]
+    [Required(ErrorMessage = "Podaj adres email.")]
+    [EmailAddress(ErrorMessage = "Podaj prawidłowy adres email.")]
     [Display(Name = "New email")]
     public string Email { get; set; } = string.Empty;
 
-    [Required, DataType(DataType.Password)]
+    [Required(ErrorMessage = "Podaj hasło."), DataType(DataType.Password)]
     [Display(Name = "Current password")]
     public string CurrentPassword { get; set; } = string.Empty;
 }
