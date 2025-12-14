@@ -2,6 +2,7 @@
 using FluentValidation.TestHelper;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Reviews.Commands;
+using MyApp.Domain.Users;
 using MyApp.Model;
 using MyApp.Tests.Common;
 
@@ -79,6 +80,7 @@ namespace MyApp.Tests.Domain.Reviews
             var review = Review.Create(
                 pharmacistId: "pharm1",
                 initialTxt: "Jakieś zalecenia",
+                userRole: UserRoles.Pharmacist,
                 number: "1234567890ABCDEF"
             );
 

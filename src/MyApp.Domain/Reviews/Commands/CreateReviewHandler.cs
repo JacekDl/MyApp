@@ -35,8 +35,10 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, CreateRe
         if (user is null)
             return new() { ErrorMessage="Nie znaleziono użytkownika." };
 
+        var userRole = _userManager.GetRolesAsync(user).Result.FirstOrDefault();
+
         string number = GenerateDigits();
-        var review = Review.Create(request.UserId, request.Advice, number);
+        var review = Review.Create(request.UserId, request.Advice, number, userRole);
 
         _db.Add(review);
         await _db.SaveChangesAsync(ct);

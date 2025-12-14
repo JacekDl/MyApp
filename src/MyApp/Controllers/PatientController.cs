@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
+using MyApp.Domain.Users;
 using MyApp.Web.ViewModels;
 using MyApp.Web.ViewModels.Common;
 using System.ComponentModel.DataAnnotations;
@@ -105,14 +106,14 @@ public class PatientController : Controller
 
     #region GetReview
 
-    [Authorize(Roles = "Patient")]
+    [Authorize(Roles = UserRoles.Patient)]
     [HttpGet]
     public IActionResult GetReview()
     {
         return View(new GetReviewViewModel());
     }
 
-    [Authorize(Roles = "Patient")]
+    [Authorize(Roles = UserRoles.Patient)]
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> GetReview(GetReviewViewModel vm)
     {
@@ -144,7 +145,7 @@ public class PatientController : Controller
 
     #region ViewReviews
     [HttpGet]
-    [Authorize(Roles = "Patient")]
+    [Authorize(Roles = UserRoles.Patient)]
     public async Task<IActionResult> Tokens(string? searchTxt)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;

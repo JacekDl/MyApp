@@ -32,7 +32,7 @@ public class AccountController : Controller
 
     #region Register
     [HttpGet, AllowAnonymous]
-    public IActionResult Register(string role = "Patient", string? returnUrl = null)
+    public IActionResult Register(string role = UserRoles.Patient, string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
         ViewData["Role"] = role;
@@ -48,7 +48,7 @@ public class AccountController : Controller
     }
 
     [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(RegisterViewModel vm , string role = "Patient", string? returnUrl = null)
+    public async Task<IActionResult> Register(RegisterViewModel vm , string role = UserRoles.Patient, string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
         ViewData["Role"] = role;
@@ -76,9 +76,9 @@ public class AccountController : Controller
 
     private static string NormalizeRole(string? role)
     {
-        return role?.Equals("Pharmacist", StringComparison.OrdinalIgnoreCase) == true
-            ? "Pharmacist"
-            : "Patient";
+        return role?.Equals(UserRoles.Pharmacist, StringComparison.OrdinalIgnoreCase) == true
+            ? UserRoles.Pharmacist
+            : UserRoles.Patient;
     }
 
 
@@ -293,11 +293,11 @@ public class AccountController : Controller
 
         var vm = new DetailsViewModel();
         var role = User.FindFirstValue(ClaimTypes.Role);
-        if (role == "Admin")
+        if (role == UserRoles.Admin)
         {
             vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Szczegóły konta||"]);
         }
-        else if (role == "Pharmacist")
+        else if (role == UserRoles.Pharmacist)  
         {
             vm.Breadcrumbs.AddRange(["Start|Reviews|Pharmacist", "Szczegóły konta||"]);
         }
@@ -328,11 +328,11 @@ public class AccountController : Controller
         var vm = new EditProfileViewModel();
         vm.DisplayName = result.Value!.DisplayName;
         var role = User.FindFirstValue(ClaimTypes.Role);
-        if (role == "Admin")
+        if (role == UserRoles.Admin)
         {
             vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Szczegóły konta|Details|Account", "Zmiana imienia||"]);
         }
-        else if (role == "Pharmacist")
+        else if (role == UserRoles.Pharmacist)
         {
             vm.Breadcrumbs.AddRange(["Start|Reviews|Pharmacist", "Szczegóły konta|Details|Account", "Zmiana imienia||"]);
         }
@@ -394,11 +394,11 @@ public class AccountController : Controller
 
         var vm = new ChangeEmailViewModel { Email = userDto.Email };
         var role = User.FindFirstValue(ClaimTypes.Role);
-        if (role == "Admin")
+        if (role == UserRoles.Admin)
         {
             vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Szczegóły konta|Details|Account", "Zmiana email||"]);
         }
-        else if (role == "Pharmacist")
+        else if (role == UserRoles.Pharmacist)
         {
             vm.Breadcrumbs.AddRange(["Start|Reviews|Pharmacist", "Szczegóły konta|Details|Account", "Zmiana email||"]);
         }
@@ -465,11 +465,11 @@ public class AccountController : Controller
         var vm = new ChangePasswordViewModel();
         var role = User.FindFirstValue(ClaimTypes.Role);
 
-        if (role == "Admin")
+        if (role == UserRoles.Admin)
         {
             vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Szczegóły konta|Details|Account", "Zmiana hasła||"]);
         }
-        else if (role == "Pharmacist")
+        else if (role == UserRoles.Pharmacist)
         {
             vm.Breadcrumbs.AddRange(["Start|Reviews|Pharmacist", "Szczegóły konta|Details|Account", "Zmiana hasła||"]);
         }
@@ -615,17 +615,17 @@ public class AccountController : Controller
 
         var role = user.Role ?? string.Empty;
 
-        if (role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+        if (role.Equals(UserRoles.Admin, StringComparison.OrdinalIgnoreCase))
         {
-            return RedirectToAction("Users", "Admin");
+            return RedirectToAction("Users", UserRoles.Admin);
         }
 
-        if (role.Equals("Pharmacist", StringComparison.OrdinalIgnoreCase))
+        if (role.Equals(UserRoles.Pharmacist, StringComparison.OrdinalIgnoreCase))
         {
-            return RedirectToAction("Reviews", "Pharmacist");
+            return RedirectToAction("Reviews", UserRoles.Pharmacist);
         }
 
-        return RedirectToAction("Tokens", "Patient");
+        return RedirectToAction("Tokens", UserRoles.Patient);
     }
 
     [AllowAnonymous]

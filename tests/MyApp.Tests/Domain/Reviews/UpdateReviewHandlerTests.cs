@@ -141,6 +141,7 @@ namespace MyApp.Tests.Domain.Reviews
             var review = Review.Create(
                 pharmacistId: "pharm1",
                 initialTxt: "Początkowe zalecenia",
+                userRole: "Pharmacist",
                 number: "1234567890ABCDEF"
                 );
 
@@ -166,6 +167,7 @@ namespace MyApp.Tests.Domain.Reviews
             var review = Review.Create(
                 pharmacistId: "pharm1",
                 initialTxt: "Początkowe zalecenia",
+                userRole: "Pharmacist",
                 number: "1234567890ABCDEF");
 
             review.DateCreated = DateTime.Now.AddDays(-61);
@@ -190,6 +192,7 @@ namespace MyApp.Tests.Domain.Reviews
             var review = Review.Create(
                 pharmacistId: "pharm1",
                 initialTxt: "Początkowe zalecenia",
+                userRole: "Pharmacist",
                 number: "1234567890ABCDEF"
                 );
 

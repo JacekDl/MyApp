@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyApp.Domain.Users;
 
 namespace MyApp.Web.Controllers;
 
@@ -10,16 +11,20 @@ public class HomeController : Controller
     {
         if (User.Identity?.IsAuthenticated == true)
         {
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole(UserRoles.Admin))
             {
-                return RedirectToAction("Users", "Admin");
+                return RedirectToAction("Users", UserRoles.Admin);
             }
 
-            if (User.IsInRole("Pharmacist"))
+            if (User.IsInRole(UserRoles.Pharmacist))
             {
-                return RedirectToAction("Reviews", "Pharmacist");
+                return RedirectToAction("Reviews", UserRoles.Pharmacist);
             }
-            else return RedirectToAction("Tokens", "Patient");
+
+            if (User.IsInRole(UserRoles.Patient))
+            {
+                return RedirectToAction("Tokens", UserRoles.Patient);
+            }
         }
         return View();
     }

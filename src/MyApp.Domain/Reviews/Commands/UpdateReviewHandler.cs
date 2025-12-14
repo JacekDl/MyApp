@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
 using MyApp.Domain.Instructions.Commands;
+using MyApp.Domain.Users;
 using MyApp.Model;
 
 namespace MyApp.Domain.Reviews.Commands;
@@ -54,6 +55,7 @@ public class UpdateReviewHandler : IRequestHandler<UpdateReviewCommand, UpdateRe
             {
                 UserId = null,
                 Text = text,
+                UserRole = UserRoles.Patient,
                 ReviewId = review.Id
             });
 

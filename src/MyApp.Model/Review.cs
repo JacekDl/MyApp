@@ -22,7 +22,7 @@ public class Review
 
     public List<Entry> Entries { get; set; } = new();
   
-    public static Review Create(string pharmacistId, string initialTxt, string number)
+    public static Review Create(string pharmacistId, string initialTxt, string number, string userRole)
     {
         var review =  new Review
         {
@@ -32,7 +32,7 @@ public class Review
             DateCreated = DateTime.UtcNow,
             Completed = false
         };
-        review.Entries.Add(Entry.Create(pharmacistId, initialTxt));
+        review.Entries.Add(Entry.Create(pharmacistId, initialTxt, userRole));
         return review;
     }
 }

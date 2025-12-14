@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MyApp.Domain.Data;
+using MyApp.Domain.Users;
 using MyApp.Model;
 
 namespace MyApp.Domain.Extensions;
@@ -20,7 +21,7 @@ public static class HostExtensions
         var userManager = services.GetRequiredService<UserManager<User>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-        string[] roles = { "Admin", "Pharmacist", "Patient" };
+        string[] roles = { UserRoles.Admin, UserRoles.Pharmacist, UserRoles.Patient};
         foreach(var role in roles)
         {
             if (!await roleManager.RoleExistsAsync(role))
@@ -29,7 +30,7 @@ public static class HostExtensions
             }
         }
 
-        const string adminRole = "Admin";
+        const string adminRole = UserRoles.Admin;
         const string adminEmail = "admin@example.com";
         const string adminPassword = "Admin#12345";
 

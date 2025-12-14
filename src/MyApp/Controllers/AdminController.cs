@@ -4,13 +4,14 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
+using MyApp.Domain.Users;
 using MyApp.Domain.Users.Commands;
 using MyApp.Domain.Users.Queries;
 using MyApp.Web.ViewModels;
 
 namespace MyApp.Web.Controllers;
 
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = UserRoles.Admin)]
 public class AdminController : Controller
 {
     private readonly IMediator _mediator;
@@ -36,9 +37,9 @@ public class AdminController : Controller
             {
                 var role = user.Role switch
                 {
-                    "Admin" => "Admin",
-                    "Pharmacist" => "Farmaceuta",
-                    "Patient" => "Pacjent",
+                    UserRoles.Admin => "Admin",
+                    UserRoles.Pharmacist => "Farmaceuta",
+                    UserRoles.Patient => "Pacjent",
                     _ => "Nieznana rola"
                 };
 

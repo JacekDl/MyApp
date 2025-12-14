@@ -7,10 +7,11 @@ using MyApp.Domain.Reviews.Queries;
 using MyApp.Web.ViewModels;
 using System.Security.Claims;
 using MyApp.Domain.Dictionaries.Queries;
+using MyApp.Domain.Users;
 
 namespace MyApp.Web.Controllers;
 
-[Authorize(Roles = "Pharmacist")]
+[Authorize(Roles = UserRoles.Pharmacist)]
 public class PharmacistController : Controller
 {
     private readonly IReviewPdfService _pdfService;

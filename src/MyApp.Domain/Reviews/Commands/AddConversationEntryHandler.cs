@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
+using MyApp.Domain.Users;
 using MyApp.Model;
 
 namespace MyApp.Domain.Reviews.Commands;
@@ -49,9 +50,13 @@ public class AddConversationEntryHandler : IRequestHandler<AddConversationEntryC
             return new() { ErrorMessage = "Nie znaleziono zaleceń." };
         }
 
-
         var user = await _userManager.FindByIdAsync(request.RequestingUserId);
-        var viewerIsAdmin = user != null && await _userManager.IsInRoleAsync(user, "Admin");
+        if (user is null)
+        {
+            return new() { ErrorMessage = "Nie znaleziono użytkownika." };
+        }
+        var userRole = _userManager.GetRolesAsync(user).Result.FirstOrDefault();
+        var viewerIsAdmin = string.Compare(userRole, UserRoles.Admin , StringComparison.OrdinalIgnoreCase) == 0;
 
         var viewerIsParticipant = review.PharmacistId == request.RequestingUserId || review.PatientId == request.RequestingUserId;
 
@@ -63,6 +68,7 @@ public class AddConversationEntryHandler : IRequestHandler<AddConversationEntryC
             UserId = request.RequestingUserId,
             Text = text,
             ReviewId = review.Id,
+            UserRole = userRole ?? "Anonymous", //TODO: czy to jest potrzebne?
             CreatedUtc = DateTime.UtcNow
         });
 

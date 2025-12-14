@@ -8,6 +8,7 @@ using MyApp.Domain.Instructions.Queries;
 using MyApp.Domain.Medicines;
 using MyApp.Domain.Medicines.Commands;
 using MyApp.Domain.Medicines.Queries;
+using MyApp.Domain.Users;
 using MyApp.Web.ViewModels;
 
 namespace MyApp.Web.Controllers
@@ -40,16 +41,16 @@ namespace MyApp.Web.Controllers
                 vm.Medicines = result.Value;
             }
 
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole(UserRoles.Admin))
                 return View("~/Views/Admin/Medicines.cshtml", vm);
 
-            if (User.IsInRole("Pharmacist"))
+            if (User.IsInRole(UserRoles.Pharmacist))
                 return View("~/Views/Pharmacist/Medicines.cshtml", vm);
 
             return Forbid(); //TODO: change that
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> AddMedicine(MedicineDto item, CancellationToken ct)
         {
@@ -58,7 +59,7 @@ namespace MyApp.Web.Controllers
             return RedirectToAction(nameof(Medicines));
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteMedicine(int id)
         {
@@ -67,7 +68,7 @@ namespace MyApp.Web.Controllers
             return RedirectToAction(nameof(Medicines));
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpGet]
         public async Task<IActionResult> ModifyMedicine(int id)
         {
@@ -84,7 +85,7 @@ namespace MyApp.Web.Controllers
             return View("~/Views/Admin/ModifyMedicine.cshtml", vm);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpPost,ValidateAntiForgeryToken]
         public async Task<IActionResult> ModifyMedicine(ModifyMedicineViewModel item)
         {
@@ -98,7 +99,7 @@ namespace MyApp.Web.Controllers
             return RedirectToAction(nameof(Medicines));
         }
 
-        [Authorize(Roles = "Pharmacist")]
+        [Authorize(Roles = UserRoles.Pharmacist)]
         public async Task<IActionResult> PrintMedicines()
         {
             var result = await _mediator.Send(new GetMedicinesQuery());
@@ -127,16 +128,16 @@ namespace MyApp.Web.Controllers
                 vm.Instructions = result.Value;
             }
 
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole(UserRoles.Admin))
                 return View("~/Views/Admin/Instructions.cshtml", vm);
 
-            if (User.IsInRole("Pharmacist"))
+            if (User.IsInRole(UserRoles.Pharmacist))
                 return View("~/Views/Pharmacist/Instructions.cshtml", vm);
 
             return Forbid(); //TODO :change that
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> AddInstruction(InstructionDto item)
         {
@@ -145,7 +146,7 @@ namespace MyApp.Web.Controllers
             return RedirectToAction(nameof(Instructions));
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteInstruction(int id)
         {
@@ -154,7 +155,7 @@ namespace MyApp.Web.Controllers
             return RedirectToAction(nameof(Instructions));
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpGet]
         public async Task<IActionResult> ModifyInstruction(int id)
         {
@@ -170,7 +171,7 @@ namespace MyApp.Web.Controllers
             return View("~/Views/Admin/ModifyInstruction.cshtml", vm);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> ModifyInstruction(ModifyInstructionViewModel item)
         {
@@ -186,7 +187,7 @@ namespace MyApp.Web.Controllers
 
         }
 
-        [Authorize(Roles = "Pharmacist")]
+        [Authorize(Roles = UserRoles.Pharmacist)]
         public async Task<IActionResult> PrintInstructions()
         {
             var result = await _mediator.Send(new GetInstructionsQuery());

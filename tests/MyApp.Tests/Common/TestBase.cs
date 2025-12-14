@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using MyApp.Domain.Data;
+using MyApp.Domain.Users;
 using MyApp.Model;
 
 namespace MyApp.Tests.Common;
@@ -53,11 +54,11 @@ public class TestBase
         // Simulate roles
         userManagerMock
             .Setup(m => m.IsInRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
-            .ReturnsAsync((User u, string role) => isAdmin && role == "Admin");
+            .ReturnsAsync((User u, string role) => isAdmin && role == UserRoles.Admin);
 
         userManagerMock
             .Setup(m => m.GetRolesAsync(It.IsAny<User>()))
-            .ReturnsAsync(isAdmin ? new List<string> { "Admin" } : new List<string>());
+            .ReturnsAsync(isAdmin ? new List<string> { UserRoles.Admin } : new List<string>());
 
         userManagerMock
             .Setup(m => m.AddToRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
@@ -132,7 +133,7 @@ public class TestBase
         userManager.Setup(m => m.IsInRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
             .ReturnsAsync((User u, string role) =>
             {
-                if (role != "Admin") return false;
+                if (role != UserRoles.Admin) return false;
                 if (users.Length == 0) return false;
                 return u.Id == users[0].Id;
             });
@@ -142,7 +143,7 @@ public class TestBase
             {
                 if (users.Length > 0 && u.Id == users[0].Id)
                 {
-                    return new List<string> { "Admin" };
+                    return new List<string> { UserRoles.Admin };
                 }
 
                 return new List<string>();

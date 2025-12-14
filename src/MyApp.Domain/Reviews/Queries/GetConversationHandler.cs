@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
 using MyApp.Domain.Instructions.Commands;
+using MyApp.Domain.Users;
 using MyApp.Model;
 
 namespace MyApp.Domain.Reviews.Queries;
@@ -41,7 +42,7 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, GetC
         }
 
         var user = await _userManager.FindByIdAsync(request.RequestingUserId);
-        var viewerIsAdmin = user != null && await _userManager.IsInRoleAsync(user, "Admin");
+        var viewerIsAdmin = user != null && await _userManager.IsInRoleAsync(user, UserRoles.Admin);
 
         var viewerIsParticipant = review.PharmacistId == request.RequestingUserId || review.PatientId == request.RequestingUserId;
 
@@ -53,46 +54,24 @@ public class GetConversationHandler : IRequestHandler<GetConversationQuery, GetC
         var entries = new List<EntryDto>();
         foreach (var e in review.Entries.OrderBy(en => en.CreatedUtc))
         {
-            string displayName = "Unknown";
-            if (!string.IsNullOrEmpty(e.UserId))
+            string role = "Użytkownik";
+            if (!string.IsNullOrEmpty(e.UserRole))
             {
-                var entryUser = await _userManager.FindByIdAsync(e.UserId);
-                if (entryUser != null)
+                if (e.UserRole.Equals(UserRoles.Pharmacist, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (!string.IsNullOrEmpty(entryUser.DisplayName))
-                    {
-                        displayName = entryUser.DisplayName;
-                    }
-                    else
-                    {
-                        var roles = await _userManager.GetRolesAsync(entryUser);
-                        var role = roles.FirstOrDefault() ?? string.Empty;
-
-                        if (role.Equals("Pharmacist", StringComparison.OrdinalIgnoreCase))
-                        {
-                            displayName = "Farmaceuta";
-                        }
-                        else if (role.Equals("Patient", StringComparison.OrdinalIgnoreCase))
-                        {
-                            displayName = "Pacjent";
-                        }
-                        else if (role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
-                        {
-                            displayName = "Admin";
-                        }
-                        else
-                        {
-                            displayName = "Użytkownik";
-                        }
-                    }
+                    role = "Farmaceuta";
+                }
+                else if (e.UserRole.Equals(UserRoles.Patient, StringComparison.OrdinalIgnoreCase))
+                {
+                    role = "Pacjent";
+                }
+                else if (e.UserRole.Equals(UserRoles.Admin, StringComparison.OrdinalIgnoreCase))
+                {
+                    role = "Admin";
                 }
             }
-            else
-            {
-                displayName = "Pacjent";
-            }
 
-            entries.Add(new EntryDto(e.UserId, e.Text, e.CreatedUtc, displayName));
+            entries.Add(new EntryDto(e.UserId, e.Text, e.CreatedUtc, role));
         }
 
         var dto = new ConversationDto(

@@ -13,7 +13,7 @@ public record class CreateUserResult : Result<UserDto>;
 
 public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserResult>
 {
-    private static readonly string[] Allowed = { "Pharmacist", "Patient" };
+    private static readonly string[] Allowed = { UserRoles.Pharmacist, UserRoles.Patient };
 
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
@@ -79,7 +79,7 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserRe
 
     public class CreateUserValidator : AbstractValidator<CreateUserCommand>
     {
-        private static readonly string[] AllowedRoles = { "Pharmacist", "Patient" };
+        private static readonly string[] AllowedRoles = { UserRoles.Pharmacist, UserRoles.Patient };
 
         public CreateUserValidator()
         {

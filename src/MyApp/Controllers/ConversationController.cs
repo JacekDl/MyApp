@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
+using MyApp.Domain.Users;
 using MyApp.Web.ViewModels;
 using System.Security.Claims;
 
@@ -41,11 +42,11 @@ public class ConversationController : Controller
             vm.Conversation = result.Value;
         }
         var role = User.FindFirstValue(ClaimTypes.Role);
-        if (role == "Admin")
+        if (role == UserRoles.Admin)
         {
             vm.Breadcrumbs.AddRange(["Zalecenia|Reviews|Admin", "Rozmowa||"]);
         }
-        else if (role == "Pharmacist")
+        else if (role == UserRoles.Pharmacist)
         {
             vm.Breadcrumbs.AddRange(["Moje zalecenia|Tokens|Pharmacist", "Rozmowa||"]);
         }

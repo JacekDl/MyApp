@@ -2,6 +2,7 @@
 using FluentValidation.TestHelper;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Reviews.Queries;
+using MyApp.Domain.Users;
 using MyApp.Model;
 using MyApp.Tests.Common;
 using Xunit;
@@ -92,6 +93,7 @@ namespace MyApp.Tests.Domain.Reviews
             var review = Review.Create(
                 pharmacistId: "pharm1",
                 initialTxt: "Initial advice",
+                userRole: UserRoles.Pharmacist,
                 number: "1234567890ABCDEF");
 
             review.Completed = true;
@@ -117,6 +119,7 @@ namespace MyApp.Tests.Domain.Reviews
             var review = Review.Create(
                 pharmacistId: "pharm1",
                 initialTxt: "Initial advice",
+                userRole: UserRoles.Pharmacist,
                 number: "1234567890ABCDEF");
 
             review.DateCreated = DateTime.UtcNow.AddDays(-61);
@@ -142,6 +145,7 @@ namespace MyApp.Tests.Domain.Reviews
             var review = Review.Create(
                 pharmacistId: "pharm1",
                 initialTxt: "Initial advice",
+                userRole: UserRoles.Pharmacist,
                 number: "1234567890ABCDEF");
 
             review.Completed = false;

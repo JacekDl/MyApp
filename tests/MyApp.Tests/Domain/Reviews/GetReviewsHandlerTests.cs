@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using MyApp.Domain.Reviews.Queries;
+using MyApp.Domain.Users;
 using MyApp.Model;
 using MyApp.Tests.Common;
 using Xunit;
@@ -109,8 +110,8 @@ namespace MyApp.Tests.Domain.Reviews
             await using var db = CreateInMemoryDb();
             var userManager = CreateUserManager(null);
 
-            var r1 = Review.Create("ph1", "Paracetamol 500 mg", "NUM000000000001");
-            var r2 = Review.Create("ph1", "Ibuprofen 200 mg", "NUM000000000002");
+            var r1 = Review.Create("ph1", "Paracetamol 500 mg", "NUM000000000001", "Pharmacist");
+            var r2 = Review.Create("ph1", "Ibuprofen 200 mg", "NUM000000000002", "Pharmacist");
 
             db.Reviews.AddRange(r1, r2);
             await db.SaveChangesAsync();
@@ -136,8 +137,8 @@ namespace MyApp.Tests.Domain.Reviews
             await using var db = CreateInMemoryDb();
             var userManager = CreateUserManager(null);
 
-            var r1 = Review.Create("ph1", "First", "NUM000000000001");
-            var r2 = Review.Create("ph2", "Second", "NUM000000000002");
+            var r1 = Review.Create("ph1", "First", "NUM000000000001", UserRoles.Pharmacist);
+            var r2 = Review.Create("ph2", "Second", "NUM000000000002", UserRoles.Pharmacist);
             r2.PatientId = "user1";
 
             db.Reviews.AddRange(r1, r2);
@@ -162,10 +163,10 @@ namespace MyApp.Tests.Domain.Reviews
             await using var db = CreateInMemoryDb();
             var userManager = CreateUserManager(null);
 
-            var r1 = Review.Create("ph1", "First", "NUM000000000001");
+            var r1 = Review.Create("ph1", "First", "NUM000000000001", "Pharmacist");
             r1.Completed = false;
 
-            var r2 = Review.Create("ph1", "Second", "NUM000000000002");
+            var r2 = Review.Create("ph1", "Second", "NUM000000000002", "Pharmacist");
             r2.Completed = true;
 
             db.Reviews.AddRange(r1, r2);
@@ -193,11 +194,11 @@ namespace MyApp.Tests.Domain.Reviews
         {
             await using var db = CreateInMemoryDb();
 
-            var r1 = Review.Create("ph1", "First", "NUM000000000001");
+            var r1 = Review.Create("ph1", "First", "NUM000000000001", "Pharmacist");
             r1.PatientModified = true;   // new for pharmacist
             r1.PharmacistModified = false;
 
-            var r2 = Review.Create("ph1", "Second", "NUM000000000002");
+            var r2 = Review.Create("ph1", "Second", "NUM000000000002", "Pharmacist");
             r2.PatientModified = false;
             r2.PharmacistModified = true; // new for patient, not pharmacist
 

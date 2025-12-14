@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
-using MyApp.Domain.Instructions.Commands;
+using MyApp.Domain.Users;
 using MyApp.Model;
 
 namespace MyApp.Domain.Reviews.Commands;
@@ -45,7 +45,7 @@ public class MarkConversationSeenHandler : IRequestHandler<MarkConversationSeenC
              return new() { ErrorMessage = "Nie znaleziono użytkownika." };
         }    
 
-        var isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
+        var isAdmin = await _userManager.IsInRoleAsync(currentUser, UserRoles.Admin);
         var belongsToUser = review.PharmacistId == request.UserId || review.PatientId == request.UserId || isAdmin;
         if (!belongsToUser)
         {
