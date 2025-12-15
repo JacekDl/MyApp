@@ -3,9 +3,25 @@
 @{
     ViewData["Title"] = "Leki";
     var medicines = Model.Medicines;
+
+    var totalPages = Model.TotalPages;
+    var page = Model.Page;
+    var pageSize = Model.PageSize;
 }
 
 <partial name="~/Views/Shared/_AdminNav.cshtml" />
+
+<form method="get" class="d-flex align-items-center gap-2 mb-3">
+    <input type="hidden" name="page" value="1" />
+
+    <label class="form-label mb-0">Liczba wyników na stronie:</label>
+    <select name="pageSize" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
+        <option value="5" selected="@(Model.PageSize == 5)">5</option>
+        <option value="10" selected="@(Model.PageSize == 10)">10</option>
+        <option value="25" selected="@(Model.PageSize == 100)">25</option>
+        <option value="50" selected="@(Model.PageSize == 200)">50</option>
+    </select>
+</form>
 
 <div class="container mt-3">
     <div class="mb-3">
@@ -63,3 +79,39 @@
         </table>
     </div>
 </div>
+
+@if (totalPages > 1)
+{
+    <nav aria-label="Paginacja" class="mt-4">
+        <ul class="pagination justify-content-center">
+
+            <li class="page-item @(page <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Medicines"
+                   asp-controller="Medicine"
+                   asp-route-page="@(page - 1)"
+                   asp-route-pageSize="@pageSize">«</a>
+            </li>
+
+            @for (var p = 1; p <= totalPages; p++)
+            {
+                <li class="page-item @(p == page ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Medicines"
+                       asp-controller="Medicine"
+                       asp-route-page="@p"
+                       asp-route-pageSize="@pageSize">@p</a>
+                </li>
+            }
+
+            <li class="page-item @(page >= totalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Medicines"
+                   asp-controller="Medicine"
+                   asp-route-page="@(page + 1)"
+                   asp-route-pageSize="@pageSize">»</a>
+            </li>
+
+        </ul>
+    </nav>
+}

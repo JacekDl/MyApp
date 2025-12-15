@@ -10,4 +10,11 @@
     {
         public TValue? Value { get; init; }
     }
+
+    public record class PagedResult<TValue> : Result<TValue>
+    {
+        public int TotalCount { get; init; }
+        public int Page { get; init; }
+        public int PageSize { get; init; }
+    }
 }

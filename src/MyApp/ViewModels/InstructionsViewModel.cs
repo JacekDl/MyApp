@@ -2,7 +2,7 @@
 
 namespace MyApp.Web.ViewModels;
 
-public class InstructionsViewModel : ViewModelBase
+public class InstructionsViewModel : PagedViewModel
 {
     public IReadOnlyList<InstructionDto> Instructions { get; set; } = [];
 }

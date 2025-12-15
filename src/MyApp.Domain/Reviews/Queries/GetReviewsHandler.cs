@@ -6,13 +6,20 @@ using MyApp.Domain.Common;
 using MyApp.Domain.Data;
 using MyApp.Domain.Instructions.Commands;
 using MyApp.Model;
+using System.Collections.Immutable;
 
 namespace MyApp.Domain.Reviews.Queries;
 
-public record class GetReviewsQuery(string? SearchTxt, string? CurrentUserId, bool? Completed, string? UserEmail = null) 
-    : IRequest<GetReviewsResult>;
+public record class GetReviewsQuery(
+    string? SearchTxt, 
+    string? CurrentUserId, 
+    bool? Completed, 
+    string? UserEmail = null,
+    int Page = 1,
+    int PageSize = 10
+    ) : IRequest<GetReviewsResult>;
 
-public record class GetReviewsResult : Result<IReadOnlyList<ReviewDto>>;
+public record class GetReviewsResult : PagedResult<List<ReviewDto>>;
 
 public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, GetReviewsResult>
 {
@@ -63,7 +70,11 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, GetReviewsResu
             query = query.Where(r => r.Completed == request.Completed.Value);
         }
 
+        var totalCount = await query.CountAsync(ct);
+
         var viewerId = effectiveUserId ?? string.Empty;
+
+        var skip = (request.Page - 1) * request.PageSize;
 
         var rows = await query
             .Select(r => new
@@ -88,9 +99,11 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, GetReviewsResu
             })
             .OrderByDescending(x => x.IsNewForViewer)
             .ThenByDescending(x => x.LatestEntryUtc)
+            .Skip(skip)
+            .Take(request.PageSize)
             .ToListAsync(ct);
 
-        var result = rows
+        var items = rows
             .Select(r =>
                  new ReviewDto(
                     r.Id,
@@ -103,7 +116,13 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, GetReviewsResu
                     r.IsNewForViewer))
             .ToList();
 
-        return new() { Value = result };
+        return new()
+        {
+            Value = items,
+            TotalCount = totalCount,
+            Page = request.Page,
+            PageSize = request.PageSize
+        };
     }
 
     public class GetReviewsValidator : AbstractValidator<GetReviewsQuery>
@@ -121,6 +140,14 @@ public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, GetReviewsResu
             RuleFor(x => x.UserEmail)
                 .Must(email => string.IsNullOrWhiteSpace(email) || email.Contains("@"))
                 .WithMessage("Nieprawidłowy adres e-mail.");
+
+            RuleFor(x => x.Page)
+                .GreaterThanOrEqualTo(1)
+                .WithMessage("Page musi być >= 1.");
+
+            RuleFor(x => x.PageSize)
+                .InclusiveBetween(1, 100)
+                .WithMessage("PageSize musi być w zakresie 1..100.");
         }
     }
 }

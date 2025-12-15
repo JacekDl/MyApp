@@ -2,7 +2,7 @@
 
 namespace MyApp.Web.ViewModels;
 
-public class ReviewsViewModel : ViewModelBase
+public class ReviewsViewModel : PagedViewModel
 {
-    public IReadOnlyList<ReviewDto> Reviews { get; set; } = [];
+    public List<ReviewDto> Reviews { get; set; } = [];
 }

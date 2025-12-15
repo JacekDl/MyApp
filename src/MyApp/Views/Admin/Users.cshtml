@@ -1,8 +1,20 @@
-﻿@model MyApp.Web.ViewModels.UsersViewModel;
+﻿@model MyApp.Web.ViewModels.UsersViewModel
 
 @{
     ViewData["Title"] = "Użytkownicy";
     var users = Model.Users;
+
+    var totalPages = Model.TotalPages;
+    var page = Model.Page;
+    var pageSize = Model.PageSize;
+
+    var window = 1;
+    int Clamp(int v, int min, int max) => v < min ? min : (v > max ? max : v);
+
+    var start = Clamp(page - window, 2, Math.Max(2, totalPages - 1));
+    var end = Clamp(page + window, 2, Math.Max(2, totalPages - 1));
+
+    if (start > end) { start = end; }
 }
 
 <partial name="~/Views/Shared/_AdminNav.cshtml" />
@@ -14,6 +26,18 @@
 }
 else
 {
+    <form method="get" class="d-flex align-items-center gap-2 mb-3">
+        <input type="hidden" name="page" value="1" />
+
+        <label class="form-label mb-0">Na stronę:</label>
+        <select name="pageSize" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
+            <option value="5" selected="@(Model.PageSize == 5)">5</option>
+            <option value="10" selected="@(Model.PageSize == 10)">10</option>
+            <option value="20" selected="@(Model.PageSize == 20)">20</option>
+            <option value="50" selected="@(Model.PageSize == 50)">50</option>
+        </select>
+    </form>
+
     <div class="table-responsive-sm">
         <table class="table table-sm align-middle mb-0">
             <thead>
@@ -62,4 +86,61 @@ else
             </tbody>
         </table>
     </div>
+}
+
+@if (totalPages > 1)
+{
+    <nav aria-label="Paginacja" class="mt-4">
+        <ul class="pagination justify-content-center">
+
+            <li class="page-item @(page <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Users"
+                   asp-route-page="@(page - 1)"
+                   asp-route-pageSize="@pageSize">«</a>
+            </li>
+
+            <li class="page-item @(page == 1 ? "active" : "")">
+                <a class="page-link"
+                   asp-action="Users"
+                   asp-route-page="1"
+                   asp-route-pageSize="@pageSize">1</a>
+            </li>
+
+            @if (start > 2)
+            {
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            }
+
+            @for (var p = start; p <= end; p++)
+            {
+                <li class="page-item @(p == page ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Users"
+                       asp-route-page="@p"
+                       asp-route-pageSize="@pageSize">@p</a>
+                </li>
+            }
+
+            @if (end < totalPages - 1)
+            {
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            }
+
+            <li class="page-item @(page == totalPages ? "active" : "")">
+                <a class="page-link"
+                   asp-action="Users"
+                   asp-route-page="@totalPages"
+                   asp-route-pageSize="@pageSize">@totalPages</a>
+            </li>
+
+            <li class="page-item @(page >= totalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Users"
+                   asp-route-page="@(page + 1)"
+                   asp-route-pageSize="@pageSize">»</a>
+            </li>
+
+        </ul>
+    </nav>
 }

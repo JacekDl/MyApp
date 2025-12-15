@@ -8,9 +8,9 @@ using MyApp.Domain.Instructions.Commands;
 namespace MyApp.Domain.Medicines.Queries
 {
     
-    public record class GetMedicinesQuery : IRequest<GetMedicinesResult>;
+    public record class GetMedicinesQuery(int Page = 1, int PageSize = 10) : IRequest<GetMedicinesResult>;
 
-    public record class GetMedicinesResult : Result<IReadOnlyList<MedicineDto>>;
+    public record class GetMedicinesResult : PagedResult<List<MedicineDto>>;
 
     public class GetMedicinesQueryHandler : IRequestHandler<GetMedicinesQuery, GetMedicinesResult>
     {
@@ -24,12 +24,24 @@ namespace MyApp.Domain.Medicines.Queries
             {
                 return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
             }
-            var result =  await _db.Medicines
+
+            var page = request.Page < 1 ? 1 : request.Page;
+            var pageSize = request.PageSize is < 1 or > 100 ? 10 : request.PageSize;
+
+            var query = _db.Medicines
+                .AsNoTracking()
                 .OrderBy(m => m.Code)
+                .ThenBy(m => m.Id);
+
+            var totalCount = await query.CountAsync(ct);
+
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Select(m => new MedicineDto(m.Id, m.Code, m.Name))
                 .ToListAsync(ct);
 
-            return new() { Value = result };
+            return new() { Value = items, TotalCount = totalCount, Page = page, PageSize = pageSize };
         }
     }
 

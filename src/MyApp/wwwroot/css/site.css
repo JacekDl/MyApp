@@ -9,7 +9,6 @@
     --bs-tertiary-bg: #000000;
 }
 
-/* Apply yellow text to all common elements in contrast mode */
 [data-bs-theme="contrast"] p,
 [data-bs-theme="contrast"] span,
 [data-bs-theme="contrast"] th,
@@ -37,17 +36,14 @@
     border-color: #ffff66 !important;
 }
 
-/* Custom yellow hamburger icon */
 [data-bs-theme="contrast"] .navbar-toggler-icon {
     background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='yellow' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
 }
 
-/* Card border in contrast mode */
 [data-bs-theme="contrast"] .card {
     border-color: #ffff66 !important;
 }
 
-/* Breadcrumb divider color in contrast mode */
 [data-bs-theme="contrast"] .breadcrumb {
     --bs-breadcrumb-divider-color: #ffff00 !important;
 }
@@ -58,23 +54,20 @@
 
 [data-bs-theme="contrast"] .bg-body-tertiary {
     background-color: #000000 !important;
-}]
+}
 
-/* Keep links readable and distinguishable */
 [data-bs-theme="contrast"] a:hover,
 [data-bs-theme="contrast"] a:focus {
     color: #ffcc00 !important;
     text-decoration: underline;
 }
 
-/* Optional: force form borders to stay visible */
 [data-bs-theme="contrast"] input,
 [data-bs-theme="contrast"] textarea,
 [data-bs-theme="contrast"] select {
     border-color: #ffff66 !important;
 }
 
-/* Optional: table borders */
 [data-bs-theme="contrast"] table,
 [data-bs-theme="contrast"] th,
 [data-bs-theme="contrast"] td {
@@ -94,7 +87,6 @@
     opacity: 1;
 }
 
-/* Contrast theme: make all button borders yellow */
 [data-bs-theme="contrast"] button,
 [data-bs-theme="contrast"] .btn {
     border-color: #ffff66 !important;
@@ -131,6 +123,21 @@
     border-color: #ffff00 !important;
 }
 
+[data-bs-theme="contrast"] .pagination .page-item.disabled .page-link {
+    color: #ffff00 !important;
+    background-color: #000000 !important;
+    opacity: 1;
+    pointer-events: none;
+}
+
+[data-bs-theme="contrast"] .pagination .page-item.active .page-link {
+    color: #000000 !important;
+    background-color: #ffff00 !important;
+    border-color: #ffff66 !important;
+    font-weight: 600;
+}
+
+
 html {
   font-size: 14px;
 }
@@ -162,3 +169,4 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+

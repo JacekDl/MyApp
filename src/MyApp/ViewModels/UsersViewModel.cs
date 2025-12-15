@@ -2,7 +2,7 @@
 
 namespace MyApp.Web.ViewModels;
 
-public class UsersViewModel : ViewModelBase
+public class UsersViewModel : PagedViewModel
 {
     public List<UserDto> Users { get; set; } = [];
 }

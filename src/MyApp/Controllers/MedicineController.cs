@@ -26,9 +26,9 @@ namespace MyApp.Web.Controllers
         }
 
         #region Medicines
-        public async Task<IActionResult> Medicines()
+        public async Task<IActionResult> Medicines(int page = 1, int pageSize = 10)
         {
-            var result = await _mediator.Send(new GetMedicinesQuery());
+            var result = await _mediator.Send(new GetMedicinesQuery(page, pageSize));
             if (!result.Succeeded)
             {
                 TempData["Error"] = result.ErrorMessage;
@@ -39,6 +39,9 @@ namespace MyApp.Web.Controllers
             if (result.Value is not null)
             {
                 vm.Medicines = result.Value;
+                vm.TotalCount = result.TotalCount;
+                vm.Page = result.Page;
+                vm.PageSize = result.PageSize;
             }
 
             if (User.IsInRole(UserRoles.Admin))
@@ -102,7 +105,7 @@ namespace MyApp.Web.Controllers
         [Authorize(Roles = UserRoles.Pharmacist)]
         public async Task<IActionResult> PrintMedicines()
         {
-            var result = await _mediator.Send(new GetMedicinesQuery());
+            var result = await _mediator.Send(new GetMedicinesQuery(Page: 1, PageSize: 10000));
 
             var pdfBytes = await _pdfService.GenerateMedicinesPdf(result.Value!);
             Response.Headers.ContentDisposition = "inline; filename=medicine.pdf";
@@ -113,9 +116,9 @@ namespace MyApp.Web.Controllers
 
         #region Instructions
 
-        public async Task<IActionResult> Instructions()
+        public async Task<IActionResult> Instructions(int page = 1, int pageSize = 10)
         {
-            var result = await _mediator.Send(new GetInstructionsQuery());
+            var result = await _mediator.Send(new GetInstructionsQuery(page, pageSize));
             if (!result.Succeeded)
             {
                 TempData["Error"] = result.ErrorMessage;
@@ -126,6 +129,9 @@ namespace MyApp.Web.Controllers
             if(result.Value is not null)
             {
                 vm.Instructions = result.Value;
+                vm.TotalCount = result.TotalCount;
+                vm.Page = result.Page;
+                vm.PageSize = result.PageSize;
             }
 
             if (User.IsInRole(UserRoles.Admin))
@@ -190,7 +196,7 @@ namespace MyApp.Web.Controllers
         [Authorize(Roles = UserRoles.Pharmacist)]
         public async Task<IActionResult> PrintInstructions()
         {
-            var result = await _mediator.Send(new GetInstructionsQuery());
+            var result = await _mediator.Send(new GetInstructionsQuery(Page: 1, PageSize: 10000));
 
             var pdfBytes = await _pdfService.GenerateInstructionsPdf(result.Value!);
             Response.Headers.ContentDisposition = "inline; filename=instruction.pdf";

@@ -7,9 +7,9 @@ using MyApp.Model;
 
 namespace MyApp.Domain.Users.Queries;
 
-public record class GetAllUsersQuery() : IRequest<GetAllUsersResult>;
+public record class GetAllUsersQuery(int Page = 1, int PageSize = 10) : IRequest<GetAllUsersResult>;
 
-public record class GetAllUsersResult : Result<IReadOnlyList<UserDto>>; 
+public record class GetAllUsersResult : PagedResult<List<UserDto>>; 
 
 public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, GetAllUsersResult>
 {
@@ -22,10 +22,20 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, GetAllUsersR
     
     public async Task<GetAllUsersResult> Handle(GetAllUsersQuery request, CancellationToken ct)
     {
-        var users =  await _userManager.Users
+        var page = request.Page < 1 ? 1 : request.Page;
+        var pageSize = request.PageSize is < 1 or > 100 ? 10 : request.PageSize;
+
+        var query = _userManager.Users
             .AsNoTracking()
-            .OrderByDescending(u => u.CreatedUtc)
+            .OrderByDescending(u => u.CreatedUtc);
+
+        var totalCount = await query.CountAsync(cancellationToken: ct);
+
+        var users = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(ct);
+
 
         var list = new List<UserDto>(users.Count);
         foreach (var user in users)
@@ -42,6 +52,6 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, GetAllUsersR
             ));
         }
 
-        return new() { Value = list };
+        return new() { Value = list, TotalCount = totalCount, Page = page, PageSize = pageSize };
     }
 }

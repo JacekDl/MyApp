@@ -4,6 +4,10 @@
     ViewData["Title"] = "Twoje zalecenia";
     var searchTxt = (string?)ViewBag.Query ?? "";
     var reviews = Model.Reviews;
+
+    var totalPages = Model.TotalPages;
+    var page = Model.Page;
+    var pageSize = Model.PageSize;
 }
 
 <partial name="~/Views/Shared/_PatientNav.cshtml" />
@@ -23,6 +27,18 @@
 }
 else
 {
+    <form method="get" class="d-flex align-items-center gap-2 mb-3">
+        <input type="hidden" name="searchTxt" value="@ViewBag.Query" />
+        <input type="hidden" name="page" value="1" />
+
+        <label class="form-label mb-0">Na stronę:</label>
+        <select name="pageSize" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
+            <option value="5" selected="@(Model.PageSize == 5)">5</option>
+            <option value="10" selected="@(Model.PageSize == 10)">10</option>
+            <option value="20" selected="@(Model.PageSize == 20)">20</option>
+            <option value="50" selected="@(Model.PageSize ==    50)">50</option>
+        </select>
+    </form>
     
     <table class="table table-stripped align-middle">
         <thead>
@@ -60,6 +76,45 @@ else
             }
         </tbody>
     </table>
+}
+
+@if (totalPages > 1)
+{
+    <nav aria-label="Paginacja" class="mt-4">
+        <ul class="pagination justify-content-center">
+
+            <li class="page-item @(page <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Tokens"
+                   asp-controller="Patient"
+                   asp-route-page="@(page - 1)"
+                   asp-route-pageSize="@pageSize"
+                   asp-route-searchTxt="@ViewBag.Query">«</a>
+            </li>
+
+            @for (var p = 1; p <= totalPages; p++)
+            {
+                <li class="page-item @(p == page ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Tokens"
+                       asp-controller="Patient"
+                       asp-route-page="@p"
+                       asp-route-pageSize="@pageSize"
+                       asp-route-searchTxt="@ViewBag.Query">@p</a>
+                </li>
+            }
+
+            <li class="page-item @(page >= totalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Tokens"
+                   asp-controller="Patient"
+                   asp-route-page="@(page + 1)"
+                   asp-route-pageSize="@pageSize"
+                   asp-route-searchTxt="@ViewBag.Query">»</a>
+            </li>
+
+        </ul>
+    </nav>
 }
 
 

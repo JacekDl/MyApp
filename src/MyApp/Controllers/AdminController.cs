@@ -22,9 +22,9 @@ public class AdminController : Controller
     }
 
     #region Users
-    public async Task<IActionResult> Users()
+    public async Task<IActionResult> Users(int page = 1, int pageSize = 10)
     {
-        var result = await _mediator.Send(new GetAllUsersQuery());
+        var result = await _mediator.Send(new GetAllUsersQuery(page, pageSize));
         var vm = new UsersViewModel();
         if (!result.Succeeded)
         {
@@ -46,6 +46,10 @@ public class AdminController : Controller
                 var updatedUser = user with { Role = role };
                 vm.Users.Add(updatedUser);
             }
+
+            vm.TotalCount = result.TotalCount;
+            vm.Page = result.Page;
+            vm.PageSize = result.PageSize;
         }
         return View(vm);
     }
@@ -61,9 +65,15 @@ public class AdminController : Controller
 
     #region Reviews
 
-    public async Task<IActionResult> Reviews(string? searchTxt, string? userId, bool? completed, string? userEmail)
+    public async Task<IActionResult> Reviews(
+        string? searchTxt, 
+        string? userId, 
+        bool? completed, 
+        string? userEmail,
+        int page = 1,
+        int pageSize = 10)
     {
-        var result = await _mediator.Send(new GetReviewsQuery(searchTxt, userId, completed, userEmail));
+        var result = await _mediator.Send(new GetReviewsQuery(searchTxt, userId, completed, userEmail, page, pageSize));
 
         if (!result.Succeeded)
         {
@@ -80,6 +90,9 @@ public class AdminController : Controller
         if (result.Value is not null)
         {
             vm.Reviews = result.Value;
+            vm.TotalCount = result.TotalCount;
+            vm.Page = result.Page;
+            vm.PageSize = result.PageSize;
         }
         return View(vm);
     }

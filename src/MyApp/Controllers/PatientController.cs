@@ -146,10 +146,10 @@ public class PatientController : Controller
     #region ViewReviews
     [HttpGet]
     [Authorize(Roles = UserRoles.Patient)]
-    public async Task<IActionResult> Tokens(string? searchTxt)
+    public async Task<IActionResult> Tokens(string? searchTxt, int page = 1, int pageSize = 10)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var result = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, null));
+        var result = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, null, null, page, pageSize));
         if (!result.Succeeded)
         {
             TempData["Error"] = result.ErrorMessage;
@@ -160,6 +160,9 @@ public class PatientController : Controller
         if (result.Value is not null)
         {
             vm.Reviews = result.Value;
+            vm.TotalCount = result.TotalCount;
+            vm.Page = result.Page;
+            vm.PageSize = result.PageSize;
         }
 
         ViewBag.Query = searchTxt;
