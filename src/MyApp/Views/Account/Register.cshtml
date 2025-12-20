@@ -4,8 +4,6 @@
     ViewData["Title"] = "Rejestracja";
     var returnUrl = (string?)ViewData["ReturnUrl"] ?? string.Empty;
 
-    var role = (string?)ViewData["Role"] ?? "Patient";
-    string roleLabel = role == "Pharmacist" ? "Farmaceuta" : "Pacjent";
 }
 
 <div class="d-flex justify-content-center gap-2 mt-3">
@@ -17,30 +15,9 @@
     <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
         <div class="border rounded-3 p-4 app-panel">
 
-            <div class="d-flex justify-content-center gap-3 mb-4">
-                <a asp-controller="Account"
-                    asp-action="Register"
-                    asp-route-role="Pharmacist"
-                    asp-route-returnUrl="@returnUrl"
-                    class="btn role-btn @(role == "Pharmacist" ? "btn-secondary" : "btn-outline-secondary") flex-fill text-center"
-                    style="max-width:220px;">
-                    Farmaceuta
-                </a>
-
-                <a asp-controller="Account"
-                    asp-action="Register"
-                    asp-route-role="Patient"
-                    asp-route-returnUrl="@returnUrl"
-                    class="btn role-btn @(role=="Patient" ? "btn-secondary" : "btn-outline-secondary") flex-fill text-center"
-                    style="max-width:220px;">
-                    Pacjent
-                </a>
-            </div>
-
             <form asp-controller="Account" asp-action="Register" asp-route-returnUrl="@returnUrl" method="post">
                 @Html.AntiForgeryToken()
 
-                <input type="hidden" name="role" value="@role" />
                 <input type="hidden" name="returnUrl" value="@returnUrl" />
 
                 <div class="mb-3">
@@ -66,7 +43,11 @@
                 </div>
             </form>
 
-            <div class="d-flex justify-content-center mt-4">
+            <div class="d-flex justify-content-center mt-2">
+                <span>lub</span>
+            </div>
+
+            <div class="d-flex justify-content-center mt-2">
                 <form asp-controller="Account"
                         asp-action="ExternalLogin"
                         method="post"
@@ -75,7 +56,6 @@
                     @Html.AntiForgeryToken()
 
                     <input type="hidden" name="provider" value="Google" />
-                    <input type="hidden" name="role" value="@role" />
                     <input type="hidden" name="returnUrl" value="@returnUrl" />
 
                     <button type="submit" class="gsi-material-button w-100">
@@ -92,7 +72,7 @@
                             </div>
 
                             <span class="gsi-material-button-contents">
-                                Zarejestruj się jako @roleLabel przez Google
+                                Zarejestruj się przez Google
                             </span>
 
                             <span style="display:none;">

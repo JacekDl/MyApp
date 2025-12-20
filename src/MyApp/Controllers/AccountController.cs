@@ -32,34 +32,29 @@ public class AccountController : Controller
 
     #region Register
     [HttpGet, AllowAnonymous]
-    public IActionResult Register(string role = UserRoles.Patient, string? returnUrl = null)
+    public IActionResult Register(string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
-        ViewData["Role"] = role;
 
         var vm = new RegisterViewModel
         {
             PostAction = nameof(Register),
-            // if you can: add Role to VM instead of ViewData
-            // Role = role
         };
 
         return View(vm);
     }
 
     [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(RegisterViewModel vm , string role = UserRoles.Patient, string? returnUrl = null)
+    public async Task<IActionResult> Register(RegisterViewModel vm, string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
-        ViewData["Role"] = role;
 
         if (!ModelState.IsValid)
         {
             return View(vm);
         }
 
-        role = NormalizeRole(role);
-        var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password, role));
+        var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password, UserRoles.Patient));
 
         if (!result.Succeeded)
         {
@@ -73,14 +68,6 @@ public class AccountController : Controller
 
         return RedirectToAction(nameof(ConfirmEmailSent));
     }
-
-    private static string NormalizeRole(string? role)
-    {
-        return role?.Equals(UserRoles.Pharmacist, StringComparison.OrdinalIgnoreCase) == true
-            ? UserRoles.Pharmacist
-            : UserRoles.Patient;
-    }
-
 
     [AllowAnonymous]
     public IActionResult ConfirmEmailSent()
@@ -150,25 +137,18 @@ public class AccountController : Controller
     #region ExternalLogin
 
     [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-    public IActionResult ExternalLogin(string provider, string? role = null, string? returnUrl = null)
+    public IActionResult ExternalLogin(string provider, string? returnUrl = null)
     {
-        var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl, role });
+        var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
         var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
-
-        if(!string.IsNullOrEmpty(role))
-        {
-            properties.Items["role"] = role;
-
-        }
 
         return Challenge(properties, provider);
     }
 
     [HttpGet, AllowAnonymous]
-    public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null, string? remoteError = null, string? role = null)
+    public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null, string? remoteError = null)
     {
         returnUrl ??= Url.Content("~/");
-        role = string.IsNullOrWhiteSpace(role) ? null : NormalizeRole(role);
 
         if (remoteError != null)
         {
@@ -218,11 +198,6 @@ public class AccountController : Controller
         }
 
         var user = await _userManager.FindByEmailAsync(email);
-        if (user == null && string.IsNullOrWhiteSpace(role))
-        {
-            TempData["Info"] = "Wybierz rolę, aby dokończyć rejestrację przez Google.";
-            return RedirectToAction(nameof(Register), new { returnUrl });
-        }
 
         if (user == null)
         {
@@ -241,7 +216,7 @@ public class AccountController : Controller
                 return RedirectToAction(nameof(Login), new { returnUrl });
             }
 
-            await _userManager.AddToRoleAsync(user, role);
+            await _userManager.AddToRoleAsync(user, UserRoles.Patient);
         }
 
         var addLoginResult = await _userManager.AddLoginAsync(user, info);
