@@ -125,5 +125,27 @@ public class AdminController : Controller
 
         return View(vm);
     }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ApprovePromotion(int requestId)
+    {
+        var result = await _mediator.Send(new ApprovePharmacistPromotionCommand(requestId));
+
+        TempData[result.Succeeded ? "Info" : "Error"] =
+            result.Succeeded ? "Zgłoszenie zatwierdzone. Użytkownik otrzymał rolę Farmaceuta." : result.ErrorMessage;
+
+        return RedirectToAction(nameof(Promotions));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> RejectPromotion(int requestId)
+    {
+        var result = await _mediator.Send(new RejectPharmacistPromotionCommand(requestId));
+
+        TempData[result.Succeeded ? "Info" : "Error"] =
+            result.Succeeded ? "Zgłoszenie zostało odrzucone." : result.ErrorMessage;
+
+        return RedirectToAction(nameof(Promotions));
+    }
     #endregion
 }

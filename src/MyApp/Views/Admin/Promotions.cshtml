@@ -51,8 +51,27 @@ else
                         </td>
 
                         <td class="text-end">
-                            @* Next step: Approve / Reject buttons *@
-                            <span class="text-muted small">wkrótce</span>
+                            <div class="d-inline-flex gap-2">
+                                <form asp-action="ApprovePromotion" asp-controller="Admin" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="requestId" value="@r.Id" />
+                                    <button type="submit"
+                                            class="btn btn-secondary"
+                                            onclick="return confirm('Zatwierdzić i nadać rolę Farmaceuta?');">
+                                        Zatwierdź
+                                    </button>
+                                </form>
+
+                                <form asp-action="RejectPromotion" asp-controller="Admin" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="requestId" value="@r.Id" />
+                                    <button type="submit"
+                                            class="btn btn-secondary"
+                                            onclick="return confirm('Anulować (odrzucić) zgłoszenie?');">
+                                        Odrzuć
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }
