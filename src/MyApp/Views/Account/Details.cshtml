@@ -23,6 +23,10 @@
     <a class="btn btn-secondary" asp-action="ChangeEmail">Zmień email</a>
     <a class="btn btn-secondary" asp-action="ChangePassword">Zmień hasło</a>
     <a class="btn btn-secondary" asp-action="EditProfile">Zmień dane konta</a>
+    @if(!User.IsInRole("Admin") && (!User.IsInRole("Pharmacist")))
+    {
+        <a class="btn btn-secondary" asp-action="PromoteToPharmacist">Zarejestruj jako Farmaceuta.</a>
+    }
     @if(!User.IsInRole("Admin"))
     {
         <form asp-action="DeleteProfile" method="post">

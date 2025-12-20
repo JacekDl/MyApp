@@ -1,0 +1,47 @@
+﻿@model MyApp.Web.ViewModels.PromoteToPharmacistViewModel
+@{
+    ViewData["Title"] = "Login";
+    var returnUrl = (string?)ViewData["ReturnUrl"];
+}
+
+<div class="d-flex justify-content-center gap-2 mt-3">
+    <h2>Zarejestruj się jako Farmaceuta</h2>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+        <div class="border rounded-3 p-4 app-panel">
+
+            <form asp-action="PromoteToPharmacist" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+                <div class="mb-3">
+                    <label asp-for="FirstName" class="form-label"></label>
+                    <input asp-for="FirstName" class="form-control" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="LastName" class="form-label"></label>
+                    <input asp-for="LastName" class="form-control" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="NumerPWZF" class="form-label"></label>
+                    <input asp-for="NumerPWZF" class="form-control" />
+                    <span asp-validation-for="NumerPWZF" class="text-danger"></span>
+                </div>
+
+                <div class="d-grid d-sm-flex justify-content-sm-center">
+                    <button type="submit" class="btn btn-secondary">Wyślij do weryfikacji</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

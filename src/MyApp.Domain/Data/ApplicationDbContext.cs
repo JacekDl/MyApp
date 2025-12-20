@@ -14,6 +14,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Entry> Entries => Set<Entry>();
     public DbSet<Instruction> Instructions => Set<Instruction>();
     public DbSet<Medicine> Medicines => Set<Medicine>();
+    public DbSet<PharmacistPromotionRequest> PharmacistPromotionRequests => Set<PharmacistPromotionRequest>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -66,6 +67,13 @@ public class ApplicationDbContext : IdentityDbContext<User>
             e.Property(x => x.Code).HasMaxLength(32).IsRequired();
             e.Property(x => x.Name).HasMaxLength(128).IsRequired();
             e.HasIndex(x => x.Code).IsUnique();
+        });
+
+        modelBuilder.Entity<PharmacistPromotionRequest>(e =>
+        {
+            e.Property(x => x.NumerPWZF)
+                .HasMaxLength(8)
+                .IsRequired();
         });
     }
 }

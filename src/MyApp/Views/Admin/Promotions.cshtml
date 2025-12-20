@@ -1,0 +1,62 @@
+﻿@model MyApp.Web.ViewModels.PromotionsViewModel
+
+@{
+    ViewData["Title"] = "Zgłoszenia promocji";
+}
+
+
+<partial name="~/Views/Shared/_AdminNav.cshtml" />
+
+<h2 class="mb-3">Zgłoszenia do roli Farmaceuta</h2>
+
+@if (Model.Requests is null || Model.Requests.Count == 0)
+{
+    <div class="alert alert-light">
+        Brak zgłoszeń oczekujących.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Użytkownik</th>
+                    <th>Imię</th>
+                    <th>Nazwisko</th>
+                    <th>PWZF</th>
+                    <th>Status</th>
+                    
+                    <th class="text-end">Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.Requests)
+                {
+                    <tr>
+                        <td>@r.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="text-break">
+                            <div class="fw-semibold">
+                                @(string.IsNullOrWhiteSpace(r.DisplayName) ? r.Email : r.DisplayName)
+                            </div>
+                        </td>
+
+                        <td>@r.FirstName</td>
+                        <td>@r.LastName</td>
+                        <td>@r.NumerPWZF</td>
+
+                        <td>
+                            <span class="badge bg-warning text-dark">@r.Status</span>
+                        </td>
+
+                        <td class="text-end">
+                            @* Next step: Approve / Reject buttons *@
+                            <span class="text-muted small">wkrótce</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

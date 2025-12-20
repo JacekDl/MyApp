@@ -105,4 +105,25 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Reviews));
     }
     #endregion
+
+    #region Promotions
+    public async Task<IActionResult> Promotions()
+    {
+        var result = await _mediator.Send(new GetPendingPromotionsQuery());
+        var vm = new PromotionsViewModel();
+
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = result.ErrorMessage;
+            return View(vm);
+        }
+
+        if (result.Value is not null)
+        {
+            vm.Requests = result.Value;
+        }
+
+        return View(vm);
+    }
+    #endregion
 }

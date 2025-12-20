@@ -580,6 +580,49 @@ public class AccountController : Controller
     }
     #endregion
 
+    #region RequestPharmacistPromotion
+    [Authorize(Roles = UserRoles.Patient)] 
+    [HttpGet]
+    public IActionResult PromoteToPharmacist()
+    {
+        return View();
+    }
+
+    [Authorize(Roles = UserRoles.Patient)]
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> PromoteToPharmacist(PromoteToPharmacistViewModel vm, string? returnUrl = null)
+    {
+        ViewData["ReturnUrl"] = returnUrl;
+
+        if (!ModelState.IsValid)
+            return View(vm);
+
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+        var result = await _mediator.Send(new RequestPharmacistPromotionCommand(
+            UserId: currentUserId,
+            FirstName: vm.FirstName,
+            LastName: vm.LastName,
+            NumerPWZF: vm.NumerPWZF
+        ));
+
+        if (!result.Succeeded)
+        {
+            ModelState.AddModelError(string.Empty, result.ErrorMessage ?? "Nie udało się wysłać prośby do weryfikacji.");
+            return View(vm);
+        }
+
+        TempData["Info"] = "Dziękujemy. Twoje zgłoszenie zostało zapisane i wysłane do weryfikacji.";
+
+        // UX choice: go back to Details or to returnUrl if it’s local
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            return LocalRedirect(returnUrl);
+
+        return RedirectToAction(nameof(Details));
+    }
+
+    #endregion
+
     #region Helpers
     private IActionResult RedirectAfterLogin(UserDto user, string? returnUrl)
     {

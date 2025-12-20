@@ -221,7 +221,7 @@
 
                 hidden.value = adv ? (text ? `${text}\n${adv}` : adv) : text;
                 addBtn.disabled = pairs.length >= maxPairs;
-                addGenBtn.disabled = genAdvice >= maxAdvice;
+                addGenBtn.disabled = genAdvice.length >= maxAdvice;
             }
 
             function addPair() 
