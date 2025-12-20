@@ -18,7 +18,7 @@ public class HomeController : Controller
 
             if (User.IsInRole(UserRoles.Pharmacist))
             {
-                return RedirectToAction("Reviews", UserRoles.Pharmacist);
+                return RedirectToAction("Tokens", UserRoles.Pharmacist);
             }
 
             if (User.IsInRole(UserRoles.Patient))

@@ -622,7 +622,7 @@ public class AccountController : Controller
 
         if (role.Equals(UserRoles.Pharmacist, StringComparison.OrdinalIgnoreCase))
         {
-            return RedirectToAction("Reviews", UserRoles.Pharmacist);
+            return RedirectToAction("Tokens", UserRoles.Pharmacist);
         }
 
         return RedirectToAction("Tokens", UserRoles.Patient);

@@ -3,16 +3,21 @@
 }
 
 <ul class="nav nav-tabs mb-4">
-    <li class="nav-item">
-        <a class="nav-link @(current == "Reviews" ? "active" : "")" asp-controller="Pharmacist" asp-action="Reviews">Utwórz nowe</a>
-    </li>
-    <li class="nav-item">
+    @* <li class="nav-item dropdown">
         <a class="nav-link @(current == "Tokens" ? "active" : "")" asp-controller="Pharmacist" asp-action="Tokens">Zalecenia</a>
+    </li> *@
+    <li class="nav-item dropdown">
+        <a class="nav-link @((current == "Tokens") || (current == "Reviews") ? "active" : "")" dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Zalecenia</a>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" asp-controller="Pharmacist" asp-action="Tokens">Udzielone</a></li>
+            <li><a class="dropdown-item" asp-controller="Pharmacist" asp-action="Reviews">Utwórz nowe</a></li>
+        </ul>
     </li>
-    <li class="nav-item">
-        <a class="nav-link @(current == "Medicines" ? "active" : "")" asp-controller="Medicine" asp-action="Medicines">Leki</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link @(current == "Instructions" ? "active" : "")" asp-controller="Medicine" asp-action="Instructions">Dawkowanie</a>
+    <li class="nav-item dropdown">
+        <a class="nav-link @((current == "Medicines") || (current == "Instructions") ? "active" : "")"  dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Słowniki</a>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" asp-controller="Medicine" asp-action="Medicines">Leki</a></li>
+            <li><a class="dropdown-item" asp-controller="Medicine" asp-action="Instructions">Dawkowanie</a></li>
+        </ul>
     </li>
 </ul>

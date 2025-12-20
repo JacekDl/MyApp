@@ -27,6 +27,11 @@
 
 </div>
 
+<div class="d-grid d-sm-flex justify-content-sm-center">
+    <a asp-controller="Pharmacist" asp-action="Reviews" class="btn btn-secondary">
+        Utwórz nowe zalecenia dla pacjenta
+    </a>
+</div>
 
 
 @if (!reviews.Any())
@@ -49,7 +54,7 @@ else
     </form>
 
     <div class="table-responsive-sm">
-        <table class="table table-sm align-middle mb-0">
+        <table class="table table-sm align-middle mb-3">
             <thead>
                 <tr>
                     <th scope="col" class="col-1 text-nowrap">Utworzono</th>
@@ -132,5 +137,7 @@ else
         </ul>
     </nav>
 }
+
+
 
 

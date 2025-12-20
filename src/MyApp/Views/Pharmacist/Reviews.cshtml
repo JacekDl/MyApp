@@ -15,36 +15,50 @@
     <div class="container py-3">
         <div class="row g-3 align-items-end">
             <div class="col-md-4">
-                <label for="medicineName" class="form-label">Nazwa leku</label>
-                <input type="text" id="medicineName" class="form-control" />
+                <label for="medicineName" class="form-label">Lek</label>
+                <input type="text" id="medicineName" class="form-control" placeholder="Wpisz nazwę leku"/>
             </div>
             <div class="col-md-6">
                 <label for="medicineAdvice" class="form-label">Dawkowanie</label>
-                <input type="text" id="medicineAdvice" class="form-control" />
+                <input type="text" id="medicineAdvice" class="form-control" placeholder="Wpisz dawkowanie"/>
             </div>
             <div class="col-md-2 d-grid">
-                <button type="button" id="addMedAdviceBtn" class="btn btn-secondary">Dodaj</button>
+                <button type="button" id="addMedAdviceBtn" class="btn btn-secondary">Dodaj do wydruku</button>
             </div>
         </div>
 
         <div class="row g-3 align-items-end">
             <div class="col-md-10">
                 <label for="generalAdvice" class="form-label">Zalecenia</label>
-                <input type="text" id="generalAdvice" class="form-control" />
+                <input type="text" id="generalAdvice" class="form-control" placeholder="Wpisz ogólne zalecenia"/>
             </div>
             <div class="col-md-2 d-grid">
-                <button type="button" id="addGenAdviceBtn" class="btn btn-secondary">Dodaj</button>
+                <button type="button" id="addGenAdviceBtn" class="btn btn-secondary">Dodaj do wydruku</button>
             </div>
         </div>
 
-        <div id="medAdviceList" class="mt-4"></div>
+        <div>
+            <div class="d-flex justify-content-center gap-2 mt-3">
+                <h3>Dodane do wydruku</h3>
+            </div>
+            <div id="medicineHeader" 
+                class="d-flex justify-content-center gap-2 mt-3 d-none">
+                <p>Leki i dawkowanie</p>
+            </div>
+            <div id="medicineList" class="mt-4"></div>
+            <div id="adviceHeader" 
+                class="d-flex justify-content-center gap-2 mt-3 d-none">
+                <p>Zalecenia ogólne</p>
+            </div>
+            <div id="adviceList" class="mt-4"></div>
+        </div>
 
         <input type="hidden" id="medAdviceHidden" name="Advice" value="" />
     </div>
 
     <div class="text-center mt-3">
         <button type="submit" class="btn btn-secondary me-2">Utwórz PDF</button>
-        <button type="button" class="btn btn-secondary" id="clearBtn">Skasuj wszystkie</button>
+        <button type="button" class="btn btn-secondary" id="clearBtn">Usuń wszystkie</button>
         <p class="text-muted mt-2">
             PDF z zaleceniami otworzy się w nowej karcie.
         </p>
@@ -61,6 +75,7 @@
             const meds  = (medicineMap && Object.keys(medicineMap).length) ? medicineMap : {};
 
             const maxPairs = 10;
+            const maxAdvice = 5;
             const nameInput = document.getElementById('medicineName');
             const adviceInput = document.getElementById('medicineAdvice');
             const genAdviceInput = document.getElementById('generalAdvice');
@@ -68,12 +83,16 @@
             const addBtn = document.getElementById('addMedAdviceBtn');
             const addGenBtn = document.getElementById('addGenAdviceBtn');
 
-            const list = document.getElementById('medAdviceList');
+            const medicineList = document.getElementById('medicineList');
+            const adviceList = document.getElementById('adviceList');
             const hidden = document.getElementById('medAdviceHidden');
             const clearBtn = document.getElementById('clearBtn');
 
+            const medicineHeader = document.getElementById('medicineHeader');
+            const adviceHeader = document.getElementById('adviceHeader');
+
             let pairs = [];
-            let genAdvice = "";
+            let genAdvice = [];
 
             function expandInstruction(text) 
             {
@@ -91,7 +110,8 @@
 
             function render() 
             {
-                list.innerHTML = '';
+                medicineList.innerHTML = '';    
+                adviceList.innerHTML = '';
 
                 const el = (tag, props = {}, ...children) => {
                     const node = document.createElement(tag);
@@ -108,7 +128,7 @@
                         onclick: onClick
                 });
 
-                const ul = el('ul', { className: 'list-group' });
+                const ulMedicine = el('ul', { className: 'list-group' });
 
                 pairs.forEach((p, idx) => {
                     const li = Object.assign(document.createElement('li'), {
@@ -116,7 +136,7 @@
                     });
 
                     const text = Object.assign(document.createElement('span'), {
-                        textContent: escapeHtml(`${p.name}: ${p.advice}`),
+                        textContent: `${p.name}: ${p.advice}`,
                         className: 'me-2'
                     });
 
@@ -149,27 +169,32 @@
                     );
 
                     li.append(text, buttonGroup);
-                    ul.appendChild(li);
+                    ulMedicine.appendChild(li);
                 });
 
-                if (genAdvice)
-                {
-                    const textSpan = el('span', {
-                        className: 'me-2',
-                        textContent: escapeHtml(genAdvice)
-                    });
+                if (pairs.length > 0) {
+                    medicineList.appendChild(ulMedicine);
+                    medicineHeader?.classList.remove('d-none');
+                } else {
+                    medicineHeader?.classList.add('d-none');
+                }
 
+                const ulAdvice =  el('ul', { className: 'list-group' });
+                genAdvice.forEach((advice, idx) =>
+                {
+                    const textSpan = el('span', { className: 'me-2', textContent: advice });
+                    
                     const buttonGroup = el(
                         'div',
                         { className: 'd-flex flex-column flex-md-row gap-2 justify-content-md-end' },
                         makeBtn('Zmień', 'btn-secondary', () => {
-                            genAdviceInput.value = genAdvice;
-                            genAdvice = '';
+                            genAdviceInput.value = advice;
+                            genAdvice.splice(idx, 1);
                             genAdviceInput?.focus();
                             render();
                         }),
                         makeBtn('Usuń', 'btn-secondary', () => {
-                            genAdvice = '';
+                            genAdvice.splice(idx, 1);
                             render();
                         })
                         );
@@ -181,25 +206,22 @@
                         buttonGroup
                     );
 
-                    ul.appendChild(li);
+                    ulAdvice.appendChild(li);
+                });
+
+                if (genAdvice.length > 0) {
+                    adviceList.appendChild(ulAdvice);
+                    adviceHeader?.classList.remove('d-none');
+                } else {
+                    adviceHeader?.classList.add('d-none');
                 }
 
-                list.appendChild(ul);
-
                 let text = pairs.map(p => `${p.name} – ${p.advice}`).join('\n');
-                text += genAdvice != "" ? `\n${genAdvice}` : "";
+                let adv = genAdvice.join('\n');
 
-                hidden.value = text;
+                hidden.value = adv ? (text ? `${text}\n${adv}` : adv) : text;
                 addBtn.disabled = pairs.length >= maxPairs;
-                addGenBtn.disabled = genAdvice != "";
-            }
-
-            function escapeHtml(str) 
-            {
-                return String(str)
-                    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#39;');
+                addGenBtn.disabled = genAdvice >= maxAdvice;
             }
 
             function addPair() 
@@ -232,11 +254,8 @@
                     genAdviceInput?.focus();
                     return;
                 }
-                if (genAdvice != "")
-                {
-                    return;
-                }
-                genAdvice = advice;
+                if (genAdvice.length >= maxAdvice) return;
+                genAdvice.push(advice);
                 genAdviceInput.value = '';
                 nameInput.focus();
                 render();
@@ -285,7 +304,7 @@
 
             clearBtn?.addEventListener('click', function () {
                 pairs = [];
-                genAdvice = "";
+                genAdvice = [];
                 render();
                 this.closest('form')?.reset();
             });
