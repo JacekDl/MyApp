@@ -15,6 +15,10 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Instruction> Instructions => Set<Instruction>();
     public DbSet<Medicine> Medicines => Set<Medicine>();
     public DbSet<PharmacistPromotionRequest> PharmacistPromotionRequests => Set<PharmacistPromotionRequest>();
+    public DbSet<TreatmentPlan> TreatmentPlans => Set<TreatmentPlan>();
+    public DbSet<TreatmentPlanMedicine> TreatmentPlanMedicines => Set<TreatmentPlanMedicine>();
+    public DbSet<TreatmentPlanAdvice> TreatmentPlanAdvices => Set<TreatmentPlanAdvice>();
+    public DbSet<MedicineTakenConfirmation> MedicineTakenConfirmations => Set<MedicineTakenConfirmation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -74,6 +78,70 @@ public class ApplicationDbContext : IdentityDbContext<User>
             e.Property(x => x.NumerPWZF)
                 .HasMaxLength(8)
                 .IsRequired();
+        });
+
+        modelBuilder.Entity<TreatmentPlan>(e =>
+        {
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.DateCreated).IsRequired();
+
+            e.HasOne(x => x.Pharmacist)
+                .WithMany()
+                .HasForeignKey(x => x.IdPharmacist)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            e.HasOne(x => x.Patient)
+                .WithMany()
+                .HasForeignKey(x => x.IdPatient)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            e.HasMany(x => x.Medicines)
+                .WithOne(m => m.TreatmentPlan)
+                .HasForeignKey(m => m.IdTreatmentPlan)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasOne(x => x.Advice)
+                .WithOne(a => a.TreatmentPlan)
+                .HasForeignKey<TreatmentPlanAdvice>(a => a.IdTreatmentPlan)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<TreatmentPlanMedicine>(e =>
+        {
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.MedicineName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            e.Property(x => x.Dosage)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            e.Property(x => x.TimeOfDay)
+                .IsRequired();
+        });
+
+        modelBuilder.Entity<TreatmentPlanAdvice>(e =>
+        {
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.AdviceText)
+                .HasMaxLength(2000);
+        });
+
+        modelBuilder.Entity<MedicineTakenConfirmation>(e =>
+        {
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.DateTimeTaken)
+                .IsRequired();
+
+            e.HasOne(x => x.TreatmentPlanMedicine)
+                .WithMany()
+                .HasForeignKey(x => x.IdTreatmentPlanMedicine)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

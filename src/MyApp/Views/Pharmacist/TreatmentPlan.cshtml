@@ -1,0 +1,358 @@
+﻿@using System.Text.Json
+@using System.Collections.Generic
+
+@model MyApp.Web.ViewModels.TreatmentPlanCreateViewModel
+
+@{
+    ViewData["Title"] = "Utwórz plan leczenia";
+    Layout = "~/Views/Shared/_PharmacistLayout.cshtml";
+}
+
+<h3 class="mb-3">Nowe zalecenia dla pacjenta</h3>
+
+<form asp-action="TreatmentPlan" asp-controller="Pharmacist" method="post" target="_blank">
+    @Html.AntiForgeryToken()
+
+    <div class="container py-3">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="medicineName" class="form-label">Lek</label>
+                <input type="text" id="medicineName" class="form-control" placeholder="Wpisz nazwę leku" />
+            </div>
+            <div class="col-md-6">
+                <label for="medicineDosage" class="form-label">Dawkowanie</label>
+                <input type="text" id="medicineDosage" class="form-control" placeholder="Wpisz dawkowanie" />
+            </div>
+            <div class="col-md-3">
+                <label for="medicineFrequency" class="form-label">Częstotliwość</label>
+                <select id="medicineFrequency" class="form-select">
+                    <option value="raz_dziennie_rano">raz dziennie rano</option>
+                    <option value="raz_dziennie_wieczorem">raz dziennie wieczorem</option>
+                    <option value="dwa_razy_dziennie">dwa razy dziennie</option>
+                    <option value="trzy_razy_dziennie">trzy razy dziennie</option>
+                    <option value="cztery_razy_dziennie">cztery razy dziennie</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="button" id="addMedAdviceBtn" class="btn btn-secondary">Dodaj do wydruku</button>
+            </div>
+        </div>
+
+        <div class="row g-3 align-items-end">
+            <div class="col-md-10">
+                <label for="generalAdvice" class="form-label">Zalecenia</label>
+                <input type="text" id="generalAdvice" class="form-control" placeholder="Wpisz ogólne zalecenia" />
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="button" id="addGenAdviceBtn" class="btn btn-secondary">Dodaj do wydruku</button>
+            </div>
+        </div>
+
+        <div>
+            <div class="d-flex justify-content-center gap-2 mt-3">
+                <h3>Dodane do wydruku</h3>
+            </div>
+            <div id="medicineHeader"
+                 class="d-flex justify-content-center mt-2 gap-1 d-none">
+                <p>Leki i dawkowanie</p>
+            </div>
+            <div id="medicineList" class="mt-1"></div>
+            <div id="adviceHeader"
+                 class="d-flex justify-content-center mt-2 gap-1 d-none">
+                <p>Zalecenia ogólne</p>
+            </div>
+            <div id="adviceList" class="mt-1"></div>
+        </div>
+
+        <div id="modelHiddenFields"></div>
+
+    </div>
+
+    <div class="text-center mt-3">
+        <button type="submit" class="btn btn-secondary me-2">Utwórz PDF</button>
+        <button type="button" class="btn btn-secondary" id="clearBtn">Usuń wszystkie</button>
+        <p class="text-muted mt-2">
+            PDF z zaleceniami otworzy się w nowej karcie.
+        </p>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        (() => {
+            const instructionMap = @Html.Raw(JsonSerializer.Serialize(ViewBag.InstructionMap ?? new Dictionary<string, string>()));
+            const medicineMap = @Html.Raw(JsonSerializer.Serialize(ViewBag.MedicineMap ?? new Dictionary<string, string>()));
+
+            const instr = (instructionMap && Object.keys(instructionMap).length) ? instructionMap : {};
+            const meds  = (medicineMap && Object.keys(medicineMap).length) ? medicineMap : {};
+
+            const maxPairs = 10;
+            const maxAdvice = 5;
+            const nameInput = document.getElementById('medicineName');
+            const dosageInput = document.getElementById('medicineDosage');
+            const frequencyInput = document.getElementById('medicineFrequency')
+            const genAdviceInput = document.getElementById('generalAdvice');
+
+            const addBtn = document.getElementById('addMedAdviceBtn');
+            const addGenBtn = document.getElementById('addGenAdviceBtn');
+            const clearBtn = document.getElementById('clearBtn');
+
+            const medicineList = document.getElementById('medicineList');
+            const adviceList = document.getElementById('adviceList');
+
+            const medicineHeader = document.getElementById('medicineHeader');
+            const adviceHeader = document.getElementById('adviceHeader');
+
+            const hiddenFieldsHost = document.getElementById('modelHiddenFields');
+
+            let pairs = [];
+            let genAdvice = [];
+
+            function expandInstruction(text)
+            {
+                if (!text) return text;
+                const key = text.trim().toUpperCase();
+                return Object.prototype.hasOwnProperty.call(instr, key) ? instr[key] : text;
+            }
+
+            function expandMedicine(text)
+            {
+                if (!text) return text;
+                const key = text.trim().toUpperCase();
+                return Object.prototype.hasOwnProperty.call(meds, key) ? meds[key] : text;
+            }
+
+            function makeHidden(name, value) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value ?? '';
+                return input;
+            }
+
+            function renderHiddenInputs() {
+                hiddenFieldsHost.innerHTML = '';
+
+                pairs.forEach((p, i) => {
+                    hiddenFieldsHost.appendChild(makeHidden(`Medicines[${i}].MedicineName`, p.name));
+                    hiddenFieldsHost.appendChild(makeHidden(`Medicines[${i}].MedicineDosage`, p.dosage));
+                    hiddenFieldsHost.appendChild(makeHidden(`Medicines[${i}].MedicineTimeOfDay`, p.frequency));
+                });
+
+                genAdvice.forEach((a, i) => {
+                    hiddenFieldsHost.appendChild(makeHidden(`Advices[${i}].AdviceText`, a));
+                });
+            }
+
+            function getFrequencyLabel(value) {
+                const opt = frequencyInput?.querySelector(`option[value="${CSS.escape(value)}"]`);
+                return opt ? opt.textContent : value;
+            }
+
+            function render()
+            {
+                medicineList.innerHTML = '';
+                adviceList.innerHTML = '';
+
+                const el = (tag, props = {}, ...children) => {
+                    const node = document.createElement(tag);
+                    Object.assign(node, props);
+                    children.forEach(c => c && node.appendChild(c));
+                    return node;
+                };
+
+                const makeBtn = (label, variant, onClick) =>
+                    el('button', {
+                        type: 'button',
+                        textContent: label,
+                        className: `btn btn-sm ${variant} w-100 w-md-auto text-nowrap flex-md-1`,
+                        onclick: onClick
+                });
+
+                const ulMedicine = el('ul', { className: 'list-group' });
+
+                pairs.forEach((p, idx) => {
+                    const li = Object.assign(document.createElement('li'), {
+                        className: 'list-group-item d-flex justify-content-between align-items-start text-break'
+                    });
+
+                    const freqLabel = getFrequencyLabel(p.frequency);
+
+                    const text = Object.assign(document.createElement('span'), {
+                        textContent: `${p.name}: ${p.dosage} (${freqLabel})`,
+                        className: 'me-2'
+                    });
+
+                    const makeBtn = (label, classes, onClick) => {
+                        const btn = Object.assign(document.createElement('button'), {
+                            type: 'button',
+                            textContent: label,
+                            className: `btn btn-sm ${classes} w-100 w-md-auto text-nowrap flex-md-1`
+                        });
+                        btn.addEventListener('click', onClick);
+                        return btn;
+                    };
+
+                    const buttonGroup = Object.assign(document.createElement('div'), {
+                        className: 'd-flex flex-column flex-md-row gap-2 justify-content-md-end'
+                    });
+
+                    buttonGroup.append(
+                        makeBtn('Zmień', 'btn-secondary', () => {
+                            nameInput.value = p.name;
+                            dosageInput.value = p.dosage;
+                            pairs.splice(idx, 1);
+                            nameInput.focus();
+                            render();
+                        }),
+                        makeBtn('Usuń', 'btn-secondary', () => {
+                            pairs.splice(idx, 1);
+                            render();
+                        })
+                    );
+
+                    li.append(text, buttonGroup);
+                    ulMedicine.appendChild(li);
+                });
+
+                if (pairs.length > 0) {
+                    medicineList.appendChild(ulMedicine);
+                    medicineHeader?.classList.remove('d-none');
+                } else {
+                    medicineHeader?.classList.add('d-none');
+                }
+
+                const ulAdvice =  el('ul', { className: 'list-group' });
+
+                genAdvice.forEach((advice, idx) =>
+                {
+                    const textSpan = el('span', { className: 'me-2', textContent: advice });
+
+                    const buttonGroup = el(
+                        'div',
+                        { className: 'd-flex flex-column flex-md-row gap-2 justify-content-md-end' },
+                        makeBtn('Zmień', 'btn-secondary', () => {
+                            genAdviceInput.value = advice;
+                            genAdvice.splice(idx, 1);
+                            genAdviceInput?.focus();
+                            render();
+                        }),
+                        makeBtn('Usuń', 'btn-secondary', () => {
+                            genAdvice.splice(idx, 1);
+                            render();
+                        })
+                        );
+
+                    const li = el(
+                        'li',
+                        { className: 'list-group-item d-flex justify-content-between align-items-start text-break' },
+                        textSpan,
+                        buttonGroup
+                    );
+
+                    ulAdvice.appendChild(li);
+                });
+
+                if (genAdvice.length > 0) {
+                    adviceList.appendChild(ulAdvice);
+                    adviceHeader?.classList.remove('d-none');
+                } else {
+                    adviceHeader?.classList.add('d-none');
+                }
+
+                renderHiddenInputs();
+
+                addBtn.disabled = pairs.length >= maxPairs;
+                addGenBtn.disabled = genAdvice.length >= maxAdvice;
+            }
+
+            function addPair() {
+                let name = (nameInput?.value || '').trim();
+                let dosage = (dosageInput?.value || '').trim();
+                let frequency = (frequencyInput?.value || '').trim();
+
+                if (!name || !dosage || !frequency) {
+                    if (!name) nameInput?.focus();
+                    else if (!dosage) dosageInput?.focus();
+                    else frequencyInput?.focus();
+                    return;
+                }
+
+                name = expandMedicine(name);
+                dosage = expandInstruction(dosage);
+
+                pairs.push({ name, dosage, frequency });
+
+                nameInput.value = '';
+                dosageInput.value = '';
+                nameInput.focus();
+                render();
+            }
+
+            function addAdvice()
+            {
+                let advice = (genAdviceInput?.value || '').trim();
+                if (!advice)
+                {
+                    genAdviceInput?.focus();
+                    return;
+                }
+                if (genAdvice.length >= maxAdvice) return;
+                genAdvice.push(advice);
+                genAdviceInput.value = '';
+                nameInput.focus();
+                render();
+            }
+
+            addBtn?.addEventListener('click', addPair);
+            addGenBtn?.addEventListener('click', addAdvice);
+
+            nameInput?.addEventListener('keydown', (e) => {
+                if (e.key === 'Tab' || e.key === ' ')
+                {
+                    const el = e.currentTarget;
+                    el.value = expandMedicine(el.value);
+                }
+                if (e.key === 'Enter')
+                {
+                    e.preventDefault();
+                    nameInput.value = expandMedicine(nameInput.value);
+                    addPair();
+                }
+            });
+
+
+            dosageInput?.addEventListener('keydown', function (e) {
+                if (e.key === 'Tab' || e.key === ' ')
+                {
+                    const el = e.currentTarget;
+                    el.value = expandInstruction(el.value);
+                }
+                if (e.key === 'Enter')
+                {
+                    e.preventDefault();
+                    const el = e.currentTarget;
+                    el.value = expandInstruction(el.value);
+                    addPair();
+                }
+            });
+
+            genAdviceInput?.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter')
+                {
+                    e.preventDefault();
+                    addAdvice();
+                }
+            });
+
+            clearBtn?.addEventListener('click', function () {
+                pairs = [];
+                genAdvice = [];
+                render();
+                this.closest('form')?.reset();
+            });
+
+            render();
+        })();
+    </script>
+}
