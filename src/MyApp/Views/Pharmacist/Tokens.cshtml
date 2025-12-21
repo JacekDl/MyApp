@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Wystawione zalecenia";
+    Layout = "~/Views/Shared/_PharmacistLayout.cshtml";
     var searchTxt = (string?)ViewBag.Query ?? "";
     var completed = (string?)ViewBag.Completed ?? "";
     var reviews = Model.Reviews;
@@ -11,35 +12,35 @@
     var pageSize = Model.PageSize;
 }
 
-<partial name="~/Views/Shared/_PharmacistNav.cshtml" />
-
-<div class="mb-3">
-    <form method="get" asp-action="Tokens" class="d-flex gap-2">
-        <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Wyszukaj tekst..." />
-        <select name="completed" class="form-select">
-            <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">Wszystkie</option>
-            <option value="true" selected=@(completed == "true" ? "selected" : null)>Ukończone</option>
-            <option value="false" selected=@(completed == "false" ? "selected" : null)>Nieukończone</option>
-        </select>
-        <button type="submit" class="btn btn-secondary">Filtruj</button>
-        <a asp-action="Tokens" class="btn btn-secondary">Wyczyść</a>
-    </form>
-
-</div>
-
-<div class="d-grid d-sm-flex justify-content-sm-center">
-    <a asp-controller="Pharmacist" asp-action="Reviews" class="btn btn-secondary">
-        Utwórz nowe zalecenia dla pacjenta
-    </a>
-</div>
-
+<h3 class="mb-3">Wystawione zalecenia</h3>
 
 @if (!reviews.Any())
 {
     <div class="alert alert-light">Nie znaleziono zaleceń.</div>
 }
-else
+
+<div class="d-grid d-sm-flex justify-content-sm-center mb-3">
+    <a asp-controller="Pharmacist" asp-action="Reviews" class="btn btn-secondary">
+        Utwórz nowe zalecenia dla pacjenta
+    </a>
+</div>
+
+@if (reviews.Any())
 {
+    <div class="mb-3">
+        <form method="get" asp-action="Tokens" class="d-flex gap-2">
+            <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Wyszukaj tekst..." />
+            <select name="completed" class="form-select">
+                <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">Wszystkie</option>
+                <option value="true" selected=@(completed == "true" ? "selected" : null)>Ukończone</option>
+                <option value="false" selected=@(completed == "false" ? "selected" : null)>Nieukończone</option>
+            </select>
+            <button type="submit" class="btn btn-secondary">Filtruj</button>
+            <a asp-action="Tokens" class="btn btn-secondary">Wyczyść</a>
+        </form>
+
+    </div>
+
     <form method="get" class="d-flex align-items-center gap-2 mb-3">
         <input type="hidden" name="searchTxt" value="@ViewBag.Query" />
         <input type="hidden" name="page" value="1" />

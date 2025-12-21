@@ -2,20 +2,25 @@
 @model GetReviewViewModel
 @{
     ViewData["Title"] = "Pobierz Zalecenia";
+    Layout = "~/Views/Shared/_PatientLayout.cshtml";
 }
 
-<partial name="~/Views/Shared/_PatientNav.cshtml" />
+<div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+        <div class="border rounded-3 p-4 app-panel">
+            <form asp-action="GetReview" method="post">
+                @Html.AntiForgeryToken()
 
-<form asp-action="GetReview" method="post">
-    @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    <label asp-for="Number" class="form-label">Wpisz numer zalecenia.</label>
+                    <input asp-for="Number" class="form-control"/>
+                    <span asp-validation-for="Number" class="text-danger"></span>
+                </div>
 
-    <div class="mb-3">
-        <label asp-for="Number" class="form-label">Wpisz numer zalecenia.</label>
-        <input asp-for="Number" class="form-control"/>
-        <span asp-validation-for="Number" class="text-danger"></span>
+                <div class="d-grid d-sm-flex justify-content-sm-center">
+                    <button type="submit" class="btn btn-secondary">Pobierz</button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div class="d-grid d-sm-flex justify-content-sm-center">
-        <button type="submit" class="btn btn-secondary">Pobierz</button>
-    </div>
-</form>
+</div>

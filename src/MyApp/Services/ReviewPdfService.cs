@@ -123,7 +123,8 @@ public class ReviewPdfService : IReviewPdfService
             .Select(e => e.Text)
             .FirstOrDefault() ?? string.Empty;
 
-        var link = $"https://localhost:7231/r/{review.Number}";
+        var host = "https://localhost:7231";
+        var link = $"{host}/r/{review.Number}";
 
         using var qrGenerator = new QRCodeGenerator();
         using var qrData = qrGenerator.CreateQrCode(link, QRCodeGenerator.ECCLevel.Q);
@@ -153,7 +154,7 @@ public class ReviewPdfService : IReviewPdfService
                         t.Span(firstEntry ?? string.Empty);
                     });
 
-                    col.Item().PaddingTop(150).Column(inner =>
+                    col.Item().PaddingTop(100).Column(inner =>
                     {
                         inner.Spacing(12);
                         inner.Item().AlignCenter().Text(t => t.Span("Zostaw swoją opinię lub zadaj pytanie kopiując poniższy link lub skanując kod QR: ").Bold());
@@ -163,6 +164,11 @@ public class ReviewPdfService : IReviewPdfService
                              .FontFamily("Courier New");
                         });
                         inner.Item().AlignCenter().Width(140).Image(qrPng);
+                        inner.Item().AlignCenter().Text(t => t.Span($"Możesz też pobrać swój plan leczenia po zarejestrowaniu na stronie {host} i wpisaniu kodu:" ).Bold());
+                        inner.Item().AlignCenter().Text(t => t.Span(review.Number)
+                             .FontFamily("Courier New")
+                             .FontSize(14));
+                             
                     });
                 });
             });

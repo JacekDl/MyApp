@@ -1,6 +1,7 @@
 ﻿@model MyApp.Web.ViewModels.ReviewsViewModel
 @{
     ViewData["Title"] = "Zalecenia";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var searchTxt = (string?)ViewBag.Query ?? "";
     var userId = (string?)ViewBag.UserId ?? "";
     var completed = (string?)ViewBag.Completed ?? "";
@@ -19,23 +20,7 @@
     if (start > end) { start = end; }
 }
 
-<partial name="~/Views/Shared/_AdminNav.cshtml" />
-
-<h2 class="mb-3">Zalecenia wystawione przez użytkowników</h2>
-
-<div class="mb-3">
-    <form method="get" asp-controller="Admin" asp-action="Reviews" class="d-flex gap-2">
-        <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Wyszukaj tekst..." />
-        <input type="text" name="userId" value="@userId" class="form-control" placeholder="Wyszukaj użytkownika..." />
-        <select name="completed" class="form-select">
-            <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">Wszystkie</option>
-            <option value="true" selected=@(completed == "true" ? "selected" : null)>Ukończone</option>
-            <option value="false" selected=@(completed == "false" ? "selected" : null)>Nieukończone</option>
-        </select>
-        <button type="submit" class="btn btn-secondary">Filtruj</button>
-        <a asp-action="Reviews" class="btn btn-secondary">Wyczyść</a>
-    </form>
-</div>
+<h3 class="mb-3">Zalecenia wystawione przez użytkowników</h3>
 
 @if (!reviews.Any())
 {
@@ -43,6 +28,20 @@
 }
 else 
 {
+    <div class="mb-3">
+        <form method="get" asp-controller="Admin" asp-action="Reviews" class="d-flex gap-2">
+            <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Wyszukaj tekst..." />
+            <input type="text" name="userId" value="@userId" class="form-control" placeholder="Wyszukaj użytkownika..." />
+            <select name="completed" class="form-select">
+                <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">Wszystkie</option>
+                <option value="true" selected=@(completed == "true" ? "selected" : null)>Ukończone</option>
+                <option value="false" selected=@(completed == "false" ? "selected" : null)>Nieukończone</option>
+            </select>
+            <button type="submit" class="btn btn-secondary">Filtruj</button>
+            <a asp-action="Reviews" class="btn btn-secondary">Wyczyść</a>
+        </form>
+    </div>
+
     <form method="get" class="d-flex align-items-center gap-2 mb-3">
         <input type="hidden" name="searchTxt" value="@ViewBag.Query" />
         <input type="hidden" name="userId" value="@ViewBag.UserId" />
@@ -64,7 +63,7 @@ else
         <table class="table table-sm align-middle mb-0">
             <thead>
                 <tr>
-                    <th scope="col" class="col-1 text-nowrap">Utworzono</th>
+                    <th scope="col" class="col-1">Utworzono</th>
                     <th scope="col" class="col-8">Treść</th>
                     <th scope="col" class="col-1">Ukończone</th>
                     <th scope="col" class="col-2" colspan="2"></th>
@@ -74,7 +73,7 @@ else
                 @foreach (var rev in reviews)
                 {
                     <tr>
-                        <td class="col-1 text-nowrap">@rev.DateCreated.ToString("yyyy-MM-dd")</td>
+                        <td class="col-1 text-nowrap">@rev.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
                         <td class="col-8 text-break" style="white-space: pre-wrap;">@rev.Text</td>
 
                         <td class="col-1">@((rev.Completed) ? "Tak" : "Nie")</td>
@@ -140,7 +139,7 @@ else
                 <li class="page-item disabled"><span class="page-link">…</span></li>
             }
 
-            @for (var p = start; p <= end; p++)
+            @for (var p = Math.Max(start,2); p <= Math.Min(end, totalPages-1); p++)
             {
                 <li class="page-item @(p == page ? "active" : "")">
                     <a class="page-link"

@@ -2,14 +2,21 @@
 
 @{
     ViewData["Title"] = "Dawkowanie";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var instructions = Model.Instructions;
 
     var totalPages = Model.TotalPages;
     var page = Model.Page;
     var pageSize = Model.PageSize;
-}
 
-<partial name="~/Views/Shared/_AdminNav.cshtml" />
+    var window = 1;
+    int Clamp(int v, int min, int max) => v < min ? min : (v > max ? max : v);
+
+    var start = Clamp(page - window, 2, Math.Max(2, totalPages - 1));
+    var end = Clamp(page + window, 2, Math.Max(2, totalPages - 1));
+
+    if (start > end) { start = end; }
+}
 
 <h2 class="mb-3">Dawkowanie - dostępne kody</h2>
 
@@ -96,7 +103,20 @@
                    asp-route-pageSize="@pageSize">«</a>
             </li>
 
-            @for (var p = 1; p <= totalPages; p++)
+            <li class="page-item @(page == 1 ? "active" : "")">
+                <a class="page-link"
+                   asp-action="Instructions"
+                   asp-controller="Medicine"
+                   asp-route-page="1"
+                   asp-route-pageSize="@pageSize">1</a>
+            </li>
+
+            @if (start > 2)
+            {
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            }
+
+            @for (var p = Math.Max(start, 2); p <= Math.Min(end, totalPages - 1); p++)
             {
                 <li class="page-item @(p == page ? "active" : "")">
                     <a class="page-link"
@@ -106,6 +126,19 @@
                        asp-route-pageSize="@pageSize">@p</a>
                 </li>
             }
+
+            @if (end < totalPages - 1)
+            {
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            }
+
+            <li class="page-item @(page == totalPages ? "active" : "")">
+                <a class="page-link"
+                   asp-action="Instructions"
+                   asp-controller="Medicine"
+                   asp-route-page="@totalPages"
+                   asp-route-pageSize="@pageSize">@totalPages</a>
+            </li>
 
             <li class="page-item @(page >= totalPages ? "disabled" : "")">
                 <a class="page-link"

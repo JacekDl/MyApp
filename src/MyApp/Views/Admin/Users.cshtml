@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Użytkownicy";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var users = Model.Users;
 
     var totalPages = Model.TotalPages;
@@ -17,9 +18,7 @@
     if (start > end) { start = end; }
 }
 
-<partial name="~/Views/Shared/_AdminNav.cshtml" />
-
-<h2 class="mb-3">Użytkownicy aplikacji</h2>
+<h3 class="mb-3">Użytkownicy aplikacji</h3>
 
 @if (!users.Any())
 {
@@ -43,9 +42,9 @@ else
         <table class="table table-sm align-middle mb-0">
             <thead>
                 <tr>
+                    <th scope="col" class="col-2">Utworzono</th>
                     <th scope="col" class="col-3">Email</th>
                     <th scope="col" class="col-1">Rola</th>
-                    <th scope="col" class="col-2">Utworzono</th>
                     <th scope="col" class="col-2" colspan="2"></th>
                 </tr>
             </thead>
@@ -53,10 +52,9 @@ else
                 @foreach(var user in Model.Users)
                 {
                     <tr>
+                        <td class="col-2">@user.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
                         <td class="col-3">@user.Email</td>
                         <td class="col-1">@user.Role</td>
-                        <td class="col-2">@user.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
-                        
                         @if (!string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
                         {
                             <td class="col-1 text-end">
@@ -113,7 +111,7 @@ else
                 <li class="page-item disabled"><span class="page-link">…</span></li>
             }
 
-            @for (var p = start; p <= end; p++)
+            @for (var p = Math.Max(start, 2); p <= Math.Min(end, totalPages - 1); p++)
             {
                 <li class="page-item @(p == page ? "active" : "")">
                     <a class="page-link"

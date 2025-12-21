@@ -11,19 +11,21 @@
     <script src="~/js/theme.js" asp-append-version="true"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MyApp.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/google-signin.css" />
 </head>
 
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100" >
     <header class="sticky-top">
         <partial name="~/Views/Shared/_NavbarPartial.cshtml" />
     </header>
 
-    <div class="container">
+    <div class="container flex-grow-1 d-flex flex-column">
         <div>
             <partial name="~/Views/Shared/_Breadcrumbs.cshtml" />
         </div>
-        <main role="main" class="flex-fill">
+
+        <main role="main" class="flex-grow-1 d-flex flex-column">
             @RenderBody()
         </main>
     </div>

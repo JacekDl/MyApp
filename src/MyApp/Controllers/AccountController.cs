@@ -614,7 +614,6 @@ public class AccountController : Controller
 
         TempData["Info"] = "Dziękujemy. Twoje zgłoszenie zostało zapisane i wysłane do weryfikacji.";
 
-        // UX choice: go back to Details or to returnUrl if it’s local
         if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
             return LocalRedirect(returnUrl);
 

@@ -4,10 +4,13 @@
 
 <ul class="nav nav-tabs mb-4">
     <li class="nav-item">
+        <a class="nav-link @(current == "TreatmentPlan" ? "active" : "")" asp-controller="Patient" asp-action="TreatmentPlan">Plan leczenia</a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link @(current == "GetReview" ? "active" : "")" asp-controller="Patient" asp-action="GetReview">Pobierz zalecenia</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(current == "Tokens" ? "active" : "")" asp-controller="Patient" asp-action="Tokens">Pobrane</a>
+        <a class="nav-link @(current == "Tokens" ? "active" : "")" asp-controller="Patient" asp-action="Tokens">Otrzymane zalecenia</a>
     </li>
 
 </ul>

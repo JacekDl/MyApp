@@ -5,9 +5,10 @@
 
 @{
     ViewData["Title"] = "Utwórz Zalecenie";
+    Layout = "~/Views/Shared/_PharmacistLayout.cshtml";
 }
 
-<partial name="~/Views/Shared/_PharmacistNav.cshtml" />
+<h3 class="mb-3">Nowe zalecenia dla pacjenta</h3>
 
 <form asp-action="Reviews" asp-controller="Pharmacist" method="post" target="_blank">
     @Html.AntiForgeryToken()
@@ -42,15 +43,15 @@
                 <h3>Dodane do wydruku</h3>
             </div>
             <div id="medicineHeader" 
-                class="d-flex justify-content-center gap-2 mt-3 d-none">
+                class="d-flex justify-content-center mt-2 gap-1 d-none">
                 <p>Leki i dawkowanie</p>
             </div>
-            <div id="medicineList" class="mt-4"></div>
-            <div id="adviceHeader" 
-                class="d-flex justify-content-center gap-2 mt-3 d-none">
+            <div id="medicineList" class="mt-1"></div>
+            <div id="adviceHeader"
+                 class="d-flex justify-content-center mt-2 gap-1 d-none">
                 <p>Zalecenia ogólne</p>
             </div>
-            <div id="adviceList" class="mt-4"></div>
+            <div id="adviceList" class="mt-1"></div>
         </div>
 
         <input type="hidden" id="medAdviceHidden" name="Advice" value="" />
@@ -216,10 +217,22 @@
                     adviceHeader?.classList.add('d-none');
                 }
 
-                let text = pairs.map(p => `${p.name} – ${p.advice}`).join('\n');
+                let meds = pairs.map(p => `${p.name} – ${p.advice}`).join('\n');
                 let adv = genAdvice.join('\n');
+                let text = "";
 
-                hidden.value = adv ? (text ? `${text}\n${adv}` : adv) : text;
+                if (meds) {
+                    text += 'Leki i dawkowanie:\n\n';
+                    text += meds;
+                    text += '\n\n';
+                }
+                if (adv) {
+                    text += 'Zalecenia:\n\n';
+                    text += adv;
+                }
+
+                hidden.value = text;
+
                 addBtn.disabled = pairs.length >= maxPairs;
                 addGenBtn.disabled = genAdvice.length >= maxAdvice;
             }

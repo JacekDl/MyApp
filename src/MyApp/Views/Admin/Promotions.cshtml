@@ -2,12 +2,10 @@
 
 @{
     ViewData["Title"] = "Zgłoszenia promocji";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-
-<partial name="~/Views/Shared/_AdminNav.cshtml" />
-
-<h2 class="mb-3">Zgłoszenia do roli Farmaceuta</h2>
+<h3 class="mb-3">Zgłoszenia do roli Farmaceuta</h3>
 
 @if (Model.Requests is null || Model.Requests.Count == 0)
 {
@@ -17,8 +15,8 @@
 }
 else
 {
-    <div class="table-responsive">
-        <table class="table table-striped align-middle">
+    <div class="table-responsive-sm">
+        <table class="table table-sm align-middle mb-0">
             <thead>
                 <tr>
                     <th>Data</th>
@@ -26,9 +24,7 @@ else
                     <th>Imię</th>
                     <th>Nazwisko</th>
                     <th>PWZF</th>
-                    <th>Status</th>
-                    
-                    <th class="text-end">Akcje</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -36,19 +32,11 @@ else
                 {
                     <tr>
                         <td>@r.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
-                        <td class="text-break">
-                            <div class="fw-semibold">
-                                @(string.IsNullOrWhiteSpace(r.DisplayName) ? r.Email : r.DisplayName)
-                            </div>
-                        </td>
+                        <td>@r.Email</td>
 
                         <td>@r.FirstName</td>
                         <td>@r.LastName</td>
                         <td>@r.NumerPWZF</td>
-
-                        <td>
-                            <span class="badge bg-warning text-dark">@r.Status</span>
-                        </td>
 
                         <td class="text-end">
                             <div class="d-inline-flex gap-2">
@@ -56,7 +44,7 @@ else
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="requestId" value="@r.Id" />
                                     <button type="submit"
-                                            class="btn btn-secondary"
+                                            class="btn btn-sm btn-secondary"
                                             onclick="return confirm('Zatwierdzić i nadać rolę Farmaceuta?');">
                                         Zatwierdź
                                     </button>
@@ -66,7 +54,7 @@ else
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="requestId" value="@r.Id" />
                                     <button type="submit"
-                                            class="btn btn-secondary"
+                                            class="btn btn-sm btn-secondary"
                                             onclick="return confirm('Anulować (odrzucić) zgłoszenie?');">
                                         Odrzuć
                                     </button>

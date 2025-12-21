@@ -1,0 +1,17 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid flex-grow-1 d-flex">
+    <div class="pharmacist-panel app-panel border rounded-3 p-4 d-flex flex-column flex-grow-1">
+        <partial name="~/Views/Shared/_PharmacistNav.cshtml" />
+
+        <div class="pharmacist-panel__content flex-grow-1 pt-3 d-flex flex-column">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}

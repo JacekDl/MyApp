@@ -3,13 +3,10 @@
 }
 
 <ul class="nav nav-tabs mb-4">
-    @* <li class="nav-item dropdown">
-        <a class="nav-link @(current == "Tokens" ? "active" : "")" asp-controller="Pharmacist" asp-action="Tokens">Zalecenia</a>
-    </li> *@
     <li class="nav-item dropdown">
         <a class="nav-link @((current == "Tokens") || (current == "Reviews") ? "active" : "")" dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Zalecenia</a>
         <ul class="dropdown-menu">
-            <li><a class="dropdown-item" asp-controller="Pharmacist" asp-action="Tokens">Udzielone</a></li>
+            <li><a class="dropdown-item" asp-controller="Pharmacist" asp-action="Tokens">Wystawione</a></li>
             <li><a class="dropdown-item" asp-controller="Pharmacist" asp-action="Reviews">Utwórz nowe</a></li>
         </ul>
     </li>

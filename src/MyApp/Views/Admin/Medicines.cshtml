@@ -2,16 +2,23 @@
 
 @{
     ViewData["Title"] = "Leki";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var medicines = Model.Medicines;
 
     var totalPages = Model.TotalPages;
     var page = Model.Page;
     var pageSize = Model.PageSize;
+
+    var window = 1;
+    int Clamp(int v, int min, int max) => v < min ? min : (v > max ? max : v);
+
+    var start = Clamp(page - window, 2, Math.Max(2, totalPages - 1));
+    var end = Clamp(page + window, 2, Math.Max(2, totalPages - 1));
+
+    if (start > end) { start = end; }
 }
 
-<partial name="~/Views/Shared/_AdminNav.cshtml" />
-
-<h2 class="mb-3">Leki - dostępne kody</h2>
+<h3 class="mb-3">Leki - dostępne kody</h3>
 
 <form method="get" class="d-flex align-items-center gap-2 mb-3">
     <input type="hidden" name="page" value="1" />
@@ -95,7 +102,25 @@
                    asp-route-pageSize="@pageSize">«</a>
             </li>
 
-            @for (var p = 1; p <= totalPages; p++)
+            <li class="page-item @(page == 1 ? "active" : "")">
+                <a class="page-link"
+                   asp-action="Medicines"
+                   asp-controller="Medicine"
+                   asp-route-page="1"
+                   asp-route-pageSize="@pageSize">1</a>
+            </li>
+
+            @{
+                var innerStart = Math.Max(start, 2);
+                var innerEnd = Math.Min(end, totalPages - 1);
+            }
+
+            @if (innerStart > 2)
+            {
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            }
+
+            @for (var p = innerStart; p <= innerEnd; p++)
             {
                 <li class="page-item @(p == page ? "active" : "")">
                     <a class="page-link"
@@ -105,6 +130,19 @@
                        asp-route-pageSize="@pageSize">@p</a>
                 </li>
             }
+
+            @if (innerEnd < totalPages - 1)
+            {
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            }
+
+            <li class="page-item @(page == totalPages ? "active" : "")">
+                <a class="page-link"
+                   asp-action="Medicines"
+                   asp-controller="Medicine"
+                   asp-route-page="@totalPages"
+                   asp-route-pageSize="@pageSize">@totalPages</a>
+            </li>
 
             <li class="page-item @(page >= totalPages ? "disabled" : "")">
                 <a class="page-link"

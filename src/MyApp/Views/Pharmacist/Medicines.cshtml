@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Lista leków";
+    Layout = "~/Views/Shared/_PharmacistLayout.cshtml";
     var medicines = Model.Medicines;
 
     var totalPages = Model.TotalPages;
@@ -9,7 +10,8 @@
     var pageSize = Model.PageSize;
 }
 
-<partial name="~/Views/Shared/_PharmacistNav.cshtml" />
+<h3 class="mb-3">Leki - dostępne kody</h3>
+<p>Użyj poniższych kodów do szybszego wpisywania nazew leków przy tworzeniu nowych zaleceń dla pacjenta.</p>
 
 <form method="get" class="d-flex align-items-center gap-2 mb-3">
     <input type="hidden" name="page" value="1" />
