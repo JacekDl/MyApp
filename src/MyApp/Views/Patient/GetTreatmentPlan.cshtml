@@ -1,14 +1,13 @@
-﻿@using MyApp.Web.ViewModels
-@model GetReviewViewModel
+﻿@model MyApp.Web.ViewModels.GetTreatmentPlanViewModel
 @{
-    ViewData["Title"] = "Pobierz Zalecenia";
+    ViewData["Title"] = "Pobierz plan leczenia";
     Layout = "~/Views/Shared/_PatientLayout.cshtml";
 }
 
 <div class="row justify-content-center">
     <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
         <div class="border rounded-3 p-4 app-panel">
-            <form asp-action="GetReview" method="post">
+            <form asp-action="GetTreatmentPlan" method="post">
                 @Html.AntiForgeryToken()
 
                 <div class="mb-3">

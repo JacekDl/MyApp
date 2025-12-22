@@ -4,77 +4,74 @@ using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
 
-namespace MyApp.Domain.Reviews.Queries;
+namespace MyApp.Domain.TreatmentPlans.Queries;
 
-public record class GetReviewQuery(string Number) : IRequest<GetReviewResult>;
+public record class GetTreatmentPlanQuery(string Number) : IRequest<GetTreatmentPlanResult>;
 
-public record class GetReviewResult : Result<ReviewDto>;
+public record class GetTreatmentPlanResult : Result<TreatmentPlanDto>;
 
-public class GetReviewHandler : IRequestHandler<GetReviewQuery, GetReviewResult>
+public class GetTreatmentPlanHandler : IRequestHandler<GetTreatmentPlanQuery, GetTreatmentPlanResult>
 {
 
     private readonly ApplicationDbContext _db;
 
-    public GetReviewHandler(ApplicationDbContext db)
+    public GetTreatmentPlanHandler(ApplicationDbContext db)
     {
         _db = db;
     }
-    public async Task<GetReviewResult> Handle(GetReviewQuery request, CancellationToken ct)
+    public async Task<GetTreatmentPlanResult> Handle(GetTreatmentPlanQuery request, CancellationToken ct)
     {
-        var validator = new GetReviewValidator().Validate(request);
+        var validator = new GetTreatmentPlanValidator().Validate(request);
         if (!validator.IsValid)
         {
             return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
         }
 
-        var review = await _db.Reviews
+        var plan = await _db.TreatmentPlans
            .Where(r => r.Number == request.Number)
            .Select(x => new
            {
                x.Id,
-               x.PharmacistId,
                x.Number,
                x.DateCreated,
-               x.Completed,
-               FirstEntryText = x.Entries
-               .OrderBy(e => e.CreatedUtc)
-               .Select(e => e.Text)
-               .FirstOrDefault()
+               x.IdPharmacist,
+               x.IdPatient,
+               x.AdviceFullText,
+               x.Claimed
            })
            .SingleOrDefaultAsync(ct);
 
-        if (review is null)
+        if (plan is null)
         {
             return new() { ErrorMessage = "Nie znaleziono zaleceń." };
         }
 
-        if (review.Completed)
+        if (plan.Claimed)
         {
             return new() { ErrorMessage = "Wykorzystano już kod zaleceń." };
         }
 
-        if (review.DateCreated.AddDays(60) < DateTime.UtcNow)
+        if (plan.DateCreated.AddDays(30) < DateTime.UtcNow)
         {
             return new () {ErrorMessage = "Minął już termin wykorzystania kodu."};
         }
 
-        var dto = new ReviewDto(
-            review.Id,
-            review.PharmacistId!,
-            review.Number,
-            review.DateCreated,
-            review.FirstEntryText ?? string.Empty,
-            string.Empty,
-            review.Completed,
-            true
+        var dto = new TreatmentPlanDto(
+            plan.Id,
+            plan.Number,
+            plan.DateCreated,
+            plan.IdPharmacist ?? "",
+            plan.IdPatient,
+            plan.AdviceFullText,
+            plan.Claimed
             );
 
         return new() { Value = dto  };
     }
 
-    public class GetReviewValidator : AbstractValidator<GetReviewQuery>
+    public class GetTreatmentPlanValidator : AbstractValidator<GetTreatmentPlanQuery>
     {
-        public GetReviewValidator()
+        public GetTreatmentPlanValidator()
         {
             RuleFor(x => x.Number)
                 .NotEmpty()

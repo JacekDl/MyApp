@@ -2,13 +2,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Abstractions;
-using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
 using MyApp.Web.ViewModels;
 using System.Security.Claims;
 using MyApp.Domain.Dictionaries.Queries;
 using MyApp.Domain.Users;
 using MyApp.Domain.TreatmentPlans.Commands;
+using MyApp.Domain.TreatmentPlans.Queries;
 
 namespace MyApp.Web.Controllers;
 
@@ -23,43 +23,6 @@ public class PharmacistController : Controller
         _pdfService = pdfService;
         _mediator = mediator;
     }
-
-    #region GenerateReview
-    [HttpGet]
-    public async Task<IActionResult> Reviews()
-    {
-        var result = await _mediator.Send(new GetDictionariesQuery());
-
-        ViewBag.InstructionMap = result.Value!.InstructionMap;
-        ViewBag.MedicineMap = result.Value!.MedicineMap;
-        return View(new ReviewCreateViewModel());
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Reviews(ReviewCreateViewModel vm)
-    {
-        if (!ModelState.IsValid)
-        {
-            return View(vm);
-        }
-
-        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-
-        var result = await _mediator.Send(new CreateReviewCommand(currentUserId, vm.Advice));
-
-        if (!result.Succeeded)
-        {
-            TempData["Error"] = result.ErrorMessage;
-            return View(vm);
-        }
-
-        var pdfBytes = await _pdfService.GenerateReviewPdf(result.Value!);
-
-        Response.Headers.ContentDisposition = "inline; filename=review.pdf";
-        return File(pdfBytes, "application/pdf");
-
-    }
-    #endregion
 
     #region GenerateTreatmentPlan
 
@@ -119,31 +82,32 @@ public class PharmacistController : Controller
     }
     #endregion
 
-    #region ListUsersReviews
+    #region GetTreatmentPlans
     [HttpGet]
-    public async Task<IActionResult> Tokens(string? searchTxt, bool? completed, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> Plans(string? searchTxt, bool? completed, int page = 1, int pageSize = 10)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var result = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, completed, null, page, pageSize));
+
+        var result = await _mediator.Send(new GetTreatmentPlansQuery(searchTxt, currentUserId, completed, null, page, pageSize));
         if (!result.Succeeded)
         {
             TempData["Error"] = result.ErrorMessage;
             return View();
         }
-        
+
         ViewBag.Query = searchTxt;
         ViewBag.Completed = completed?.ToString().ToLowerInvariant();
 
-        var vm = new ReviewsViewModel();
+        var vm = new TreatmentPlansViewModel();
         if (result.Value is not null)
         {
-            vm.Reviews = result.Value;
+            vm.Plans = result.Value;
             vm.TotalCount = result.TotalCount;
             vm.Page = result.Page;
             vm.PageSize = result.PageSize;
         }
         return View(vm);
     }
-    #endregion  
+    #endregion
 }
 

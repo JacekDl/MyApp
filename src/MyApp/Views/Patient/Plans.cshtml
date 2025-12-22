@@ -1,17 +1,17 @@
-﻿@model MyApp.Web.ViewModels.ReviewsViewModel;
+﻿@model MyApp.Web.ViewModels.TreatmentPlansViewModel;
 
 @{
     ViewData["Title"] = "Twoje zalecenia";
     Layout = "~/Views/Shared/_PatientLayout.cshtml";
     var searchTxt = (string?)ViewBag.Query ?? "";
-    var reviews = Model.Reviews;
+    var plans = Model.Plans;
 
     var totalPages = Model.TotalPages;
     var page = Model.Page;
     var pageSize = Model.PageSize;
 }
 
-@if (!reviews.Any())
+@if (!plans.Any())
 {
     <div class="alert alert-light">Nie znaleziono żadnych zaleceń.</div>
 }
@@ -38,35 +38,39 @@ else
         </select>
     </form>
     
-    <table class="table table-stripped align-middle">
+    <table class="table align-middle">
         <thead>
             <tr>
-                <th>Utworzono</th>
-                <th>Treść</th>
-                <th>Status</th>
-                <th>Ukończono</th>
-                <th></th>
+                <th scope="col" class="col-1 text-nowrap">Utworzono</th>
+                <th scope="col" class="col-7">Treść</th>
+                <th scope="col" class="col-1 text-nowrap">Status</th>
+                <th scope="col" class="col-1">Ukończono</th>
+                <th scope="col" class="col-2" colspan="2"></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var rev in reviews)
+            @foreach (var plan in plans)
             {
                 <tr>
-                    <td>@rev.DateCreated.ToString("yyyy-MM-dd")</td>
-                    <td>@rev.Text</td>
+                    <td>@plan.DateCreated.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td class="text-break" style="white-space: pre-wrap;">@plan.AdviceFullText</td>
                     <td>
-                        @if (rev.IsNewForViewer)
+                        @* TODO: implement *@
+                        @* @if (rev.IsNewForViewer)
                         {
                             <span class="badge bg-success">Nowe</span>
                         }
                         else
                         {
                             <span class="badge bg-secondary">Obejrzane</span>
-                        }
+                        } *@
                     </td>
-                    <td>@(rev.Completed ? "Tak" : "Nie")</td>
                     <td>
-                        <a asp-action="Display" asp-controller="Conversation" asp-route-number="@rev.Number"
+                        @* TODO: implement *@
+                        @* @(rev.Completed ? "Tak" : "Nie") *@
+                    </td>
+                    <td>
+                        <a asp-action="Display" asp-controller="Conversation" asp-route-number="@plan.Number"
                            class="btn btn-sm btn-secondary">Podgląd</a>
                     </td>
                 </tr>
@@ -83,7 +87,7 @@ else
 
             <li class="page-item @(page <= 1 ? "disabled" : "")">
                 <a class="page-link"
-                   asp-action="Tokens"
+                   asp-action="Plans"
                    asp-controller="Patient"
                    asp-route-page="@(page - 1)"
                    asp-route-pageSize="@pageSize"
@@ -94,7 +98,7 @@ else
             {
                 <li class="page-item @(p == page ? "active" : "")">
                     <a class="page-link"
-                       asp-action="Tokens"
+                       asp-action="Plans"
                        asp-controller="Patient"
                        asp-route-page="@p"
                        asp-route-pageSize="@pageSize"
@@ -104,7 +108,7 @@ else
 
             <li class="page-item @(page >= totalPages ? "disabled" : "")">
                 <a class="page-link"
-                   asp-action="Tokens"
+                   asp-action="Plans"
                    asp-controller="Patient"
                    asp-route-page="@(page + 1)"
                    asp-route-pageSize="@pageSize"

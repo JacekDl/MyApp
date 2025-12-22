@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
+using MyApp.Domain.TreatmentPlans.Commands;
+using MyApp.Domain.TreatmentPlans.Queries;
 using MyApp.Domain.Users;
 using MyApp.Web.ViewModels;
 using MyApp.Web.ViewModels.Common;
@@ -104,18 +106,18 @@ public class PatientController : Controller
     }
     #endregion
 
-    #region GetReview
+    #region GetTreatmentPlan
 
     [Authorize(Roles = UserRoles.Patient)]
     [HttpGet]
-    public IActionResult GetReview()
+    public IActionResult GetTreatmentPlan()
     {
-        return View(new GetReviewViewModel());
+        return View(new GetTreatmentPlanViewModel());
     }
 
     [Authorize(Roles = UserRoles.Patient)]
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> GetReview(GetReviewViewModel vm)
+    public async Task<IActionResult> GetTreatmentPlan(GetTreatmentPlanViewModel vm)
     {
         if (!ModelState.IsValid)
         {
@@ -124,42 +126,69 @@ public class PatientController : Controller
 
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        var precheck = await _mediator.Send(new GetReviewQuery(vm.Number));
+        var precheck = await _mediator.Send(new GetTreatmentPlanQuery(vm.Number));
         if (!precheck.Succeeded)
         {
-            ModelState.AddModelError(nameof(vm.Number), precheck.ErrorMessage!); 
+            ModelState.AddModelError(nameof(vm.Number), precheck.ErrorMessage!);
             return View(vm);
         }
 
 
-        var result = await _mediator.Send(new ClaimReviewByPatientCommand(vm.Number, currentUserId));
+        var result = await _mediator.Send(new ClaimTreatmentPlanCommand(vm.Number, currentUserId));
         if (!result.Succeeded)
         {
             ModelState.AddModelError(nameof(vm.Number), result.ErrorMessage!);
             return View(vm);
         }
-        TempData["Info"] = "Token został przypisany do Twojego konta.";
-        return RedirectToAction(nameof(Tokens));
+        TempData["Info"] = "Pobrano pomyślnie plan lecznia.";
+        return RedirectToAction(nameof(Plans));
     }
     #endregion
 
     #region ViewReviews
+    //[HttpGet]
+    //[Authorize(Roles = UserRoles.Patient)]
+    //public async Task<IActionResult> Tokens(string? searchTxt, int page = 1, int pageSize = 10)
+    //{
+    //    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+    //    var result = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, null, null, page, pageSize));
+    //    if (!result.Succeeded)
+    //    {
+    //        TempData["Error"] = result.ErrorMessage;
+    //        return View();
+    //    }
+
+    //    var vm = new ReviewsViewModel();
+    //    if (result.Value is not null)
+    //    {
+    //        vm.Reviews = result.Value;
+    //        vm.TotalCount = result.TotalCount;
+    //        vm.Page = result.Page;
+    //        vm.PageSize = result.PageSize;
+    //    }
+
+    //    ViewBag.Query = searchTxt;
+    //    return View(vm);
+    //}
+    #endregion
+
+    #region ViewTreatmentPlans
     [HttpGet]
     [Authorize(Roles = UserRoles.Patient)]
-    public async Task<IActionResult> Tokens(string? searchTxt, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> Plans(string? searchTxt, int page = 1, int pageSize = 10)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var result = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, null, null, page, pageSize));
+        var result = await _mediator.Send(new GetTreatmentPlansQuery(searchTxt, currentUserId, null, null, page, pageSize));
         if (!result.Succeeded)
         {
             TempData["Error"] = result.ErrorMessage;
             return View();
         }
 
-        var vm = new ReviewsViewModel();
+        var vm = new TreatmentPlansViewModel();
         if (result.Value is not null)
         {
-            vm.Reviews = result.Value;
+            vm.Plans = result.Value;
             vm.TotalCount = result.TotalCount;
             vm.Page = result.Page;
             vm.PageSize = result.PageSize;

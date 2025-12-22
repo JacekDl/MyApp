@@ -8,18 +8,18 @@
     Layout = "~/Views/Shared/_PharmacistLayout.cshtml";
 }
 
-<h3 class="mb-3">Nowe zalecenia dla pacjenta</h3>
+<h3 class="mb-3">Utwórz nowy plan leczenia</h3>
 
 <form asp-action="TreatmentPlan" asp-controller="Pharmacist" method="post" target="_blank">
     @Html.AntiForgeryToken()
 
     <div class="container py-3">
         <div class="row g-3 align-items-end">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label for="medicineName" class="form-label">Lek</label>
                 <input type="text" id="medicineName" class="form-control" placeholder="Wpisz nazwę leku" />
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label for="medicineDosage" class="form-label">Dawkowanie</label>
                 <input type="text" id="medicineDosage" class="form-control" placeholder="Wpisz dawkowanie" />
             </div>
@@ -201,6 +201,7 @@
                         makeBtn('Zmień', 'btn-secondary', () => {
                             nameInput.value = p.name;
                             dosageInput.value = p.dosage;
+                            frequencyInput.value = p.frequency;
                             pairs.splice(idx, 1);
                             nameInput.focus();
                             render();

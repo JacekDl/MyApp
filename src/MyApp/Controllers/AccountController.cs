@@ -274,7 +274,7 @@ public class AccountController : Controller
         }
         else if (role == UserRoles.Pharmacist)  
         {
-            vm.Breadcrumbs.AddRange(["Start|Reviews|Pharmacist", "Szczegóły konta||"]);
+            vm.Breadcrumbs.AddRange(["Start|Plans|Pharmacist", "Szczegóły konta||"]);
         }
         else
         {
@@ -639,7 +639,7 @@ public class AccountController : Controller
 
         if (role.Equals(UserRoles.Pharmacist, StringComparison.OrdinalIgnoreCase))
         {
-            return RedirectToAction("Tokens", UserRoles.Pharmacist);
+            return RedirectToAction("Plans", UserRoles.Pharmacist);
         }
 
         return RedirectToAction("Tokens", UserRoles.Patient);

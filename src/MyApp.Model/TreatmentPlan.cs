@@ -14,6 +14,8 @@ public class TreatmentPlan
     public DateTime? DateStarted { get; set; }
     public DateTime? DateCompleted { get; set; }
 
+    public bool Claimed { get; set; }
+
     public string? IdPharmacist { get; set; }
     public User? Pharmacist { get; set; }
 
