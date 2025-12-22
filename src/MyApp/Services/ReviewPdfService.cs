@@ -10,6 +10,63 @@ namespace MyApp.Web.Services;
 
 public class ReviewPdfService : IReviewPdfService
 {
+    public Task<byte[]> GenerateTreatmentPlanPdf(TreatmentPlan plan)
+    {
+        
+        var host = "https://localhost:7231";
+        var link = $"{host}/r/{plan.Number}";
+
+        using var qrGenerator = new QRCodeGenerator();
+        using var qrData = qrGenerator.CreateQrCode(link, QRCodeGenerator.ECCLevel.Q);
+        var qrCode = new PngByteQRCode(qrData);
+
+        byte[] qrPng = qrCode.GetGraphic(
+            pixelsPerModule: 10,
+            drawQuietZones: true
+        );
+
+        var date = plan.DateCreated.ToString("dd.MM.yyyy");
+
+        var pdfBytes = Document.Create(container =>
+        {
+            container.Page(page =>
+            {
+                page.Size(PageSizes.A4);
+                page.Margin(40);
+
+                page.Content().Column(col =>
+                {
+                    col.Spacing(12);
+
+                    col.Item().AlignCenter().Text(t => t.Span($"Zalecenia ({date})").FontSize(20).Bold());
+                    col.Item().Text(t =>
+                    {
+                        t.Span(plan.AdviceFullText ?? string.Empty);
+                    });
+
+                    col.Item().PaddingTop(100).Column(inner =>
+                    {
+                        inner.Spacing(12);
+                        inner.Item().AlignCenter().Text(t => t.Span("Zostaw swoją opinię lub zadaj pytanie kopiując poniższy link lub skanując kod QR: ").Bold());
+                        inner.Item().AlignCenter().Text(t =>
+                        {
+                            t.Span(link)
+                             .FontFamily("Courier New");
+                        });
+                        inner.Item().AlignCenter().Width(140).Image(qrPng);
+                        inner.Item().AlignCenter().Text(t => t.Span($"Możesz też pobrać swój plan leczenia po zarejestrowaniu na stronie {host} i wpisaniu kodu:").Bold());
+                        inner.Item().AlignCenter().Text(t => t.Span(plan.Number)
+                             .FontFamily("Courier New")
+                             .FontSize(14));
+
+                    });
+                });
+            });
+        }).GeneratePdf();
+
+        return Task.FromResult(pdfBytes);
+    }
+
     public Task<byte[]> GenerateInstructionsPdf(IReadOnlyList<InstructionDto> dto)
     {
         var rows = (dto ?? Array.Empty<InstructionDto>())

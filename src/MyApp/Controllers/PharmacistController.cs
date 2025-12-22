@@ -105,8 +105,17 @@ public class PharmacistController : Controller
             Medicines: medicines,
             Advice: adviceText));
 
-        //TODO: finish implementation 
-        throw new NotImplementedException();
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = result.ErrorMessage;
+            return View(vm);
+        }
+
+        var pdfBytes = await _pdfService.GenerateTreatmentPlanPdf(result.Value!);
+
+        Response.Headers.ContentDisposition = "inline; filename=review.pdf";
+        return File(pdfBytes, "application/pdf");
+
     }
     #endregion
 

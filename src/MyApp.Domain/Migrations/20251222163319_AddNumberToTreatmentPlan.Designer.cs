@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyApp.Domain.Data;
 
@@ -10,9 +11,11 @@ using MyApp.Domain.Data;
 namespace MyApp.Domain.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251222163319_AddNumberToTreatmentPlan")]
+    partial class AddNumberToTreatmentPlan
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
@@ -174,7 +177,7 @@ namespace MyApp.Domain.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Entries", (string)null);
+                    b.ToTable("Entries");
                 });
 
             modelBuilder.Entity("MyApp.Model.Instruction", b =>
@@ -241,7 +244,7 @@ namespace MyApp.Domain.Migrations
 
                     b.HasIndex("IdTreatmentPlanMedicine");
 
-                    b.ToTable("MedicineTakenConfirmations", (string)null);
+                    b.ToTable("MedicineTakenConfirmations");
                 });
 
             modelBuilder.Entity("MyApp.Model.PharmacistPromotionRequest", b =>
@@ -276,7 +279,7 @@ namespace MyApp.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PharmacistPromotionRequests", (string)null);
+                    b.ToTable("PharmacistPromotionRequests");
                 });
 
             modelBuilder.Entity("MyApp.Model.Review", b =>
@@ -316,7 +319,7 @@ namespace MyApp.Domain.Migrations
 
                     b.HasIndex("PharmacistId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("MyApp.Model.TreatmentPlan", b =>
@@ -354,7 +357,7 @@ namespace MyApp.Domain.Migrations
 
                     b.HasIndex("IdPharmacist");
 
-                    b.ToTable("TreatmentPlans", (string)null);
+                    b.ToTable("TreatmentPlans");
                 });
 
             modelBuilder.Entity("MyApp.Model.TreatmentPlanAdvice", b =>
@@ -375,7 +378,7 @@ namespace MyApp.Domain.Migrations
                     b.HasIndex("IdTreatmentPlan")
                         .IsUnique();
 
-                    b.ToTable("TreatmentPlanAdvices", (string)null);
+                    b.ToTable("TreatmentPlanAdvices");
                 });
 
             modelBuilder.Entity("MyApp.Model.TreatmentPlanMedicine", b =>
@@ -404,7 +407,7 @@ namespace MyApp.Domain.Migrations
 
                     b.HasIndex("IdTreatmentPlan");
 
-                    b.ToTable("TreatmentPlanMedicines", (string)null);
+                    b.ToTable("TreatmentPlanMedicines");
                 });
 
             modelBuilder.Entity("MyApp.Model.User", b =>

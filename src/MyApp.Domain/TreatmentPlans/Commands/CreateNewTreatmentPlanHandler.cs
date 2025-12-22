@@ -4,6 +4,7 @@ using MyApp.Domain.Data;
 using MyApp.Domain.Users;
 using MyApp.Model;
 using MyApp.Model.enums;
+using System.Security.Cryptography;
 
 namespace MyApp.Domain.TreatmentPlans.Commands
 {
@@ -12,7 +13,7 @@ namespace MyApp.Domain.TreatmentPlans.Commands
         IReadOnlyList<CreateTreatmentPlanMedicineDTO> Medicines,
         string? Advice) : IRequest<CreateTreatmentPlanResult>;
 
-    public record class CreateTreatmentPlanResult : Result;
+    public record class CreateTreatmentPlanResult : Result<TreatmentPlan>;
 
     public class CreateNewTreatmentPlanHandler : IRequestHandler<CreateTreatmentPlanCommand, CreateTreatmentPlanResult>
     {
@@ -25,12 +26,17 @@ namespace MyApp.Domain.TreatmentPlans.Commands
 
         public async Task<CreateTreatmentPlanResult> Handle(CreateTreatmentPlanCommand request, CancellationToken ct)
         {
+
             var plan = new TreatmentPlan
             {
                 DateCreated = DateTime.UtcNow,
+                DateStarted = null,
                 DateCompleted = null,
-                IdPharmacist = request.PharmacistId
+                IdPharmacist = request.PharmacistId,
             };
+
+            string number = GenerateDigits();
+            plan.Number = number;
 
             _db.TreatmentPlans.Add(plan);
             await _db.SaveChangesAsync(ct);
@@ -53,6 +59,8 @@ namespace MyApp.Domain.TreatmentPlans.Commands
                 }
             }
 
+            plan.AdviceFullText = BuildAdviceFullText(request.Medicines, request.Advice);
+
             if (medicinesToAdd.Count > 0)
             {
                 _db.TreatmentPlanMedicines.AddRange(medicinesToAdd);
@@ -69,7 +77,7 @@ namespace MyApp.Domain.TreatmentPlans.Commands
             }
 
             await _db.SaveChangesAsync(ct);
-            return new();
+            return new() { Value = plan };
         }
 
         private static IReadOnlyList<TimeOfDay> ExpandFrequency(string token) =>
@@ -82,5 +90,34 @@ namespace MyApp.Domain.TreatmentPlans.Commands
             "cztery_razy_dziennie" => new[] { TimeOfDay.Rano, TimeOfDay.Poludnie, TimeOfDay.Popoludnie, TimeOfDay.Wieczor },
             _ => Array.Empty<TimeOfDay>()
         };
+
+        private static string BuildAdviceFullText(
+            IEnumerable<CreateTreatmentPlanMedicineDTO> medicines,
+            string? advice)
+        {
+            var lines = new List<string>();
+            foreach (var m in medicines)
+            {
+                lines.Add($"{m.MedicineName} - {m.MedicineDosage} {m.MedicineFrequency.Replace('_', ' ')}.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(advice))
+            {
+                lines.Add(advice.Trim());
+            }
+
+            return string.Join("\n", lines);
+        }
+        private static string GenerateDigits(int bytes = 16)
+        {
+            byte[] buffer = new byte[bytes];
+            RandomNumberGenerator.Fill(buffer);
+            var token = Convert.ToBase64String(buffer)
+                .Replace("+", "")
+                .Replace("/", "")
+                .Replace("=", "")
+                [..bytes];
+            return token;
+        }
     }
 }

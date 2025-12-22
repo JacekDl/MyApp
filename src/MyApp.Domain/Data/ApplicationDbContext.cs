@@ -86,6 +86,8 @@ public class ApplicationDbContext : IdentityDbContext<User>
 
             e.Property(x => x.DateCreated).IsRequired();
 
+            e.Property(x => x.Number).IsRequired();
+
             e.HasOne(x => x.Pharmacist)
                 .WithMany()
                 .HasForeignKey(x => x.IdPharmacist)
