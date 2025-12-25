@@ -58,9 +58,9 @@ else
                         @if (!string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
                         {
                             <td class="col-1 text-end">
-                                <form asp-action="Reviews" asp-route-userId="@user.Id" style="display:inline">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-secondary">Zalecenia</button>
+                                <form asp-controller="Admin" asp-action="Plans" method="get" style="display:inline">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <button type="submit" class="btn btn-sm btn-secondary">Plany leczenia</button>
                                 </form>
                             </td>
                             <td class="col-1 text-start">

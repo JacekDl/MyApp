@@ -1,0 +1,184 @@
+﻿@model MyApp.Web.ViewModels.TreatmentPlansViewModel;
+@{
+    ViewData["Title"] = "Zalecenia";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var searchTxt = (string?)ViewBag.Query ?? "";
+    var userId = (string?)ViewBag.UserId ?? "";
+    var completed = (string?)ViewBag.Completed ?? "";
+    var plans = Model.Plans;
+
+    var totalPages = Model.TotalPages;
+    var page = Model.Page;
+    var pageSize = Model.PageSize;
+
+    var window = 1;
+    int Clamp(int v, int min, int max) => v < min ? min : (v > max ? max : v);
+
+    var start = Clamp(page - window, 2, Math.Max(2, totalPages - 1));
+    var end = Clamp(page + window, 2, Math.Max(2, totalPages - 1));
+
+    if (start > end) { start = end; }
+}
+
+<h3 class="mb-3">Utworzone plany leczenia</h3>
+
+@if (!plans.Any())
+{
+    <div class="alert alert-light">Nie znaleziono żadnych planów leczenia.</div>
+}
+else
+{
+    <div class="mb-3">
+        <form method="get" asp-controller="Admin" asp-action="Reviews" class="d-flex gap-2">
+            <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Wyszukaj tekst..." />
+            <select name="completed" class="form-select">
+                <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">Wszystkie</option>
+                <option value="true" selected=@(completed == "true" ? "selected" : null)>Ukończone</option>
+                <option value="false" selected=@(completed == "false" ? "selected" : null)>Nieukończone</option>
+            </select>
+            <button type="submit" class="btn btn-secondary">Filtruj</button>
+            <a asp-action="Reviews" class="btn btn-secondary">Wyczyść</a>
+        </form>
+    </div>
+
+    <form method="get" class="d-flex align-items-center gap-2 mb-3">
+        <input type="hidden" name="searchTxt" value="@ViewBag.Query" />
+        <input type="hidden" name="userId" value="@ViewBag.UserId" />
+        <input type="hidden" name="completed" value="@ViewBag.Completed" />
+        <input type="hidden" name="userEmail" value="@ViewBag.UserEmail" />
+        <input type="hidden" name="page" value="1" />
+
+        <label class="form-label mb-0">Liczba wyników na stronie:</label>
+        <select name="pageSize" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+            <option value="5" selected="@(Model.PageSize == 5)">5</option>
+            <option value="10" selected="@(Model.PageSize == 10)">10</option>
+            <option value="20" selected="@(Model.PageSize == 20)">20</option>
+            <option value="50" selected="@(Model.PageSize == 50)">50</option>
+
+        </select>
+    </form>
+
+    <div class="table-responsive-sm">
+        <table class="table table-sm align-middle mb-0">
+            <thead>
+                <tr>
+                    <th scope="col" class="col-1">Utworzono</th>
+                    <th scope="col" class="col-7">Treść</th>
+                    <th scope="col" class="col-2 text-nowrap">Status</th>
+                    <th scope="col" class="col-2" colspan="2"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var plan in plans)
+                {
+                    <tr>
+                        <td class="col-1">@plan.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="col-8 text-break" style="white-space: pre-wrap;">@plan.AdviceFullText</td>
+                        <td class="col-1"></td>
+                        <td class="col-1">
+                            <div class="d-grid gap-2 d-md-inline">
+                                <a asp-action="Display"
+                                   asp-controller="Conversation"
+                                   asp-route-number="@plan.Number"
+                                   class="btn btn-sm btn-secondary w-100 w-md-auto text-nowrap">
+                                    Podgląd
+                                </a>
+                            </div>
+                        </td>
+                        <td class="col-1">
+                            <form asp-action="DeleteReview" asp-controller="Admin" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@plan.Id" />
+                                <button type="submit"
+                                        class="btn btn-sm btn-secondary w-100 w-md-auto text-nowrap"
+                                        onclick="return confirm('Czy na pewno chcesz usunąć ten wpis?');">
+                                    Usuń
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@if (totalPages > 1)
+{
+    <nav aria-label="Paginacja" class="mt-4">
+        <ul class="pagination justify-content-center">
+
+            <li class="page-item @(page <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Reviews"
+                   asp-route-page="@(page - 1)"
+                   asp-route-pageSize="@pageSize"
+                   asp-route-searchTxt="@ViewBag.Query"
+                   asp-route-userId="@ViewBag.UserId"
+                   asp-route-completed="@ViewBag.Completed"
+                   asp-route-userEmail="@ViewBag.UserEmail">«</a>
+            </li>
+
+            <li class="page-item @(page == 1 ? "active" : "")">
+                <a class="page-link"
+                   asp-action="Reviews"
+                   asp-route-page="1"
+                   asp-route-pageSize="@pageSize"
+                   asp-route-searchTxt="@ViewBag.Query"
+                   asp-route-userId="@ViewBag.UserId"
+                   asp-route-completed="@ViewBag.Completed"
+                   asp-route-userEmail="@ViewBag.UserEmail">1</a>
+            </li>
+
+            @if (start > 2)
+            {
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            }
+
+            @for (var p = Math.Max(start, 2); p <= Math.Min(end, totalPages - 1); p++)
+            {
+                <li class="page-item @(p == page ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Reviews"
+                       asp-route-page="@p"
+                       asp-route-pageSize="@pageSize"
+                       asp-route-searchTxt="@ViewBag.Query"
+                       asp-route-userId="@ViewBag.UserId"
+                       asp-route-completed="@ViewBag.Completed"
+                       asp-route-userEmail="@ViewBag.UserEmail">@p</a>
+                </li>
+            }
+
+            @if (end < totalPages - 1)
+            {
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            }
+
+            @if (totalPages > 1)
+            {
+                <li class="page-item @(page == totalPages ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Reviews"
+                       asp-route-page="@totalPages"
+                       asp-route-pageSize="@pageSize"
+                       asp-route-searchTxt="@ViewBag.Query"
+                       asp-route-userId="@ViewBag.UserId"
+                       asp-route-completed="@ViewBag.Completed"
+                       asp-route-userEmail="@ViewBag.UserEmail">@totalPages</a>
+                </li>
+            }
+
+            <li class="page-item @(page >= totalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Reviews"
+                   asp-route-page="@(page + 1)"
+                   asp-route-pageSize="@pageSize"
+                   asp-route-searchTxt="@ViewBag.Query"
+                   asp-route-userId="@ViewBag.UserId"
+                   asp-route-completed="@ViewBag.Completed"
+                   asp-route-userEmail="@ViewBag.UserEmail">»</a>
+            </li>
+
+        </ul>
+    </nav>
+}

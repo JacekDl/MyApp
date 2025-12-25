@@ -12,11 +12,11 @@
     var pageSize = Model.PageSize;
 }
 
-<h3 class="mb-3">Wystawione zalecenia</h3>
+<h3 class="mb-3">Utworzone plany leczenia</h3>
 
 @if (!plans.Any())
 {
-    <div class="alert alert-light">Nie znaleziono zaleceń.</div>
+    <div class="alert alert-light">Nie znaleziono żadnych planów leczenia.</div>
 }
 
 <div class="d-grid d-sm-flex justify-content-sm-center mb-3">
@@ -30,11 +30,11 @@
     <div class="mb-3">
         <form method="get" asp-action="Plans" class="d-flex gap-2">
             <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Wyszukaj tekst..." />
-            @* <select name="completed" class="form-select">
+            <select name="completed" class="form-select">
                 <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">Wszystkie</option>
                 <option value="true" selected=@(completed == "true" ? "selected" : null)>Ukończone</option>
                 <option value="false" selected=@(completed == "false" ? "selected" : null)>Nieukończone</option>
-            </select> *@
+            </select>
             <button type="submit" class="btn btn-secondary">Filtruj</button>
             <a asp-action="Plans" class="btn btn-secondary">Wyczyść</a>
         </form>
@@ -45,7 +45,7 @@
         <input type="hidden" name="searchTxt" value="@ViewBag.Query" />
         <input type="hidden" name="page" value="1" />
 
-        <label class="form-label mb-0">Na stronę:</label>
+        <label class="form-label mb-0">Liczba wyników na stronie:</label>
         <select name="pageSize" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
             <option value="5" selected="@(Model.PageSize == 5)">5</option>
             <option value="10" selected="@(Model.PageSize == 10)">10</option>
@@ -60,8 +60,7 @@
                 <tr>
                     <th scope="col" class="col-1 text-nowrap">Utworzono</th>
                     <th scope="col" class="col-7">Treść</th>
-                    <th scope="col" class="col-1 text-nowrap">Status</th>
-                    <th scope="col" class="col-1">Ukończono</th>
+                    <th scope="col" class="col-2 text-nowrap">Status</th>
                     <th scope="col" class="col-2" colspan="2"></th>
                 </tr>
             </thead>
@@ -82,10 +81,6 @@
                                 <span class="badge bg-secondary">Obejrzane</span>
                             } *@
                         </td>
-                        <td class="text-nowrap">
-                            @* TODO: zaimplementować *@
-                            @* @((rev.Completed) ? "Tak" : "Nie") *@
-                        </td> 
                         <td class="text-end">
                             <div class="d-grid gap-2 d-md-inline">
                                 <a asp-action="Display"

@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
+using MyApp.Domain.TreatmentPlans.Queries;
 using MyApp.Domain.Users;
 using MyApp.Domain.Users.Commands;
 using MyApp.Domain.Users.Queries;
 using MyApp.Web.ViewModels;
+using System.Security.Claims;
 
 namespace MyApp.Web.Controllers;
 
@@ -63,33 +65,27 @@ public class AdminController : Controller
     }
     #endregion
 
-    #region Reviews
 
-    public async Task<IActionResult> Reviews(
-        string? searchTxt, 
-        string? userId, 
-        bool? completed, 
-        string? userEmail,
-        int page = 1,
-        int pageSize = 10)
+
+
+    #region GetTreatmentPlans
+    public async Task<IActionResult> Plans(string? searchTxt, string? userId, bool? completed, int page = 1, int pageSize = 10)
     {
-        var result = await _mediator.Send(new GetReviewsQuery(searchTxt, userId, completed, userEmail, page, pageSize));
 
+        var result = await _mediator.Send(new GetTreatmentPlansQuery(searchTxt, userId, completed, null, page, pageSize));
         if (!result.Succeeded)
         {
             TempData["Error"] = result.ErrorMessage;
-            return View(new ReviewsViewModel()); //TODO: is that correct?
+            return View();
         }
 
         ViewBag.Query = searchTxt;
         ViewBag.Completed = completed?.ToString().ToLowerInvariant();
-        ViewBag.UserId = userId;
-        ViewBag.UserEmail = userEmail;
 
-        var vm = new ReviewsViewModel();
+        var vm = new TreatmentPlansViewModel();
         if (result.Value is not null)
         {
-            vm.Reviews = result.Value;
+            vm.Plans = result.Value;
             vm.TotalCount = result.TotalCount;
             vm.Page = result.Page;
             vm.PageSize = result.PageSize;
@@ -102,7 +98,7 @@ public class AdminController : Controller
     {
         var result = await _mediator.Send(new DeleteReviewCommand(id));
         TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Usunięto zalecenia." : result.ErrorMessage;
-        return RedirectToAction(nameof(Reviews));
+        return RedirectToAction(nameof(Plans));
     }
     #endregion
 
