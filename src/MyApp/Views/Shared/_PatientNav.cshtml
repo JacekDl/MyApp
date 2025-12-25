@@ -6,11 +6,11 @@
     <li class="nav-item">
         <a class="nav-link @(current == "TreatmentPlan" ? "active" : "")" asp-controller="Patient" asp-action="TreatmentPlan">Plan leczenia</a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link @(current == "GetTreatmentPlan" ? "active" : "")" asp-controller="Patient" asp-action="GetTreatmentPlan">Pobierz zalecenia</a>
+    <li class="nav-item dropdown">
+        <a class="nav-link @((current == "Plans") || (current == "ClaimPlan") ? "active" : "")" dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Plany leczenia</a>
+        <ul class="dropdown-menu">
+            <a class="dropdown-item" asp-controller="Patient" asp-action="ClaimPlan">Pobierz nowy</a>
+            <a class="dropdown-item" asp-controller="Patient" asp-action="Plans">Pobrane</a>
+        </ul>
     </li>
-    <li class="nav-item">
-        <a class="nav-link @(current == "Plans" ? "active" : "")" asp-controller="Patient" asp-action="Plans">Otrzymane zalecenia</a>
-    </li>
-
 </ul>

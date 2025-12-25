@@ -106,18 +106,18 @@ public class PatientController : Controller
     }
     #endregion
 
-    #region GetTreatmentPlan
+    #region ClaimPlan
 
     [Authorize(Roles = UserRoles.Patient)]
     [HttpGet]
-    public IActionResult GetTreatmentPlan()
+    public IActionResult ClaimPlan()
     {
-        return View(new GetTreatmentPlanViewModel());
+        return View(new ClaimPlanViewModel());
     }
 
     [Authorize(Roles = UserRoles.Patient)]
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> GetTreatmentPlan(GetTreatmentPlanViewModel vm)
+    public async Task<IActionResult> ClaimPlan(ClaimPlanViewModel vm)
     {
         if (!ModelState.IsValid)
         {

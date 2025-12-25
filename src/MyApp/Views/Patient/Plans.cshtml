@@ -43,8 +43,7 @@ else
             <tr>
                 <th scope="col" class="col-1 text-nowrap">Utworzono</th>
                 <th scope="col" class="col-7">Treść</th>
-                <th scope="col" class="col-1 text-nowrap">Status</th>
-                <th scope="col" class="col-1">Ukończono</th>
+                <th scope="col" class="col-2 text-nowrap">Status</th>
                 <th scope="col" class="col-2" colspan="2"></th>
             </tr>
         </thead>
@@ -54,17 +53,7 @@ else
                 <tr>
                     <td>@plan.DateCreated.ToString("dd.MM.yyyy HH:mm")</td>
                     <td class="text-break" style="white-space: pre-wrap;">@plan.AdviceFullText</td>
-                    <td>
-                        @* TODO: implement *@
-                        @* @if (rev.IsNewForViewer)
-                        {
-                            <span class="badge bg-success">Nowe</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary">Obejrzane</span>
-                        } *@
-                    </td>
+
                     <td>
                         @* TODO: implement *@
                         @* @(rev.Completed ? "Tak" : "Nie") *@
