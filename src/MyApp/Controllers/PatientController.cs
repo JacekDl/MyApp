@@ -9,6 +9,7 @@ using MyApp.Domain.Users;
 using MyApp.Web.ViewModels;
 using MyApp.Web.ViewModels.Common;
 using System.ComponentModel.DataAnnotations;
+using System.Net.WebSockets;
 using System.Security.Claims;
 
 namespace MyApp.Web.Controllers;
@@ -126,14 +127,6 @@ public class PatientController : Controller
 
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        var precheck = await _mediator.Send(new GetTreatmentPlanQuery(vm.Number));
-        if (!precheck.Succeeded)
-        {
-            ModelState.AddModelError(nameof(vm.Number), precheck.ErrorMessage!);
-            return View(vm);
-        }
-
-
         var result = await _mediator.Send(new ClaimTreatmentPlanCommand(vm.Number, currentUserId));
         if (!result.Succeeded)
         {
@@ -145,34 +138,7 @@ public class PatientController : Controller
     }
     #endregion
 
-    #region ViewReviews
-    //[HttpGet]
-    //[Authorize(Roles = UserRoles.Patient)]
-    //public async Task<IActionResult> Tokens(string? searchTxt, int page = 1, int pageSize = 10)
-    //{
-    //    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-    //    var result = await _mediator.Send(new GetReviewsQuery(searchTxt, currentUserId, null, null, page, pageSize));
-    //    if (!result.Succeeded)
-    //    {
-    //        TempData["Error"] = result.ErrorMessage;
-    //        return View();
-    //    }
-
-    //    var vm = new ReviewsViewModel();
-    //    if (result.Value is not null)
-    //    {
-    //        vm.Reviews = result.Value;
-    //        vm.TotalCount = result.TotalCount;
-    //        vm.Page = result.Page;
-    //        vm.PageSize = result.PageSize;
-    //    }
-
-    //    ViewBag.Query = searchTxt;
-    //    return View(vm);
-    //}
-    #endregion
-
-    #region ViewTreatmentPlans
+    #region ViewPlans
     [HttpGet]
     [Authorize(Roles = UserRoles.Patient)]
     public async Task<IActionResult> Plans(string? searchTxt, int page = 1, int pageSize = 10)
@@ -196,6 +162,89 @@ public class PatientController : Controller
 
         ViewBag.Query = searchTxt;
         return View(vm);
+    }
+    #endregion
+
+    #region GetPlan
+
+    public async Task<IActionResult> GetPlan(string number)
+    {
+        if (string.IsNullOrWhiteSpace(number))
+        {
+            return RedirectToAction("Plans");
+        }
+
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var result = await _mediator.Send(new GetTreatmentPlanQuery(number));
+
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = result.ErrorMessage;
+            return RedirectToAction(nameof(Plans));
+        }
+
+        if (!string.Equals(result.Value.IdPatient, currentUserId, StringComparison.OrdinalIgnoreCase))
+        {
+            return Forbid();
+        }
+
+        var tp = result.Value;
+
+        var vm = new TreatmentPlanViewModel(); //TODO: zrobić jakiś mapper
+        vm.Id = tp.Id;
+        vm.Number = tp.Number;
+        vm.DateCreated = tp.DateCreated;
+        vm.DateStarted = tp.DateStarted;
+        vm.DateCompleted    = tp.DateCompleted;
+        vm.IdPharmacist = tp.IdPharmacist;
+        vm.IdPatient = tp.IdPatient;
+        vm.AdviceFullText = tp.AdviceFullText;
+        vm.Status = tp.Status;
+        
+        return View(vm);
+    }
+
+    #endregion
+
+
+    #region UpdatePlanStart
+    [Authorize(Roles = UserRoles.Patient)]
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdatePlanStart(TreatmentPlanViewModel vm)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View("GetPlan", vm);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.Number))
+        {
+            return BadRequest();
+        }
+
+        if (!vm.DateStarted.HasValue || !vm.DateCompleted.HasValue)
+        {
+            ModelState.AddModelError("", "Wybierz datę rozpoczęcia i długość leczenia aby wyliczyć datę ukończenia.");
+            return View("GetPlan", vm);
+        }
+
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+        var result = await _mediator.Send(new UpdateTreatmentPlanStartCommand(
+            Number: vm.Number,
+            IdPatient: currentUserId,
+            DateStarted: vm.DateStarted.Value,
+            DateCompleted: vm.DateCompleted.Value
+        ));
+
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = result.ErrorMessage;
+            return RedirectToAction(nameof(GetPlan), new { number = vm.Number });
+        }
+
+        TempData["Info"] = "Zapisano daty planu leczenia.";
+        return RedirectToAction(nameof(Plans));
     }
     #endregion
 }

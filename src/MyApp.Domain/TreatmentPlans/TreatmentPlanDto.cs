@@ -5,8 +5,10 @@ public record TreatmentPlanDto
     int Id,
     string Number,
     DateTime DateCreated,
+    DateTime? DateStarted,
+    DateTime? DateCompleted,
     string? IdPharmacist,
     string? IdPatient,
     string AdviceFullText,
-    bool Claimed
+    string Status
 );

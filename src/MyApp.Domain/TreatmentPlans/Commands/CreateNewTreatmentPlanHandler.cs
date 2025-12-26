@@ -33,7 +33,7 @@ namespace MyApp.Domain.TreatmentPlans.Commands
                 DateStarted = null,
                 DateCompleted = null,
                 IdPharmacist = request.PharmacistId,
-                Claimed = false,
+                Status = TreatmentPlanStatus.Created
             };
 
             string number = GenerateDigits();

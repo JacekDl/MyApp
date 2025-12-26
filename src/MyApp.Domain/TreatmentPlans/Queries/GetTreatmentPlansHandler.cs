@@ -67,11 +67,13 @@ public class GetTreatmentPlansHandler : IRequestHandler<GetTreatmentPlansQuery, 
             {
                 r.Id,
                 r.Number,
+                r.DateCreated,
+                r.DateStarted,
+                r.DateCompleted,
                 r.IdPharmacist,
                 r.IdPatient,
-                r.DateCreated,
                 r.AdviceFullText,
-                r.Claimed
+                r.Status
 
             })
             .OrderByDescending(x => x.DateCreated)
@@ -85,10 +87,12 @@ public class GetTreatmentPlansHandler : IRequestHandler<GetTreatmentPlansQuery, 
                     r.Id,
                     r.Number,
                     r.DateCreated,
+                    r.DateStarted,
+                    r.DateCompleted,
                     r.IdPharmacist ?? "",
                     r.IdPatient ?? "",
                     r.AdviceFullText,
-                    r.Claimed
+                    r.Status.ToString()
                     ))
             .ToList();
 

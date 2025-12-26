@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MyApp.Model.enums;
 
 namespace MyApp.Model;
 
@@ -14,7 +10,7 @@ public class TreatmentPlan
     public DateTime? DateStarted { get; set; }
     public DateTime? DateCompleted { get; set; }
 
-    public bool Claimed { get; set; }
+    public TreatmentPlanStatus Status { get; set; }
 
     public string? IdPharmacist { get; set; }
     public User? Pharmacist { get; set; }

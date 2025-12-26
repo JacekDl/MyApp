@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Model;
+using MyApp.Model.enums;
 
 namespace MyApp.Domain.Data;
 
@@ -86,7 +87,11 @@ public class ApplicationDbContext : IdentityDbContext<User>
 
             e.Property(x => x.DateCreated).IsRequired();
             e.Property(x => x.Number).IsRequired();
-            e.Property(x => x.Claimed).IsRequired();
+
+            e.Property(x => x.Status)
+                .HasConversion<int>()
+                .HasDefaultValue(TreatmentPlanStatus.Created)
+                .IsRequired();
 
             e.HasOne(x => x.Pharmacist)
                 .WithMany()
@@ -107,6 +112,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 .WithOne(a => a.TreatmentPlan)
                 .HasForeignKey<TreatmentPlanAdvice>(a => a.IdTreatmentPlan)
                 .OnDelete(DeleteBehavior.Cascade);
+
         });
 
         modelBuilder.Entity<TreatmentPlanMedicine>(e =>
@@ -145,5 +151,6 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 .HasForeignKey(x => x.IdTreatmentPlanMedicine)
                 .OnDelete(DeleteBehavior.Cascade);
         });
+
     }
 }

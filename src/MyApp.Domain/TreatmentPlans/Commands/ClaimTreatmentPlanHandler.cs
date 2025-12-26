@@ -31,26 +31,26 @@ public class ClaimTreatmentPlanHandler : IRequestHandler<ClaimTreatmentPlanComma
 
         if (plan is null)
         {
-            return new() { ErrorMessage = "Nie znaleziono zaleceń." };
+            return new() { ErrorMessage = "Nie znaleziono planu leczenia." };
         }
 
-        if (plan.Claimed)
+        if (plan.Status >= Model.enums.TreatmentPlanStatus.Claimed) //plan pobrany i potencjalnie wykorzystany
         {
-            return new() { ErrorMessage = "Zalecenia zostały już pobrane." };
+            return new() { ErrorMessage = "Plan lecznia został już pobrany." };
         }
 
         if (plan.DateCreated.AddDays(30) < DateTime.UtcNow)
         {
-            return new() { ErrorMessage = "Upłynął termin ważności zaleceń." };
+            return new() { ErrorMessage = "Upłynął termin ważności planu lecznia." };
         }
 
         if (plan.IdPatient is not null && plan.IdPatient != request.PatientId)
         {
-            return new() { ErrorMessage = "Zalecenia zostały już użyte." };
+            return new() { ErrorMessage = "Plan leczenia został już użyty." };
         }
 
         plan.IdPatient = request.PatientId;
-        plan.Claimed = true;
+        plan.Status = Model.enums.TreatmentPlanStatus.Claimed;
         await _db.SaveChangesAsync(ct);
         return new();
     }

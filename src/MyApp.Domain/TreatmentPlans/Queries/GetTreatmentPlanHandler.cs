@@ -34,36 +34,30 @@ public class GetTreatmentPlanHandler : IRequestHandler<GetTreatmentPlanQuery, Ge
                x.Id,
                x.Number,
                x.DateCreated,
+               x.DateStarted,
+               x.DateCompleted,
                x.IdPharmacist,
                x.IdPatient,
                x.AdviceFullText,
-               x.Claimed
+               x.Status
            })
            .SingleOrDefaultAsync(ct);
 
         if (plan is null)
         {
-            return new() { ErrorMessage = "Nie znaleziono zaleceń." };
-        }
-
-        if (plan.Claimed)
-        {
-            return new() { ErrorMessage = "Wykorzystano już kod zaleceń." };
-        }
-
-        if (plan.DateCreated.AddDays(30) < DateTime.UtcNow)
-        {
-            return new () {ErrorMessage = "Minął już termin wykorzystania kodu."};
+            return new() { ErrorMessage = "Nie znaleziono planu leczenia." };
         }
 
         var dto = new TreatmentPlanDto(
             plan.Id,
             plan.Number,
             plan.DateCreated,
+            plan.DateStarted,
+            plan.DateCompleted,
             plan.IdPharmacist ?? "",
-            plan.IdPatient,
+            plan.IdPatient ?? "",
             plan.AdviceFullText,
-            plan.Claimed
+            plan.Status.ToString()
             );
 
         return new() { Value = dto  };

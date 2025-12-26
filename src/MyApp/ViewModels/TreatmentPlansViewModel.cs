@@ -1,5 +1,4 @@
-﻿using MyApp.Domain.Reviews;
-using MyApp.Domain.TreatmentPlans;
+﻿using MyApp.Domain.TreatmentPlans;
 
 namespace MyApp.Web.ViewModels
 {

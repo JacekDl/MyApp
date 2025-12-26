@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyApp.Domain.Data;
 
@@ -10,9 +11,11 @@ using MyApp.Domain.Data;
 namespace MyApp.Domain.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251225161744_TreatmentPlanStatus")]
+    partial class TreatmentPlanStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
@@ -328,6 +331,9 @@ namespace MyApp.Domain.Migrations
                     b.Property<string>("AdviceFullText")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("Claimed")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("DateCompleted")
                         .HasColumnType("TEXT");

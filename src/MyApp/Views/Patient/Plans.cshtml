@@ -34,7 +34,7 @@ else
             <option value="5" selected="@(Model.PageSize == 5)">5</option>
             <option value="10" selected="@(Model.PageSize == 10)">10</option>
             <option value="20" selected="@(Model.PageSize == 20)">20</option>
-            <option value="50" selected="@(Model.PageSize ==    50)">50</option>
+            <option value="50" selected="@(Model.PageSize == 50)">50</option>
         </select>
     </form>
     
@@ -44,7 +44,7 @@ else
                 <th scope="col" class="col-1 text-nowrap">Utworzono</th>
                 <th scope="col" class="col-7">Treść</th>
                 <th scope="col" class="col-2 text-nowrap">Status</th>
-                <th scope="col" class="col-2" colspan="2"></th>
+                <th scope="col" class="col-2"></th>
             </tr>
         </thead>
         <tbody>
@@ -59,7 +59,7 @@ else
                         @* @(rev.Completed ? "Tak" : "Nie") *@
                     </td>
                     <td>
-                        <a asp-action="Display" asp-controller="Conversation" asp-route-number="@plan.Number"
+                        <a asp-action="GetPlan" asp-controller="Patient" asp-route-number="@plan.Number"
                            class="btn btn-sm btn-secondary">Podgląd</a>
                     </td>
                 </tr>

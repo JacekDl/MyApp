@@ -1,0 +1,181 @@
+﻿@model MyApp.Web.ViewModels.TreatmentPlanViewModel
+
+@{
+    ViewData["Title"] = "Plan leczenia";
+    Layout = "~/Views/Shared/_PatientLayout.cshtml";
+}
+
+<h3 class="mb-3">Plan leczenia</h3>
+
+<div class="card">
+    <div class="card-body">
+        <div class="text-break" style="white-space: pre-wrap;">@Model.AdviceFullText</div>
+       
+        <hr />
+        
+        <div class="mb-2">
+            <strong>Data utworzenia:</strong>
+            @Model.DateCreated.ToLocalTime().ToString("dd.MM.yyyy")
+        </div>
+
+        <div class="mb-2">
+            <strong>Data rozpoczęcia:</strong>
+            <span id="dateStartedDisplay">
+                @(Model.DateStarted.HasValue
+                                ? Model.DateStarted.Value.ToLocalTime().ToString("dd.MM.yyyy")
+                                : "—")
+            </span>
+        </div>
+
+        <div class="mb-3">
+            <strong>Data ukończenia:</strong>
+            <span id="dateCompletedDisplay">
+                @(Model.DateCompleted.HasValue
+                                ? Model.DateCompleted.Value.ToLocalTime().ToString("dd.MM.yyyy")
+                                : "—")
+            </span>
+        </div>
+        
+        <hr />
+
+        <form asp-action="UpdatePlanStart" asp-controller="Patient" method="post" class="row g-3">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Number" />
+            <input type="hidden" asp-for="DateCompleted" id="DateCompleted" />
+
+            <div class="col-12 col-md-6">
+                <label asp-for="DateStarted" class="form-label">Data rozpoczęcia</label>
+                <input asp-for="DateStarted"
+                       type="date"
+                       class="form-control"
+                       id="DateStarted" />
+                <span asp-validation-for="DateStarted" class="text-danger"></span>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label asp-for="TreatmentLengthDays" class="form-label"></label>
+                <input asp-for="TreatmentLengthDays"
+                       id="TreatmentLengthDays"
+                       type="number"
+                       class="form-control"
+                       min="1" max="365" step="1" />
+                <span asp-validation-for="TreatmentLengthDays" class="text-danger"></span>
+            </div>
+
+            <div class="col-12 d-flex justify-content-center gap-2">
+                <button type="button"
+                        class="btn btn-secondary"
+                        id="calculateEndDateBtn">
+                    Zmień
+                </button>
+
+                <button type="submit" class="btn btn-secondary">
+                    Zapisz
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@* TODO: replace with breadcrumbs *@
+@* <div class="mt-3">
+    <a asp-action="Plans" class="btn btn-secondary">Wróć</a>
+</div> *@
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const startInput = document.getElementById("DateStarted");
+            const daysInput = document.getElementById("TreatmentLengthDays");
+            const startDisplay = document.getElementById("dateStartedDisplay");
+            const endDisplay = document.getElementById("dateCompletedDisplay");
+            const endHidden = document.getElementById("DateCompleted");
+            const calcBtn = document.getElementById("calculateEndDateBtn");
+
+            if (!startInput || !daysInput || !startDisplay || !endDisplay || !endHidden || !calcBtn) {
+                console.error("GetPlan.cshtml: missing element(s)", {
+                    startInput, daysInput, startDisplay, endDisplay, endHidden, calcBtn
+                });
+                return;
+            }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const toYmd = (d) => {
+                const yyyy = d.getFullYear();
+                const mm = String(d.getMonth() + 1).padStart(2, "0");
+                const dd = String(d.getDate()).padStart(2, "0");
+                return `${yyyy}-${mm}-${dd}`;
+            };
+
+            startInput.min = toYmd(today);
+
+            calcBtn.addEventListener("click", function () {
+
+                if (!startInput.value || !daysInput.value) return;
+
+                const startDate = new Date(startInput.value);
+                startDate.setHours(0, 0, 0, 0);
+
+                const days = parseInt(daysInput.value, 10);
+                if (isNaN(days) || days <= 0) return;
+
+                if (startDate < today) {
+                    alert("Data rozpoczęcia nie może być wcześniejsza niż dzisiaj.");
+                    startInput.value = "";
+                    endHidden.value = "";
+                    endDisplay.textContent = "—";
+                    return;
+                }
+
+                const endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + days);
+
+                startDisplay.textContent = startDate.toLocaleDateString("pl-PL");
+                endDisplay.textContent = endDate.toLocaleDateString("pl-PL");
+
+                endHidden.value = toYmd(endDate);
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const startInput = document.getElementById("DateStarted");
+            const endHidden = document.getElementById("DateCompleted");
+            const daysInput = document.getElementById("TreatmentLengthDays");
+
+            if (!startInput || !endHidden || !daysInput) {
+                console.error("Missing elements for default TreatmentLengthDays logic", { startInput, endHidden, daysInput });
+                return;
+            }
+
+            if (!startInput.value) {
+                daysInput.value = 30;
+                return;
+            }
+
+            if (startInput.value && endHidden.value) {
+                const startDate = new Date(startInput.value);
+                const endDate = new Date(endHidden.value);
+
+                startDate.setHours(0, 0, 0, 0);
+                endDate.setHours(0, 0, 0, 0);
+
+                if (endDate > startDate) {
+                    const diffMs = endDate - startDate;
+                    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+                    daysInput.value = diffDays;
+                }
+            }
+        });
+    </script>
+}
