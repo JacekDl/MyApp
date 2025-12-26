@@ -109,5 +109,46 @@ public class PharmacistController : Controller
         return View(vm);
     }
     #endregion
+
+    #region GetPlan
+
+    public async Task<IActionResult> GetPlan(string number)
+    {
+        if (string.IsNullOrWhiteSpace(number))
+        {
+            return RedirectToAction("Plans");
+        }
+
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var result = await _mediator.Send(new GetTreatmentPlanQuery(number));
+
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = result.ErrorMessage;
+            return RedirectToAction(nameof(Plans));
+        }
+
+        if (!string.Equals(result.Value.IdPharmacist, currentUserId, StringComparison.OrdinalIgnoreCase))
+        {
+            return Forbid();
+        }
+
+        var tp = result.Value;
+
+        var vm = new TreatmentPlanViewModel();
+        vm.Id = tp.Id;
+        vm.Number = tp.Number;
+        vm.DateCreated = tp.DateCreated;
+        vm.DateStarted = tp.DateStarted;
+        vm.DateCompleted = tp.DateCompleted;
+        vm.IdPharmacist = tp.IdPharmacist;
+        vm.IdPatient = tp.IdPatient;
+        vm.AdviceFullText = tp.AdviceFullText;
+        vm.Status = tp.Status;
+
+        return View(vm);
+    }
+
+    #endregion
 }
 

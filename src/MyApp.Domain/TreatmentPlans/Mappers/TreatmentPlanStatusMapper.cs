@@ -8,10 +8,10 @@ namespace MyApp.Domain.TreatmentPlans.Mappers
             => status switch
             {
                 TreatmentPlanStatus.Created => "Utworzony",
-                TreatmentPlanStatus.Claimed => "Przypisany",
+                TreatmentPlanStatus.Claimed => "Pobrany",
                 TreatmentPlanStatus.Started => "Rozpoczęty",
                 TreatmentPlanStatus.Completed => "Zakończony",
-                TreatmentPlanStatus.Expired => "Wygasły",
+                TreatmentPlanStatus.Expired => "Niewykorzystany",
                 _ => "Nieznany"
             };
     }

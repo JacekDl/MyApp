@@ -1,0 +1,39 @@
+﻿@model MyApp.Web.ViewModels.TreatmentPlanViewModel
+
+@{
+    ViewData["Title"] = "Plan leczenia";
+    Layout = "~/Views/Shared/_PharmacistLayout.cshtml";
+}
+
+<h3 class="mb-3">Plan leczenia</h3>
+
+<div class="card">
+    <div class="card-body">
+        <div class="text-break" style="white-space: pre-wrap;">@Model.AdviceFullText</div>
+
+        <hr />
+
+        <div class="mb-2">
+            <strong>Data utworzenia:</strong>
+            @Model.DateCreated.ToLocalTime().ToString("dd.MM.yyyy")
+        </div>
+
+        <div class="mb-2">
+            <strong>Data rozpoczęcia:</strong>
+            <span id="dateStartedDisplay">
+                @(Model.DateStarted.HasValue
+                                ? Model.DateStarted.Value.ToLocalTime().ToString("dd.MM.yyyy")
+                                : "—")
+            </span>
+        </div>
+
+        <div class="mb-3">
+            <strong>Data ukończenia:</strong>
+            <span id="dateCompletedDisplay">
+                @(Model.DateCompleted.HasValue
+                                ? Model.DateCompleted.Value.ToLocalTime().ToString("dd.MM.yyyy")
+                                : "—")
+            </span>
+        </div>
+    </div>
+</div>

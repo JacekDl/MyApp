@@ -190,7 +190,7 @@ public class PatientController : Controller
 
         var tp = result.Value;
 
-        var vm = new TreatmentPlanViewModel(); //TODO: zrobić jakiś mapper
+        var vm = new TreatmentPlanViewModel();
         vm.Id = tp.Id;
         vm.Number = tp.Number;
         vm.DateCreated = tp.DateCreated;

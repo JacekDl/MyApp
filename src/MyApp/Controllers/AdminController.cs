@@ -65,9 +65,6 @@ public class AdminController : Controller
     }
     #endregion
 
-
-
-
     #region GetTreatmentPlans
     public async Task<IActionResult> Plans(string? searchTxt, string? userId, bool? completed, int page = 1, int pageSize = 10)
     {
@@ -100,6 +97,41 @@ public class AdminController : Controller
         TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Usunięto zalecenia." : result.ErrorMessage;
         return RedirectToAction(nameof(Plans));
     }
+    #endregion
+
+    #region GetPlan
+    public async Task<IActionResult> GetPlan(string number)
+    {
+        if (string.IsNullOrWhiteSpace(number))
+        {
+            return RedirectToAction("Plans");
+        }
+
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var result = await _mediator.Send(new GetTreatmentPlanQuery(number));
+
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = result.ErrorMessage;
+            return RedirectToAction(nameof(Plans));
+        }
+
+        var tp = result.Value;
+
+        var vm = new TreatmentPlanViewModel();
+        vm.Id = tp.Id;
+        vm.Number = tp.Number;
+        vm.DateCreated = tp.DateCreated;
+        vm.DateStarted = tp.DateStarted;
+        vm.DateCompleted = tp.DateCompleted;
+        vm.IdPharmacist = tp.IdPharmacist;
+        vm.IdPatient = tp.IdPatient;
+        vm.AdviceFullText = tp.AdviceFullText;
+        vm.Status = tp.Status;
+
+        return View(vm);
+    }
+
     #endregion
 
     #region Promotions
