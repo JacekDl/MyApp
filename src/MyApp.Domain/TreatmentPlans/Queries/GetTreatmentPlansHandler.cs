@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
+using MyApp.Domain.TreatmentPlans.Mappers;
 using MyApp.Model;
 
 namespace MyApp.Domain.TreatmentPlans.Queries;
@@ -92,7 +93,7 @@ public class GetTreatmentPlansHandler : IRequestHandler<GetTreatmentPlansQuery, 
                     r.IdPharmacist ?? "",
                     r.IdPatient ?? "",
                     r.AdviceFullText,
-                    r.Status.ToString()
+                    TreatmentPlanStatusMapper.ToPolish(r.Status)
                     ))
             .ToList();
 

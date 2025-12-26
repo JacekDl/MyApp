@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
+using MyApp.Domain.TreatmentPlans.Mappers;
 
 namespace MyApp.Domain.TreatmentPlans.Queries;
 
@@ -57,7 +58,7 @@ public class GetTreatmentPlanHandler : IRequestHandler<GetTreatmentPlanQuery, Ge
             plan.IdPharmacist ?? "",
             plan.IdPatient ?? "",
             plan.AdviceFullText,
-            plan.Status.ToString()
+            TreatmentPlanStatusMapper.ToPolish(plan.Status)
             );
 
         return new() { Value = dto  };

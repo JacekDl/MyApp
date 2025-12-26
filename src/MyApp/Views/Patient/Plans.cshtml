@@ -53,11 +53,7 @@ else
                 <tr>
                     <td>@plan.DateCreated.ToString("dd.MM.yyyy HH:mm")</td>
                     <td class="text-break" style="white-space: pre-wrap;">@plan.AdviceFullText</td>
-
-                    <td>
-                        @* TODO: implement *@
-                        @* @(rev.Completed ? "Tak" : "Nie") *@
-                    </td>
+                    <td>@plan.Status</td>
                     <td>
                         <a asp-action="GetPlan" asp-controller="Patient" asp-route-number="@plan.Number"
                            class="btn btn-sm btn-secondary">Podgląd</a>

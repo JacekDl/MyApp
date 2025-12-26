@@ -206,7 +206,6 @@ public class PatientController : Controller
 
     #endregion
 
-
     #region UpdatePlanStart
     [Authorize(Roles = UserRoles.Patient)]
     [HttpPost, ValidateAntiForgeryToken]
