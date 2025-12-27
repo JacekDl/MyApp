@@ -4,6 +4,8 @@
     Layout = "~/Views/Shared/_PatientLayout.cshtml";
 }
 
+<h3 class="mb-3">Pobierz nowy plan leczenia</h3>
+
 <div class="row justify-content-center">
     <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
         <div class="border rounded-3 p-4 app-panel">
@@ -11,7 +13,7 @@
                 @Html.AntiForgeryToken()
 
                 <div class="mb-3">
-                    <label asp-for="Number" class="form-label">Wpisz numer zalecenia.</label>
+                    <label asp-for="Number" class="form-label">Wpisz numer planu leczenia.</label>
                     <input asp-for="Number" class="form-control"/>
                     <span asp-validation-for="Number" class="text-danger"></span>
                 </div>

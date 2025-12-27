@@ -1,10 +1,11 @@
 ﻿@{
     var current = ViewContext.RouteData.Values["action"]?.ToString();
+    var plan = current == "Plans" || current == "TreatmentPlan" || current == "GetPlan";
 }
 
 <ul class="nav nav-tabs mb-4">
     <li class="nav-item dropdown">
-        <a class="nav-link @((current == "Plans") || (current == "TreatmentPlan") ? "active" : "")" dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Plany leczenia</a>
+        <a class="nav-link @(plan ? "active" : "")" dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Plany leczenia</a>
         <ul class="dropdown-menu">
             <li><a class="dropdown-item" asp-controller="Pharmacist" asp-action="Plans">Utworzone</a></li>
             <li><a class="dropdown-item" asp-controller="Pharmacist" asp-action="TreatmentPlan">Utwórz nowy</a></li>

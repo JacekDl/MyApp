@@ -4,6 +4,7 @@
     ViewData["Title"] = "Twoje zalecenia";
     Layout = "~/Views/Shared/_PatientLayout.cshtml";
     var searchTxt = (string?)ViewBag.Query ?? "";
+    var status = (string?)ViewBag.Status ?? "";
     var plans = Model.Plans;
 
     var totalPages = Model.TotalPages;
@@ -11,22 +12,33 @@
     var pageSize = Model.PageSize;
 }
 
+<h3 class="mb-3">Pobrane plany leczenia</h3>
+
+<div class="mb-3">
+    <form method="get" asp-controller="Patient" asp-action="Plans" class="d-flex gap-2">
+        <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Wyszukaj tekst..." />
+        <select name="status" class="form-select">
+            <option value="" selected="@(string.IsNullOrEmpty(status) ? "selected" : null)">Wszystkie</option>
+            <option value="Created" selected=@(status == "created" ? "selected" : null)>Utworzone</option>
+            <option value="Claimed" selected=@(status == "claimed" ? "selected" : null)>Pobrane</option>
+            <option value="Started" selected=@(status == "started" ? "selected" : null)>Rozpoczęte</option>
+            <option value="Completed" selected=@(status == "completed" ? "selected" : null)>Zakończone</option>
+            <option value="Expired" selected=@(status == "expired" ? "selected" : null)>Niewykorzystane</option>
+        </select>
+        <button type="submit" class="btn btn-secondary">Filtruj</button>
+        <a asp-action="Plans" class="btn btn-secondary">Wyczyść</a>
+    </form>
+</div>
+
 @if (!plans.Any())
 {
     <div class="alert alert-light">Nie znaleziono żadnych zaleceń.</div>
 }
 else
 {
-    <div class="mb-3">
-        <form method="get" asp-action="Tokens" class="d-flex gap-2">
-            <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Wyszukaj..." />
-            <button type="submit" class="btn btn-secondary">Filtruj</button>
-            <a asp-action="Tokens" class="btn btn-secondary">Wyczyść</a>
-        </form>
-    </div>
-
     <form method="get" class="d-flex align-items-center gap-2 mb-3">
         <input type="hidden" name="searchTxt" value="@ViewBag.Query" />
+        <input type="hidden" name="status" value="@ViewBag.Status" />
         <input type="hidden" name="page" value="1" />
 
         <label class="form-label mb-0">Na stronę:</label>
@@ -41,10 +53,10 @@ else
     <table class="table align-middle">
         <thead>
             <tr>
-                <th scope="col" class="col-1 text-nowrap">Utworzono</th>
+                <th scope="col" class="col-2 text-nowrap">Utworzono</th>
                 <th scope="col" class="col-7">Treść</th>
                 <th scope="col" class="col-2 text-nowrap">Status</th>
-                <th scope="col" class="col-2"></th>
+                <th scope="col" class="col-1"></th>
             </tr>
         </thead>
         <tbody>
@@ -55,8 +67,12 @@ else
                     <td class="text-break" style="white-space: pre-wrap;">@plan.AdviceFullText</td>
                     <td>@plan.Status</td>
                     <td>
-                        <a asp-action="GetPlan" asp-controller="Patient" asp-route-number="@plan.Number"
-                           class="btn btn-sm btn-secondary">Podgląd</a>
+                        <a asp-action="GetPlan" 
+                            asp-controller="Patient" 
+                            asp-route-number="@plan.Number"
+                            class="btn btn-sm btn-secondary">
+                            Szczegóły
+                        </a>
                     </td>
                 </tr>
 
@@ -74,7 +90,7 @@ else
                 <a class="page-link"
                    asp-action="Plans"
                    asp-controller="Patient"
-                   asp-route-page="@(page - 1)"
+                   asp-route-status="@ViewBag.Status"
                    asp-route-pageSize="@pageSize"
                    asp-route-searchTxt="@ViewBag.Query">«</a>
             </li>
@@ -85,6 +101,7 @@ else
                     <a class="page-link"
                        asp-action="Plans"
                        asp-controller="Patient"
+                       asp-route-status="@ViewBag.Status"
                        asp-route-page="@p"
                        asp-route-pageSize="@pageSize"
                        asp-route-searchTxt="@ViewBag.Query">@p</a>
@@ -95,6 +112,7 @@ else
                 <a class="page-link"
                    asp-action="Plans"
                    asp-controller="Patient"
+                   asp-route-status="@ViewBag.Status"
                    asp-route-page="@(page + 1)"
                    asp-route-pageSize="@pageSize"
                    asp-route-searchTxt="@ViewBag.Query">»</a>

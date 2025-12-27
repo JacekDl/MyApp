@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var searchTxt = (string?)ViewBag.Query ?? "";
     var userId = (string?)ViewBag.UserId ?? "";
-    var completed = (string?)ViewBag.Completed ?? "";
+    var status = (string?)ViewBag.Status ?? "";
     var plans = Model.Plans;
 
     var totalPages = Model.TotalPages;
@@ -22,29 +22,33 @@
 
 <h3 class="mb-3">Utworzone plany leczenia</h3>
 
+<div class="mb-3">
+    <form method="get" asp-controller="Admin" asp-action="Plans" class="d-flex gap-2">
+        <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Wyszukaj tekst..." />
+        <select name="status" class="form-select">
+            <option value="" selected="@(string.IsNullOrEmpty(status) ? "selected" : null)">Wszystkie</option>
+            <option value="Created" selected=@(status == "created" ? "selected" : null)>Utworzone</option>
+            <option value="Claimed" selected=@(status == "claimed" ? "selected" : null)>Pobrane</option>
+            <option value="Started" selected=@(status == "started" ? "selected" : null)>Rozpoczęte</option>
+            <option value="Completed" selected=@(status == "completed" ? "selected" : null)>Zakończone</option>
+            <option value="Expired" selected=@(status == "expired" ? "selected" : null)>Niewykorzystane</option>
+        </select>
+        <button type="submit" class="btn btn-secondary">Filtruj</button>
+        <a asp-action="Plans" class="btn btn-secondary">Wyczyść</a>
+    </form>
+</div>
+
 @if (!plans.Any())
 {
     <div class="alert alert-light">Nie znaleziono żadnych planów leczenia.</div>
 }
 else
 {
-    <div class="mb-3">
-        <form method="get" asp-controller="Admin" asp-action="Reviews" class="d-flex gap-2">
-            <input type="text" name="searchTxt" value="@searchTxt" class="form-control" placeholder="Wyszukaj tekst..." />
-            <select name="completed" class="form-select">
-                <option value="" selected="@(string.IsNullOrEmpty(completed) ? "selected" : null)">Wszystkie</option>
-                <option value="true" selected=@(completed == "true" ? "selected" : null)>Ukończone</option>
-                <option value="false" selected=@(completed == "false" ? "selected" : null)>Nieukończone</option>
-            </select>
-            <button type="submit" class="btn btn-secondary">Filtruj</button>
-            <a asp-action="Reviews" class="btn btn-secondary">Wyczyść</a>
-        </form>
-    </div>
-
     <form method="get" class="d-flex align-items-center gap-2 mb-3">
         <input type="hidden" name="searchTxt" value="@ViewBag.Query" />
         <input type="hidden" name="userId" value="@ViewBag.UserId" />
-        <input type="hidden" name="completed" value="@ViewBag.Completed" />
+        <input type="hidden" name="status" value="@ViewBag.Status" />
+        //TODO: usunąć nieużywane pola
         <input type="hidden" name="userEmail" value="@ViewBag.UserEmail" />
         <input type="hidden" name="page" value="1" />
 
@@ -62,10 +66,10 @@ else
         <table class="table table-sm align-middle mb-0">
             <thead>
                 <tr>
-                    <th scope="col" class="col-1">Utworzono</th>
+                    <th scope="col" class="col-2">Utworzono</th>
                     <th scope="col" class="col-7">Treść</th>
                     <th scope="col" class="col-2 text-nowrap">Status</th>
-                    <th scope="col" class="col-2" colspan="2"></th>
+                    <th scope="col" class="col-1"></th>
                 </tr>
             </thead>
             <tbody>
@@ -81,11 +85,12 @@ else
                                    asp-controller="Admin"
                                    asp-route-number="@plan.Number"
                                    class="btn btn-sm btn-secondary w-100 w-md-auto text-nowrap">
-                                    Podgląd
+                                    Szczegóły
                                 </a>
                             </div>
                         </td>
-                        <td class="col-1">
+                        @* TODO: implement in Szczegóły *@
+                        @* <td class="col-1">
                             <form asp-action="DeleteReview" asp-controller="Admin" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@plan.Id" />
@@ -95,7 +100,7 @@ else
                                     Usuń
                                 </button>
                             </form>
-                        </td>
+                        </td> *@
                     </tr>
                 }
             </tbody>
@@ -110,23 +115,23 @@ else
 
             <li class="page-item @(page <= 1 ? "disabled" : "")">
                 <a class="page-link"
-                   asp-action="Reviews"
+                   asp-action="Plans"
                    asp-route-page="@(page - 1)"
                    asp-route-pageSize="@pageSize"
                    asp-route-searchTxt="@ViewBag.Query"
                    asp-route-userId="@ViewBag.UserId"
-                   asp-route-completed="@ViewBag.Completed"
+                   asp-route-status="@ViewBag.Status"
                    asp-route-userEmail="@ViewBag.UserEmail">«</a>
             </li>
 
             <li class="page-item @(page == 1 ? "active" : "")">
                 <a class="page-link"
-                   asp-action="Reviews"
+                   asp-action="Plans"
                    asp-route-page="1"
                    asp-route-pageSize="@pageSize"
                    asp-route-searchTxt="@ViewBag.Query"
                    asp-route-userId="@ViewBag.UserId"
-                   asp-route-completed="@ViewBag.Completed"
+                   asp-route-status="@ViewBag.Status"
                    asp-route-userEmail="@ViewBag.UserEmail">1</a>
             </li>
 
@@ -139,12 +144,12 @@ else
             {
                 <li class="page-item @(p == page ? "active" : "")">
                     <a class="page-link"
-                       asp-action="Reviews"
+                       asp-action="Plans"
                        asp-route-page="@p"
                        asp-route-pageSize="@pageSize"
                        asp-route-searchTxt="@ViewBag.Query"
                        asp-route-userId="@ViewBag.UserId"
-                       asp-route-completed="@ViewBag.Completed"
+                       asp-route-status="@ViewBag.Status"
                        asp-route-userEmail="@ViewBag.UserEmail">@p</a>
                 </li>
             }
@@ -158,24 +163,24 @@ else
             {
                 <li class="page-item @(page == totalPages ? "active" : "")">
                     <a class="page-link"
-                       asp-action="Reviews"
+                       asp-action="Plans"
                        asp-route-page="@totalPages"
                        asp-route-pageSize="@pageSize"
                        asp-route-searchTxt="@ViewBag.Query"
                        asp-route-userId="@ViewBag.UserId"
-                       asp-route-completed="@ViewBag.Completed"
+                       asp-route-status="@ViewBag.Status"
                        asp-route-userEmail="@ViewBag.UserEmail">@totalPages</a>
                 </li>
             }
 
             <li class="page-item @(page >= totalPages ? "disabled" : "")">
                 <a class="page-link"
-                   asp-action="Reviews"
+                   asp-action="Plans"
                    asp-route-page="@(page + 1)"
                    asp-route-pageSize="@pageSize"
                    asp-route-searchTxt="@ViewBag.Query"
                    asp-route-userId="@ViewBag.UserId"
-                   asp-route-completed="@ViewBag.Completed"
+                   asp-route-status="@ViewBag.Status"
                    asp-route-userEmail="@ViewBag.UserEmail">»</a>
             </li>
 

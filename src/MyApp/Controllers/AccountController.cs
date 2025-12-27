@@ -278,7 +278,7 @@ public class AccountController : Controller
         }
         else
         {
-            vm.Breadcrumbs.AddRange(["Start|Tokens|Patient", "Szczegóły konta||"]);
+            vm.Breadcrumbs.AddRange(["Start|Schedule|Patient", "Szczegóły konta||"]);
         }
         vm.User = result.Value!;
 
@@ -642,7 +642,7 @@ public class AccountController : Controller
             return RedirectToAction("Plans", UserRoles.Pharmacist);
         }
 
-        return RedirectToAction("Tokens", UserRoles.Patient);
+        return RedirectToAction("Schedule", UserRoles.Patient);
     }
 
     [AllowAnonymous]

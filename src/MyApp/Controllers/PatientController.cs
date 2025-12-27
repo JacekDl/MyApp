@@ -6,6 +6,7 @@ using MyApp.Domain.Reviews.Queries;
 using MyApp.Domain.TreatmentPlans.Commands;
 using MyApp.Domain.TreatmentPlans.Queries;
 using MyApp.Domain.Users;
+using MyApp.Model.enums;
 using MyApp.Web.ViewModels;
 using MyApp.Web.ViewModels.Common;
 using System.ComponentModel.DataAnnotations;
@@ -141,15 +142,18 @@ public class PatientController : Controller
     #region ViewPlans
     [HttpGet]
     [Authorize(Roles = UserRoles.Patient)]
-    public async Task<IActionResult> Plans(string? searchTxt, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> Plans(string? searchTxt, TreatmentPlanStatus? status, int page = 1, int pageSize = 10)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var result = await _mediator.Send(new GetTreatmentPlansQuery(searchTxt, currentUserId, null, null, page, pageSize));
+        var result = await _mediator.Send(new GetTreatmentPlansQuery(searchTxt, currentUserId, status, null, page, pageSize));
         if (!result.Succeeded)
         {
             TempData["Error"] = result.ErrorMessage;
             return View();
         }
+
+        ViewBag.Query = searchTxt;
+        ViewBag.Status = status?.ToString().ToLowerInvariant();
 
         var vm = new TreatmentPlansViewModel();
         if (result.Value is not null)
@@ -160,7 +164,6 @@ public class PatientController : Controller
             vm.PageSize = result.PageSize;
         }
 
-        ViewBag.Query = searchTxt;
         return View(vm);
     }
     #endregion
@@ -244,6 +247,25 @@ public class PatientController : Controller
 
         TempData["Info"] = "Zapisano daty planu leczenia.";
         return RedirectToAction(nameof(Plans));
+    }
+    #endregion
+
+    #region Calendar
+    [Authorize(Roles = UserRoles.Patient)]
+    [HttpGet]
+    public async Task<IActionResult> Schedule()
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+        var result = await _mediator.Send(new GetTreatmentPlanMedicinesQuery(currentUserId));
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = result.ErrorMessage;
+            return View(new DateMedicinesViewModel());
+        }
+
+        var vm = DateMedicinesViewModel.From(result.Value ?? new());
+        return View(vm);
     }
     #endregion
 }

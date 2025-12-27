@@ -5,13 +5,14 @@ using MyApp.Domain.Common;
 using MyApp.Domain.Data;
 using MyApp.Domain.TreatmentPlans.Mappers;
 using MyApp.Model;
+using MyApp.Model.enums;
 
 namespace MyApp.Domain.TreatmentPlans.Queries;
 
 public record class GetTreatmentPlansQuery(
     string? SearchTxt,
     string? CurrentUserId,
-    bool? Completed,
+    TreatmentPlanStatus? Status,
     string? UserEmail = null,
     int Page = 1,
     int PageSize = 10
@@ -50,6 +51,11 @@ public class GetTreatmentPlansHandler : IRequestHandler<GetTreatmentPlansQuery, 
             var pattern = $"%{request.SearchTxt.Trim()}%";
             query = query.Where(r =>
                 EF.Functions.Like(r.AdviceFullText, pattern));
+        }
+
+        if(request.Status is not null)
+        {
+            query = query.Where(tp => tp.Status == request.Status);
         }
 
         if (!string.IsNullOrWhiteSpace(request.CurrentUserId))

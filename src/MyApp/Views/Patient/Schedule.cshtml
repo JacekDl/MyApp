@@ -1,0 +1,65 @@
+﻿@model MyApp.Web.ViewModels.DateMedicinesViewModel
+@{
+    Layout = "~/Views/Shared/_PatientLayout.cshtml";
+}
+<h3 class="mb-3">Leki na dziś</h3>
+
+<h4>Rano</h4>
+@if (!Model.Morning.Any())
+{
+    <p class="text-muted">Brak</p>
+}
+else
+{
+    <ul>
+        @foreach (var m in Model.Morning)
+        {
+            <li><strong>@m.MedicineName</strong> — @m.Dosage <span class="text-muted">(Plan: @m.TreatmentPlanNumber)</span></li>
+        }
+    </ul>
+}
+
+<h4>W południe</h4>
+@if (!Model.Noon.Any())
+{
+    <p class="text-muted">Brak</p>
+}
+else 
+{
+    <ul>
+        @foreach (var m in Model.Noon)
+        {
+            <li><strong>@m.MedicineName</strong> — @m.Dosage <span class="text-muted">(Plan: @m.TreatmentPlanNumber)</span></li>
+        }
+    </ul>
+}
+
+<h4>Popołudnie</h4>
+@if (!Model.Afternoon.Any())
+{
+    <p class="text-muted">Brak</p>
+}
+else
+{
+    <ul>
+        @foreach (var m in Model.Afternoon)
+        {
+            <li><strong>@m.MedicineName</strong> — @m.Dosage <span class="text-muted">(Plan: @m.TreatmentPlanNumber)</span></li>
+        }
+    </ul>
+}
+
+<h4>Wieczór</h4>
+@if (!Model.Evening.Any())
+{
+    <p class="text-muted">Brak</p>
+}
+else
+{
+    <ul>
+        @foreach (var m in Model.Evening)
+        {
+            <li><strong>@m.MedicineName</strong> — @m.Dosage <span class="text-muted">(Plan: @m.TreatmentPlanNumber)</span></li>
+        }
+    </ul>
+}

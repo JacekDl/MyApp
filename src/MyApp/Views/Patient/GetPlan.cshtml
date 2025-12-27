@@ -36,8 +36,6 @@
             </span>
         </div>
 
-        
-        
         <hr />
 
         <form asp-action="UpdatePlanStart" asp-controller="Patient" method="post" class="row g-3">
@@ -48,7 +46,7 @@
             <input type="hidden" asp-for="DateCompleted" id="DateCompleted" />
 
             <div class="col-12 col-md-6">
-                <label asp-for="DateStarted" class="form-label">Data rozpoczęcia</label>
+                <label asp-for="DateStarted" class="form-label">Kiedy chcesz rozpocząć plan leczenia?</label>
                 <input asp-for="DateStarted"
                        type="date"
                        class="form-control"

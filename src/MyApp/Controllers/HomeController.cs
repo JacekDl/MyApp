@@ -23,7 +23,7 @@ public class HomeController : Controller
 
             if (User.IsInRole(UserRoles.Patient))
             {
-                return RedirectToAction("Plans", UserRoles.Patient);
+                return RedirectToAction("Schedule", UserRoles.Patient);
             }
         }
         return View();

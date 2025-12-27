@@ -1,13 +1,12 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Reviews.Commands;
-using MyApp.Domain.Reviews.Queries;
 using MyApp.Domain.TreatmentPlans.Queries;
 using MyApp.Domain.Users;
 using MyApp.Domain.Users.Commands;
 using MyApp.Domain.Users.Queries;
+using MyApp.Model.enums;
 using MyApp.Web.ViewModels;
 using System.Security.Claims;
 
@@ -66,10 +65,9 @@ public class AdminController : Controller
     #endregion
 
     #region GetTreatmentPlans
-    public async Task<IActionResult> Plans(string? searchTxt, string? userId, bool? completed, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> Plans(string? searchTxt, string? userId, TreatmentPlanStatus? status, int page = 1, int pageSize = 10)
     {
-
-        var result = await _mediator.Send(new GetTreatmentPlansQuery(searchTxt, userId, completed, null, page, pageSize));
+        var result = await _mediator.Send(new GetTreatmentPlansQuery(searchTxt, userId, status, null, page, pageSize));
         if (!result.Succeeded)
         {
             TempData["Error"] = result.ErrorMessage;
@@ -77,7 +75,7 @@ public class AdminController : Controller
         }
 
         ViewBag.Query = searchTxt;
-        ViewBag.Completed = completed?.ToString().ToLowerInvariant();
+        ViewBag.Status = status?.ToString().ToLowerInvariant();
 
         var vm = new TreatmentPlansViewModel();
         if (result.Value is not null)

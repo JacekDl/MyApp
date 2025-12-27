@@ -9,6 +9,7 @@ using MyApp.Domain.Dictionaries.Queries;
 using MyApp.Domain.Users;
 using MyApp.Domain.TreatmentPlans.Commands;
 using MyApp.Domain.TreatmentPlans.Queries;
+using MyApp.Model.enums;
 
 namespace MyApp.Web.Controllers;
 
@@ -84,11 +85,11 @@ public class PharmacistController : Controller
 
     #region GetTreatmentPlans
     [HttpGet]
-    public async Task<IActionResult> Plans(string? searchTxt, bool? completed, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> Plans(string? searchTxt, TreatmentPlanStatus? status, int page = 1, int pageSize = 10)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        var result = await _mediator.Send(new GetTreatmentPlansQuery(searchTxt, currentUserId, completed, null, page, pageSize));
+        var result = await _mediator.Send(new GetTreatmentPlansQuery(searchTxt, currentUserId, status, null, page, pageSize));
         if (!result.Succeeded)
         {
             TempData["Error"] = result.ErrorMessage;
@@ -96,7 +97,7 @@ public class PharmacistController : Controller
         }
 
         ViewBag.Query = searchTxt;
-        ViewBag.Completed = completed?.ToString().ToLowerInvariant();
+        ViewBag.Completed = status?.ToString().ToLowerInvariant();
 
         var vm = new TreatmentPlansViewModel();
         if (result.Value is not null)
