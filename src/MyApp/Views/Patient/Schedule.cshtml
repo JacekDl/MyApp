@@ -2,6 +2,7 @@
 @{
     Layout = "~/Views/Shared/_PatientLayout.cshtml";
     var d = Model.Date.Date;
+    var isFutureDay = Model.Date.Date > DateTime.Today;
 }
 <h3 class="mb-3">
     Leki do przyjęcia: @d.ToString("dd.MM.yyyy - dddd ", new System.Globalization.CultureInfo("pl-PL"))
@@ -16,7 +17,27 @@
         <ul class="list-group list-group-flush">
             @foreach(var m in Model.Morning)
             {
-                <li class="list-group-item">@m.MedicineName - @m.Dosage</li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <label class="mb-0 flex-grow-1" for="med-@m.IdMedicine">
+                        @m.MedicineName – @m.Dosage
+                    </label>
+
+                    <form asp-action="ToggleMedicineTaken" method="post" class="m-0">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" name="date" value="@Model.Date.ToString("yyyy-MM-dd")" />
+                        <input type="hidden" name="treatmentPlanMedicineId" value="@m.IdMedicine" />
+
+                        <input class="form-check-input ms-2"
+                               type="checkbox"
+                               id="med-@m.IdMedicine"
+                               name="isTaken"
+                               value="true"
+                               checked="@(Model.TakenMedicineIds.Contains(m.IdMedicine))"
+                               onchange="this.form.submit();"
+                               disabled="@(isFutureDay ? "disabled" : null)" />
+                    </form>
+                </li>
             }
         </ul>
     </div>
@@ -32,7 +53,27 @@
         <ul class="list-group list-group-flush">
             @foreach (var m in Model.Noon)
             {
-                <li class="list-group-item">@m.MedicineName - @m.Dosage</li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <label class="mb-0 flex-grow-1" for="med-@m.IdMedicine">
+                        @m.MedicineName – @m.Dosage
+                    </label>
+
+                    <form asp-action="ToggleMedicineTaken" method="post" class="m-0">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" name="date" value="@Model.Date.ToString("yyyy-MM-dd")" />
+                        <input type="hidden" name="treatmentPlanMedicineId" value="@m.IdMedicine" />
+
+                        <input class="form-check-input ms-2"
+                               type="checkbox"
+                               id="med-@m.IdMedicine"
+                               name="isTaken"
+                               value="true"
+                               checked="@(Model.TakenMedicineIds.Contains(m.IdMedicine))"
+                               onchange="this.form.submit();"
+                               disabled="@(isFutureDay ? "disabled" : null)" />
+                    </form>
+                </li>
             }
         </ul>
     </div>
@@ -48,7 +89,27 @@
         <ul class="list-group list-group-flush">
             @foreach (var m in Model.Afternoon)
             {
-                <li class="list-group-item">@m.MedicineName - @m.Dosage</li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <label class="mb-0 flex-grow-1" for="med-@m.IdMedicine">
+                        @m.MedicineName – @m.Dosage
+                    </label>
+
+                    <form asp-action="ToggleMedicineTaken" method="post" class="m-0">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" name="date" value="@Model.Date.ToString("yyyy-MM-dd")" />
+                        <input type="hidden" name="treatmentPlanMedicineId" value="@m.IdMedicine" />
+
+                        <input class="form-check-input ms-2"
+                               type="checkbox"
+                               id="med-@m.IdMedicine"
+                               name="isTaken"
+                               value="true"
+                               checked="@(Model.TakenMedicineIds.Contains(m.IdMedicine))"
+                               onchange="this.form.submit();"
+                               disabled="@(isFutureDay ? "disabled" : null)" />
+                    </form>
+                </li>
             }
         </ul>
     </div>
@@ -64,7 +125,27 @@
         <ul class="list-group list-group-flush">
             @foreach (var m in Model.Evening)
             {
-                <li class="list-group-item">@m.MedicineName - @m.Dosage</li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <label class="mb-0 flex-grow-1" for="med-@m.IdMedicine">
+                        @m.MedicineName – @m.Dosage
+                    </label>
+
+                    <form asp-action="ToggleMedicineTaken" method="post" class="m-0">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" name="date" value="@Model.Date.ToString("yyyy-MM-dd")" />
+                        <input type="hidden" name="treatmentPlanMedicineId" value="@m.IdMedicine" />
+
+                        <input class="form-check-input ms-2"
+                               type="checkbox"
+                               id="med-@m.IdMedicine"
+                               name="isTaken"
+                               value="true"
+                               checked="@(Model.TakenMedicineIds.Contains(m.IdMedicine))"
+                               onchange="this.form.submit();"
+                               disabled="@(isFutureDay ? "disabled" : null)" />
+                    </form>
+                </li>
             }
         </ul>
     </div>

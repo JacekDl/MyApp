@@ -35,6 +35,7 @@ namespace MyApp.Domain.TreatmentPlans.Queries
                 where tp.DateCompleted!.Value >= dayStart
                 orderby tp.Number, (int)m.TimeOfDay, m.MedicineName
                 select new TreatmentPlanMedicineDto(
+                    m.Id,
                     tp.Id,
                     tp.Number,
                     m.MedicineName,

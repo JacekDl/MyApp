@@ -268,7 +268,32 @@ public class PatientController : Controller
 
         var vm = DateMedicinesViewModel.From(result.Value ?? new());
         vm.Date = selectedDate;
+
+        var takenIdsResult = await _mediator.Send(new GetTakenMedicineIdsForDateQuery(currentUserId, selectedDate));
+        vm.TakenMedicineIds = takenIdsResult.Value ?? new HashSet<int>();
+
         return View(vm);
+    }
+
+    [Authorize(Roles = UserRoles.Patient)]
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ToggleMedicineTaken(int treatmentPlanMedicineId, DateTime date, bool isTaken)
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+        var result = await _mediator.Send(new ToggleMedicineTakenCommand(
+            IdPatient: currentUserId,
+            TreatmentPlanMedicineId: treatmentPlanMedicineId,
+            Date: date.Date,
+            IsTaken: isTaken
+        ));
+
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = result.ErrorMessage;
+        }
+
+        return RedirectToAction(nameof(Schedule), new { date = date.Date });
     }
     #endregion
 }

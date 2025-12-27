@@ -12,6 +12,8 @@ namespace MyApp.Web.ViewModels
 
         public DateTime Date { get; set; } = DateTime.Today;
 
+        public HashSet<int> TakenMedicineIds { get; set; } = new();
+
         public static DateMedicinesViewModel From(List<TreatmentPlanMedicineDto> items)
         {
             return new DateMedicinesViewModel
