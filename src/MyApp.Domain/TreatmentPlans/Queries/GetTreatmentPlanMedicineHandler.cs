@@ -8,7 +8,7 @@ using MyApp.Model;
 namespace MyApp.Domain.TreatmentPlans.Queries
 {
 
-    public record class GetTreatmentPlanMedicinesQuery(string PatientId) : IRequest<GetTreatmentPlanMedicinesResult>;
+    public record class GetTreatmentPlanMedicinesQuery(string PatientId, DateTime Date) : IRequest<GetTreatmentPlanMedicinesResult>;
 
     public record class GetTreatmentPlanMedicinesResult : Result<List<TreatmentPlanMedicineDto>>;
     public class GetTreatmentPlanMedicinesHandler : IRequestHandler<GetTreatmentPlanMedicinesQuery, GetTreatmentPlanMedicinesResult>
@@ -22,8 +22,8 @@ namespace MyApp.Domain.TreatmentPlans.Queries
 
         public async Task<GetTreatmentPlanMedicinesResult> Handle(GetTreatmentPlanMedicinesQuery request, CancellationToken ct)
         {
-            var todayStart = DateTime.Today;
-            var tomorrowStart = todayStart.AddDays(1);
+            var dayStart = request.Date.Date;
+            var nextDayStart = dayStart.AddDays(1);
 
             var query =
                 from m in _db.Set<TreatmentPlanMedicine>().AsNoTracking()
@@ -31,8 +31,8 @@ namespace MyApp.Domain.TreatmentPlans.Queries
                     on m.IdTreatmentPlan equals tp.Id
                 where tp.IdPatient == request.PatientId
                 where tp.DateStarted.HasValue && tp.DateCompleted.HasValue
-                where tp.DateStarted!.Value < tomorrowStart
-                where tp.DateCompleted!.Value >= todayStart
+                where tp.DateStarted!.Value < nextDayStart
+                where tp.DateCompleted!.Value >= dayStart
                 orderby tp.Number, (int)m.TimeOfDay, m.MedicineName
                 select new TreatmentPlanMedicineDto(
                     tp.Id,

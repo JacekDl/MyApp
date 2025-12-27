@@ -253,18 +253,21 @@ public class PatientController : Controller
     #region Calendar
     [Authorize(Roles = UserRoles.Patient)]
     [HttpGet]
-    public async Task<IActionResult> Schedule()
+    public async Task<IActionResult> Schedule(DateTime? date)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        var result = await _mediator.Send(new GetTreatmentPlanMedicinesQuery(currentUserId));
+        var selectedDate = (date ?? DateTime.Today).Date;
+
+        var result = await _mediator.Send(new GetTreatmentPlanMedicinesQuery(currentUserId, selectedDate));
         if (!result.Succeeded)
         {
             TempData["Error"] = result.ErrorMessage;
-            return View(new DateMedicinesViewModel());
+            return View(new DateMedicinesViewModel { Date = selectedDate });
         }
 
         var vm = DateMedicinesViewModel.From(result.Value ?? new());
+        vm.Date = selectedDate;
         return View(vm);
     }
     #endregion

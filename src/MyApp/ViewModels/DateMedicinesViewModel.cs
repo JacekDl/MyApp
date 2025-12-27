@@ -10,6 +10,8 @@ namespace MyApp.Web.ViewModels
         public List<TreatmentPlanMedicineDto> Afternoon { get; init; } = new();
         public List<TreatmentPlanMedicineDto> Evening { get; init; } = new();
 
+        public DateTime Date { get; set; } = DateTime.Today;
+
         public static DateMedicinesViewModel From(List<TreatmentPlanMedicineDto> items)
         {
             return new DateMedicinesViewModel

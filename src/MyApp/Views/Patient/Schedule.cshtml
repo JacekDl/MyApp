@@ -1,65 +1,90 @@
 ﻿@model MyApp.Web.ViewModels.DateMedicinesViewModel
 @{
     Layout = "~/Views/Shared/_PatientLayout.cshtml";
+    var d = Model.Date.Date;
 }
-<h3 class="mb-3">Leki na dziś</h3>
+<h3 class="mb-3">
+    Leki do przyjęcia: @d.ToString("dd.MM.yyyy - dddd ", new System.Globalization.CultureInfo("pl-PL"))
+</h3>
 
-<h4>Rano</h4>
-@if (!Model.Morning.Any())
+@if (Model.Morning.Any())
 {
-    <p class="text-muted">Brak</p>
-}
-else
-{
-    <ul>
-        @foreach (var m in Model.Morning)
-        {
-            <li><strong>@m.MedicineName</strong> — @m.Dosage <span class="text-muted">(Plan: @m.TreatmentPlanNumber)</span></li>
-        }
-    </ul>
-}
-
-<h4>W południe</h4>
-@if (!Model.Noon.Any())
-{
-    <p class="text-muted">Brak</p>
-}
-else 
-{
-    <ul>
-        @foreach (var m in Model.Noon)
-        {
-            <li><strong>@m.MedicineName</strong> — @m.Dosage <span class="text-muted">(Plan: @m.TreatmentPlanNumber)</span></li>
-        }
-    </ul>
+    <div class="card mb-3">
+        <div class="card-header text-center">
+            Rano
+        </div>
+        <ul class="list-group list-group-flush">
+            @foreach(var m in Model.Morning)
+            {
+                <li class="list-group-item">@m.MedicineName - @m.Dosage</li>
+            }
+        </ul>
+    </div>
 }
 
-<h4>Popołudnie</h4>
-@if (!Model.Afternoon.Any())
+
+@if (Model.Noon.Any())
 {
-    <p class="text-muted">Brak</p>
-}
-else
-{
-    <ul>
-        @foreach (var m in Model.Afternoon)
-        {
-            <li><strong>@m.MedicineName</strong> — @m.Dosage <span class="text-muted">(Plan: @m.TreatmentPlanNumber)</span></li>
-        }
-    </ul>
+    <div class="card mb-3">
+        <div class="card-header text-center">
+            Południe
+        </div>
+        <ul class="list-group list-group-flush">
+            @foreach (var m in Model.Noon)
+            {
+                <li class="list-group-item">@m.MedicineName - @m.Dosage</li>
+            }
+        </ul>
+    </div>
 }
 
-<h4>Wieczór</h4>
-@if (!Model.Evening.Any())
+
+@if (Model.Afternoon.Any())
 {
-    <p class="text-muted">Brak</p>
+    <div class="card mb-3">
+        <div class="card-header text-center">
+            Popołudnie
+        </div>
+        <ul class="list-group list-group-flush">
+            @foreach (var m in Model.Afternoon)
+            {
+                <li class="list-group-item">@m.MedicineName - @m.Dosage</li>
+            }
+        </ul>
+    </div>
 }
-else
+
+
+@if (Model.Evening.Any())
 {
-    <ul>
-        @foreach (var m in Model.Evening)
-        {
-            <li><strong>@m.MedicineName</strong> — @m.Dosage <span class="text-muted">(Plan: @m.TreatmentPlanNumber)</span></li>
-        }
-    </ul>
+    <div class="card mb-3">
+        <div class="card-header text-center">
+            Wieczorem
+        </div>
+        <ul class="list-group list-group-flush">
+            @foreach (var m in Model.Evening)
+            {
+                <li class="list-group-item">@m.MedicineName - @m.Dosage</li>
+            }
+        </ul>
+    </div>
 }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a class="btn btn-secondary"
+       asp-action="Schedule"
+       asp-route-date="@d.AddDays(-1).ToString("yyyy-MM-dd")">
+        ← Poprzedni dzień
+    </a>
+
+    <a class="btn btn-secondary"
+       asp-action="Schedule">
+        Leki na dzisiaj
+    </a>
+
+    <a class="btn btn-secondary"
+       asp-action="Schedule"
+       asp-route-date="@d.AddDays(1).ToString("yyyy-MM-dd")">
+        Następny dzień →
+    </a>
+</div>
