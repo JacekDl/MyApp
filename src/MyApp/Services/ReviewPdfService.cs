@@ -38,28 +38,54 @@ public class ReviewPdfService : IReviewPdfService
                 {
                     col.Spacing(12);
 
-                    col.Item().AlignCenter().Text(t => t.Span($"Zalecenia ({date})").FontSize(20).Bold());
-                    col.Item().Text(t =>
-                    {
-                        t.Span(plan.AdviceFullText ?? string.Empty);
-                    });
+                    col.Item().AlignCenter().Text(t => t.Span($"Twój plan leczenia").FontSize(20).Bold());
+                    col.Item().AlignCenter().Text(t => t.Span($"{date}"));
 
-                    col.Item().PaddingTop(100).Column(inner =>
-                    {
-                        inner.Spacing(12);
-                        inner.Item().AlignCenter().Text(t => t.Span("Zostaw swoją opinię lub zadaj pytanie kopiując poniższy link lub skanując kod QR: ").Bold());
-                        inner.Item().AlignCenter().Text(t =>
-                        {
-                            t.Span(link)
-                             .FontFamily("Courier New");
-                        });
-                        inner.Item().AlignCenter().Width(140).Image(qrPng);
-                        inner.Item().AlignCenter().Text(t => t.Span($"Możesz też pobrać swój plan leczenia po zarejestrowaniu na stronie {host} i wpisaniu kodu:").Bold());
-                        inner.Item().AlignCenter().Text(t => t.Span(plan.Number)
-                             .FontFamily("Courier New")
-                             .FontSize(14));
+                    col.Item()
+                               .Border(1)
+                               .BorderColor(Colors.Grey.Darken2)
+                               .Padding(16)
+                               .ExtendVertical()
+                               .Column(inner =>
+                               {
+                                   inner.Spacing(12);
 
-                    });
+                                   inner.Item().Text(t =>
+                                   {
+                                       t.Span(plan.AdviceFullText ?? string.Empty);
+                                   });
+
+                                   inner.Item()
+                                     .PaddingVertical(8)
+                                     .LineHorizontal(1)
+                                     .LineColor(Colors.Grey.Darken2);
+
+                                   inner.Item()
+                                        .ExtendVertical()
+                                        .AlignBottom()
+                                        .Column(footer =>
+                                        {
+                                            footer.Spacing(12);
+
+                                            footer.Item().AlignCenter().Text(t =>
+                                                t.Span("Zostaw swoją opinię lub zadaj pytanie kopiując poniższy link lub skanując kod QR:")
+                                                 .Bold());
+
+                                            footer.Item().AlignCenter().Text(t =>
+                                                t.Span(link).FontFamily("Courier New"));
+
+                                            footer.Item().AlignCenter().Width(140).Image(qrPng);
+
+                                            footer.Item().AlignCenter().Text(t =>
+                                                t.Span($"Możesz też pobrać swój plan leczenia po zarejestrowaniu na stronie {host} i wpisaniu kodu:")
+                                                 .Bold());
+
+                                            footer.Item().AlignCenter().Text(t =>
+                                                t.Span(plan.Number)
+                                                 .FontFamily("Courier New")
+                                                 .FontSize(14));
+                                        });
+                               });
                 });
             });
         }).GeneratePdf();
@@ -165,67 +191,6 @@ public class ReviewPdfService : IReviewPdfService
                             table.Cell().BorderBottom(0.5f).PaddingVertical(4)
                                   .Text(m.Name ?? string.Empty);
                         }
-                    });
-                });
-            });
-        }).GeneratePdf();
-
-        return Task.FromResult(pdfBytes);
-    }
-
-    public Task<byte[]> GenerateReviewPdf(Review review)
-    {
-        var firstEntry = review.Entries?
-            .OrderBy(e => e.CreatedUtc)
-            .Select(e => e.Text)
-            .FirstOrDefault() ?? string.Empty;
-
-        var host = "https://localhost:7231";
-        var link = $"{host}/r/{review.Number}";
-
-        using var qrGenerator = new QRCodeGenerator();
-        using var qrData = qrGenerator.CreateQrCode(link, QRCodeGenerator.ECCLevel.Q);
-        var qrCode = new PngByteQRCode(qrData);
-
-        byte[] qrPng = qrCode.GetGraphic(
-            pixelsPerModule: 10,
-            drawQuietZones: true
-        );
-
-        var date = review.DateCreated.ToString("dd.MM.yyyy");
-
-        var pdfBytes = Document.Create(container =>
-        {
-            container.Page(page =>
-            {
-                page.Size(PageSizes.A4);
-                page.Margin(40);
-
-                page.Content().Column(col =>
-                {
-                    col.Spacing(12);
-
-                    col.Item().AlignCenter().Text(t => t.Span($"Zalecenia ({date})").FontSize(20).Bold());
-                    col.Item().Text(t =>
-                    {
-                        t.Span(firstEntry ?? string.Empty);
-                    });
-
-                    col.Item().PaddingTop(100).Column(inner =>
-                    {
-                        inner.Spacing(12);
-                        inner.Item().AlignCenter().Text(t => t.Span("Zostaw swoją opinię lub zadaj pytanie kopiując poniższy link lub skanując kod QR: ").Bold());
-                        inner.Item().AlignCenter().Text(t =>
-                        {
-                            t.Span(link)
-                             .FontFamily("Courier New");
-                        });
-                        inner.Item().AlignCenter().Width(140).Image(qrPng);
-                        inner.Item().AlignCenter().Text(t => t.Span($"Możesz też pobrać swój plan leczenia po zarejestrowaniu na stronie {host} i wpisaniu kodu:" ).Bold());
-                        inner.Item().AlignCenter().Text(t => t.Span(review.Number)
-                             .FontFamily("Courier New")
-                             .FontSize(14));
-                             
                     });
                 });
             });

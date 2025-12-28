@@ -29,12 +29,61 @@
     }
     @if(!User.IsInRole("Admin"))
     {
-        <form asp-action="DeleteProfile" method="post">
-            <button type="submit"
-                    class="btn btn-secondary w-100"
-                    onclick="return confirm('Czy na pewno chcesz usunąć konto?');">
-                Usuń konto
-            </button>
-        </form>
+        <button type="button"
+                class="btn btn-secondary"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteAccountModal">
+            Usuń konto
+        </button>
     }
 </div>
+
+@if (!User.IsInRole("Admin"))
+{
+    <div class="modal fade"
+         id="deleteAccountModal"
+         tabindex="-1"
+         aria-labelledby="deleteAccountModalLabel"
+         aria-hidden="true"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAccountModalLabel">
+                        Potwierdzenie usunięcia konta
+                    </h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Zamknij"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p class="mb-0">
+                        Czy na pewno chcesz <strong>trwale usunąć konto</strong>?
+                        <br />
+                        Tej operacji nie można cofnąć.
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Anuluj
+                    </button>
+
+                    <form asp-action="DeleteProfile" method="post" class="m-0">
+                        <button type="submit" class="btn btn-danger">
+                            Usuń konto
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}

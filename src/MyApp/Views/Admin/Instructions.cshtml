@@ -73,14 +73,66 @@
                             </form>
                         </td>
                         <td class="col-1 text-start">
-                            <form asp-action="DeleteInstruction" asp-controller="Medicine" method="post" class="d-inline">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@item.Id" />
-                                <button type="submit" class="btn btn-sm btn-secondary"
-                                        onclick="return confirm('Czy na pewno chcesz usunąć?');">
-                                    Usuń
-                                </button>
-                            </form>
+                            <button type="button"
+                                    class="btn btn-sm btn-secondary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteInstructionModal-@item.Id">
+                                Usuń
+                            </button>
+
+                            <div class="modal fade"
+                                 id="deleteInstructionModal-@item.Id"
+                                 tabindex="-1"
+                                 aria-labelledby="deleteInstructionModalLabel-@item.Id"
+                                 aria-hidden="true"
+                                 data-bs-backdrop="static"
+                                 data-bs-keyboard="false">
+
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+
+                                        <div class="modal-header">
+                                            <h5 class="modal-title"
+                                                id="deleteInstructionModalLabel-@item.Id">
+                                                Potwierdzenie usunięcia
+                                            </h5>
+                                            <button type="button"
+                                                    class="btn-close"
+                                                    data-bs-dismiss="modal"
+                                                    aria-label="Zamknij"></button>
+                                        </div>
+
+                                        <div class="modal-body">
+                                            <p class="mb-2">
+                                                Czy na pewno chcesz usunąć dawkowanie:
+                                            </p>
+                                            <p class="fw-bold text-break mb-0">
+                                                @item.Code - @item.Text
+                                            </p>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary"
+                                                    data-bs-dismiss="modal">
+                                                Anuluj
+                                            </button>
+
+                                            <form asp-action="DeleteInstruction"
+                                                  asp-controller="Medicine"
+                                                  method="post"
+                                                  class="m-0">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="btn btn-danger">
+                                                    Usuń
+                                                </button>
+                                            </form>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 }

@@ -137,11 +137,50 @@
     font-weight: 600;
 }
 
+[data-bs-theme="contrast"] .modal-content {
+    background-color: #000000 !important;
+    color: #ffff00 !important;
+    border: 2px solid #ffff66 !important;
+}
+
+[data-bs-theme="contrast"] .modal-header,
+[data-bs-theme="contrast"] .modal-footer {
+    border-color: #ffff66 !important;
+}
+
+[data-bs-theme="contrast"] .modal-title {
+    color: #ffff00 !important;
+}
+
+[data-bs-theme="contrast"] .btn-close {
+    filter: invert(1);
+}
+
+[data-bs-theme="contrast"] .dropdown-menu {
+    background-color: #000000 !important;
+    border: 2px solid #ffff66 !important;
+}
+
+[data-bs-theme="contrast"] .dropdown-item {
+    color: #ffff00 !important;
+    background-color: transparent !important;
+}
+
+[data-bs-theme="contrast"] .dropdown-item:hover,
+[data-bs-theme="contrast"] .dropdown-item:focus {
+    background-color: #222 !important;
+    color: #ffcc00 !important;
+}
+
+[data-bs-theme="contrast"] .dropdown-divider {
+    border-color: #ffff66 !important;
+}
+
 
 html {
   font-size: 14px;
 }
-
+ 
 @media (min-width: 768px) {
   html {
     font-size: 16px;
