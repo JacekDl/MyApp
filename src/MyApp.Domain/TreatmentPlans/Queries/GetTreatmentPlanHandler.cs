@@ -7,7 +7,7 @@ using MyApp.Domain.TreatmentPlans.Mappers;
 
 namespace MyApp.Domain.TreatmentPlans.Queries;
 
-public record class GetTreatmentPlanQuery(string Number) : IRequest<GetTreatmentPlanResult>;
+public record class GetTreatmentPlanQuery(string Number, string CurrentUserId) : IRequest<GetTreatmentPlanResult>;
 
 public record class GetTreatmentPlanResult : Result<TreatmentPlanDto>;
 
@@ -26,6 +26,37 @@ public class GetTreatmentPlanHandler : IRequestHandler<GetTreatmentPlanQuery, Ge
         if (!validator.IsValid)
         {
             return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
+        }
+
+        var treatmentPlan = await _db.TreatmentPlans
+            .Include(p => p.Review)
+                .ThenInclude(r => r.ReviewEntries)
+            .SingleOrDefaultAsync(p => p.Number == request.Number, ct);
+
+        if (treatmentPlan is null)
+        {
+            return new() { ErrorMessage = "Nie znaleziono planu leczenia." };
+        }
+
+        var isPharmacist = !string.IsNullOrWhiteSpace(treatmentPlan.IdPharmacist)
+                       && treatmentPlan.IdPharmacist == request.CurrentUserId;
+
+        var isPatient = !string.IsNullOrWhiteSpace(treatmentPlan.IdPatient)
+                        && treatmentPlan.IdPatient == request.CurrentUserId;
+
+        if (treatmentPlan.Review != null)
+        {
+            if (isPharmacist)
+            {
+                treatmentPlan.Review.UnreadForPharmacist = false;
+
+            }
+            else if (isPatient)
+            {
+                treatmentPlan.Review.UnreadForPatient = false;
+
+            }
+            await _db.SaveChangesAsync(ct);
         }
 
         var plan = await _db.TreatmentPlans

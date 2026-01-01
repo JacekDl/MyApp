@@ -185,7 +185,7 @@ public class PatientController : Controller
         }
 
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var result = await _mediator.Send(new GetTreatmentPlanQuery(number));
+        var result = await _mediator.Send(new GetTreatmentPlanQuery(number, currentUserId));
 
         if (!result.Succeeded)
         {

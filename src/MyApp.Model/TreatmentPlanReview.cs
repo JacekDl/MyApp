@@ -7,7 +7,6 @@
         public int IdTreatmentPlan {  get; set; }
         public TreatmentPlan TreatmentPlan { get; set; } = default!;
 
-
         public bool UnreadForPharmacist { get; set; }
         public bool UnreadForPatient { get; set; }
 

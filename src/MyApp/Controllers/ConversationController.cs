@@ -90,7 +90,17 @@ public class ConversationController : Controller
 
         TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Wiadomość wysłana." : result.ErrorMessage;
 
+        if (User.IsInRole(UserRoles.Pharmacist))
+        {
+            return RedirectToAction("GetPlan", "Pharmacist", new { number });
+        }
+        else if (User.IsInRole(UserRoles.Patient)) 
+        {
+            return RedirectToAction("GetPlan", "Patient", new { number });
+        }
+        //TODO: domyslnie w przyszlosci moze byc admin
         return RedirectToAction("GetPlan", "Patient", new { number });
+
     }
 
     #endregion

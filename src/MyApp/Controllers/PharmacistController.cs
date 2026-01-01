@@ -124,11 +124,11 @@ public class PharmacistController : Controller
     {
         if (string.IsNullOrWhiteSpace(number))
         {
-            return RedirectToAction("Plans");
+            return RedirectToAction(nameof(Plans));
         }
 
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var result = await _mediator.Send(new GetTreatmentPlanQuery(number));
+        var result = await _mediator.Send(new GetTreatmentPlanQuery(number, currentUserId)); 
 
         if (!result.Succeeded)
         {
@@ -137,22 +137,32 @@ public class PharmacistController : Controller
         }
 
         if (!string.Equals(result.Value.IdPharmacist, currentUserId, StringComparison.OrdinalIgnoreCase))
-        {
             return Forbid();
-        }
 
         var tp = result.Value;
 
-        var vm = new TreatmentPlanViewModel();
-        vm.Id = tp.Id;
-        vm.Number = tp.Number;
-        vm.DateCreated = tp.DateCreated;
-        vm.DateStarted = tp.DateStarted;
-        vm.DateCompleted = tp.DateCompleted;
-        vm.IdPharmacist = tp.IdPharmacist;
-        vm.IdPatient = tp.IdPatient;
-        vm.AdviceFullText = tp.AdviceFullText;
-        vm.Status = tp.Status;
+        var vm = new TreatmentPlanViewModel
+        {
+            Id = tp.Id,
+            Number = tp.Number,
+            DateCreated = tp.DateCreated,
+            DateStarted = tp.DateStarted,
+            DateCompleted = tp.DateCompleted,
+            IdPharmacist = tp.IdPharmacist,
+            IdPatient = tp.IdPatient,
+            AdviceFullText = tp.AdviceFullText,
+            Status = tp.Status,
+
+            ReviewEntries = tp.ReviewEntries
+                .Select(e => new ReviewEntryViewModel
+                {
+                    Id = e.Id,
+                    DateCreated = e.DateCreated,
+                    Author = e.Author,
+                    Text = e.Text
+                })
+                .ToList()
+        };
 
         return View(vm);
     }
