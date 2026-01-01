@@ -12,8 +12,6 @@ public class ApplicationDbContext : IdentityDbContext<User>
     {
     }
     public DbSet<User> ApplicationUsers => Set<User>();
-    //public DbSet<Review> Reviews => Set<Review>();
-    //public DbSet<Entry> Entries => Set<Entry>();
     public DbSet<Instruction> Instructions => Set<Instruction>();
     public DbSet<Medicine> Medicines => Set<Medicine>();
     public DbSet<PharmacistPromotionRequest> PharmacistPromotionRequests => Set<PharmacistPromotionRequest>();
