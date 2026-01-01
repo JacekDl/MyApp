@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.TreatmentPlans.Queries;
 using MyApp.Domain.Users;
 using MyApp.Domain.Users.Commands;
@@ -95,13 +94,13 @@ public class AdminController : Controller
         return View(vm);
     }
 
-    [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteReview(int id)
-    {
-        var result = await _mediator.Send(new DeleteReviewCommand(id));
-        TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Usunięto zalecenia." : result.ErrorMessage;
-        return RedirectToAction(nameof(Plans));
-    }
+    //[HttpPost, ValidateAntiForgeryToken]
+    //public async Task<IActionResult> DeleteReview(int id)
+    //{
+    //    var result = await _mediator.Send(new DeleteReviewCommand(id));
+    //    TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Usunięto zalecenia." : result.ErrorMessage;
+    //    return RedirectToAction(nameof(Plans));
+    //}
     #endregion
 
     #region GetPlan

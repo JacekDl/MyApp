@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Abstractions;
-using MyApp.Domain.Reviews.Queries;
 using MyApp.Web.ViewModels;
 using System.Security.Claims;
 using MyApp.Domain.Dictionaries.Queries;

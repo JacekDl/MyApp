@@ -12,8 +12,8 @@ public class ApplicationDbContext : IdentityDbContext<User>
     {
     }
     public DbSet<User> ApplicationUsers => Set<User>();
-    public DbSet<Review> Reviews => Set<Review>();
-    public DbSet<Entry> Entries => Set<Entry>();
+    //public DbSet<Review> Reviews => Set<Review>();
+    //public DbSet<Entry> Entries => Set<Entry>();
     public DbSet<Instruction> Instructions => Set<Instruction>();
     public DbSet<Medicine> Medicines => Set<Medicine>();
     public DbSet<PharmacistPromotionRequest> PharmacistPromotionRequests => Set<PharmacistPromotionRequest>();
@@ -27,37 +27,6 @@ public class ApplicationDbContext : IdentityDbContext<User>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        modelBuilder.Entity<User>()
-            .HasMany(u => u.Reviews)
-            .WithOne(p => p.Pharmacist)
-            .HasForeignKey(p => p.PharmacistId)
-            .OnDelete(DeleteBehavior.SetNull);
-
-        modelBuilder.Entity<Review>()
-            .Property(r => r.DateCreated)
-            .HasDefaultValueSql("CURRENT_TIMESTAMP")
-            .ValueGeneratedOnAdd();
-
-        modelBuilder.Entity<Review>()
-            .HasOne(r => r.Patient) 
-            .WithMany()
-            .HasForeignKey(r => r.PatientId)
-            .OnDelete(DeleteBehavior.SetNull);
-
-        modelBuilder.Entity<Entry>(e =>
-        {
-            e.HasKey(x => x.Id);
-            e.Property(x => x.Text).IsRequired();
-            e.HasOne(x => x.User)
-            .WithMany()
-            .HasForeignKey(x => x.UserId)
-            .OnDelete(DeleteBehavior.SetNull);
-            e.HasOne(x => x.Review)
-            .WithMany(r => r.Entries)
-            .HasForeignKey(x => x.ReviewId)
-            .OnDelete(DeleteBehavior.Cascade);
-        });
 
         modelBuilder.Entity<Instruction>(e =>
         {
