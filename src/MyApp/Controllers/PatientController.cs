@@ -145,7 +145,14 @@ public class PatientController : Controller
     public async Task<IActionResult> Plans(string? searchTxt, TreatmentPlanStatus? status, int page = 1, int pageSize = 10)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var result = await _mediator.Send(new GetTreatmentPlansQuery(searchTxt, currentUserId, status, null, page, pageSize));
+        var result = await _mediator.Send(new GetTreatmentPlansQuery(
+            searchTxt, 
+            currentUserId, 
+            status, 
+            ConversationParty.Patient,
+            null,
+            page, 
+            pageSize));
         if (!result.Succeeded)
         {
             TempData["Error"] = result.ErrorMessage;
@@ -203,6 +210,15 @@ public class PatientController : Controller
         vm.IdPatient = tp.IdPatient;
         vm.AdviceFullText = tp.AdviceFullText;
         vm.Status = tp.Status;
+        vm.ReviewEntries = tp.ReviewEntries
+            .Select(e => new ReviewEntryViewModel
+            {
+                Id = e.Id,
+                DateCreated = e.DateCreated,
+                Author = e.Author,
+                Text = e.Text
+            })
+            .ToList();
         
         return View(vm);
     }

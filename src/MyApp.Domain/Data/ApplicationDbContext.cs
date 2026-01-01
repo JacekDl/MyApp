@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MyApp.Model;
 using MyApp.Model.enums;
+using System.Security.Cryptography.X509Certificates;
 
 namespace MyApp.Domain.Data;
 
@@ -20,6 +21,8 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<TreatmentPlanMedicine> TreatmentPlanMedicines => Set<TreatmentPlanMedicine>();
     public DbSet<TreatmentPlanAdvice> TreatmentPlanAdvices => Set<TreatmentPlanAdvice>();
     public DbSet<MedicineTakenConfirmation> MedicineTakenConfirmations => Set<MedicineTakenConfirmation>();
+    public DbSet<TreatmentPlanReview> TreatmentPlanReviews => Set<TreatmentPlanReview>();
+    public DbSet<ReviewEntry> ReviewEntries => Set<ReviewEntry>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -113,6 +116,11 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 .HasForeignKey<TreatmentPlanAdvice>(a => a.IdTreatmentPlan)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            e.HasOne(x => x.Review)
+                .WithOne(r => r.TreatmentPlan)
+                .HasForeignKey<TreatmentPlanReview>(r => r.IdTreatmentPlan)
+                .OnDelete(DeleteBehavior.Cascade);
+
         });
 
         modelBuilder.Entity<TreatmentPlanMedicine>(e =>
@@ -150,6 +158,41 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 .WithMany()
                 .HasForeignKey(x => x.IdTreatmentPlanMedicine)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<TreatmentPlanReview>(e =>
+        {
+            e.HasKey(x => x.Id);
+
+            e.HasIndex(x => x.IdTreatmentPlan)
+                .IsUnique();
+            e.Property(x => x.UnreadForPatient)
+                .HasDefaultValue(false);
+            e.Property(x => x.UnreadForPharmacist)
+                .HasDefaultValue(false);
+
+            e.HasMany(x => x.ReviewEntries)
+                .WithOne(x => x.TreatmentPlanReview)
+                .HasForeignKey(x => x.IdTreatmentPlanReview)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ReviewEntry>(e =>
+        {
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Text)
+                .IsRequired()
+                .HasMaxLength(500);
+
+            e.Property(x => x.Author)
+                .HasConversion<int>()
+                .IsRequired();
+
+            e.Property(x => x.DateCreated)
+                .IsRequired();
+
+            e.HasIndex(x => new { x.IdTreatmentPlanReview, x.DateCreated });
         });
 
     }

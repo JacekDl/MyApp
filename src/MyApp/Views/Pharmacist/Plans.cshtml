@@ -63,7 +63,8 @@
                 <tr>
                     <th scope="col" class="col-2 text-nowrap">Utworzono</th>
                     <th scope="col" class="col-7">Treść</th>
-                    <th scope="col" class="col-2 text-nowrap">Status</th>
+                    <th scope="col" class="col-1"></th>
+                    <th scope="col" class="col-1 text-nowrap">Status</th>
                     <th scope="col" class="col-1"></th>
                 </tr>
             </thead>
@@ -73,6 +74,12 @@
                     <tr>
                         <td>@plan.DateCreated.ToString("dd.MM.yyyy HH:mm")</td>
                         <td class="text-break" style="white-space: pre-wrap;">@plan.AdviceFullText</td>
+                        <td>
+                            @if (plan.UnreadForPharmacist)
+                            {
+                                <span class="badge bg-warning text-dark">Nowy</span>
+                            }
+                        </td>
                         <td>@plan.Status</td>
                         <td class="text-end">
                             <div class="d-grid gap-2 d-md-inline">

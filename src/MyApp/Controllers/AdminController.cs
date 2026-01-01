@@ -67,7 +67,14 @@ public class AdminController : Controller
     #region GetTreatmentPlans
     public async Task<IActionResult> Plans(string? searchTxt, string? userId, TreatmentPlanStatus? status, int page = 1, int pageSize = 10)
     {
-        var result = await _mediator.Send(new GetTreatmentPlansQuery(searchTxt, userId, status, null, page, pageSize));
+        var result = await _mediator.Send(new GetTreatmentPlansQuery(
+            searchTxt, 
+            userId, 
+            status, 
+            null,
+            null,
+            page, 
+            pageSize));
         if (!result.Succeeded)
         {
             TempData["Error"] = result.ErrorMessage;

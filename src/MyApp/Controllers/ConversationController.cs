@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Domain.Reviews.Commands;
 using MyApp.Domain.Reviews.Queries;
+using MyApp.Domain.TreatmentPlans.Commands;
 using MyApp.Domain.Users;
 using MyApp.Web.ViewModels;
 using System.Security.Claims;
@@ -76,5 +77,21 @@ public class ConversationController : Controller
         TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Rozmowa została zamknięta." : result.ErrorMessage;
         return RedirectToAction(nameof(Display), new { number });
     }
+    #endregion
+
+
+    #region TreatmentPlan
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddTreatmentPlanMessage(string number, string text)
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+        var result = await _mediator.Send(new AddTreatmentPlanReviewEntryCommand(number, currentUserId, text));
+
+        TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Wiadomość wysłana." : result.ErrorMessage;
+
+        return RedirectToAction("GetPlan", "Patient", new { number });
+    }
+
     #endregion
 }

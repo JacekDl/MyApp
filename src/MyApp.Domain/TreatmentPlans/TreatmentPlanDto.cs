@@ -10,5 +10,6 @@ public record TreatmentPlanDto
     string? IdPharmacist,
     string? IdPatient,
     string AdviceFullText,
-    string Status
+    string Status,
+    List<TreatmentPlanReviewEntryDto> ReviewEntries
 );

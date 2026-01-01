@@ -89,7 +89,14 @@ public class PharmacistController : Controller
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        var result = await _mediator.Send(new GetTreatmentPlansQuery(searchTxt, currentUserId, status, null, page, pageSize));
+        var result = await _mediator.Send(new GetTreatmentPlansQuery(
+            searchTxt, 
+            currentUserId, 
+            status, 
+            ConversationParty.Pharmacist,
+            null, 
+            page, 
+            pageSize));
         if (!result.Succeeded)
         {
             TempData["Error"] = result.ErrorMessage;

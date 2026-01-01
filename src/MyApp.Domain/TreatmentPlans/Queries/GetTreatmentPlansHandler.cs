@@ -6,6 +6,7 @@ using MyApp.Domain.Data;
 using MyApp.Domain.TreatmentPlans.Mappers;
 using MyApp.Model;
 using MyApp.Model.enums;
+using System.Numerics;
 
 namespace MyApp.Domain.TreatmentPlans.Queries;
 
@@ -13,11 +14,12 @@ public record class GetTreatmentPlansQuery(
     string? SearchTxt,
     string? CurrentUserId,
     TreatmentPlanStatus? Status,
+    ConversationParty? ViewerParty,
     string? UserEmail = null,
     int Page = 1,
     int PageSize = 10
-    ) : IRequest<GetTreatmentPlansResult>;
-public record class GetTreatmentPlansResult : PagedResult<List<TreatmentPlanDto>>;
+) : IRequest<GetTreatmentPlansResult>;
+public record class GetTreatmentPlansResult : PagedResult<List<TreatmentPlanListItemDto>>;
 
 
 public class GetTreatmentPlansHandler : IRequestHandler<GetTreatmentPlansQuery, GetTreatmentPlansResult>
@@ -70,38 +72,43 @@ public class GetTreatmentPlansHandler : IRequestHandler<GetTreatmentPlansQuery, 
         var skip = (request.Page - 1) * request.PageSize;
 
         var rows = await query
-            .Select(r => new
-            {
-                r.Id,
-                r.Number,
-                r.DateCreated,
-                r.DateStarted,
-                r.DateCompleted,
-                r.IdPharmacist,
-                r.IdPatient,
-                r.AdviceFullText,
-                r.Status
-
-            })
-            .OrderByDescending(x => x.DateCreated)
+            .OrderByDescending(tp =>
+                request.ViewerParty == ConversationParty.Patient
+                    ? tp.Review != null && tp.Review.UnreadForPatient
+                    : tp.Review != null && tp.Review.UnreadForPharmacist
+            )
+            .ThenByDescending(tp => tp.DateCreated)
             .Skip(skip)
             .Take(request.PageSize)
+            .Select(tp => new
+            {
+                tp.Id,
+                tp.Number,
+                tp.DateCreated,
+                tp.DateStarted,
+                tp.DateCompleted,
+                tp.AdviceFullText,
+                tp.Status,
+                UnreadForPatient = tp.Review != null && tp.Review.UnreadForPatient,
+                UnreadForPharmacist = tp.Review != null && tp.Review.UnreadForPharmacist
+            })
             .ToListAsync(ct);
 
         var items = rows
             .Select(r =>
-                 new TreatmentPlanDto(
+                 new TreatmentPlanListItemDto(
                     r.Id,
                     r.Number,
                     r.DateCreated,
                     r.DateStarted,
                     r.DateCompleted,
-                    r.IdPharmacist ?? "",
-                    r.IdPatient ?? "",
                     r.AdviceFullText,
-                    TreatmentPlanStatusMapper.ToPolish(r.Status)
+                    TreatmentPlanStatusMapper.ToPolish(r.Status),
+                    r.UnreadForPatient,
+                    r.UnreadForPharmacist
                     ))
             .ToList();
+
 
         return new()
         {

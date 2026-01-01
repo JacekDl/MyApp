@@ -4,7 +4,7 @@ namespace MyApp.Web.ViewModels
 {
     public class TreatmentPlansViewModel : PagedViewModel
     {
-        public List<TreatmentPlanDto> Plans { get; set; } = [];
+        public List<TreatmentPlanListItemDto> Plans { get; set; } = [];
     }
 
 }

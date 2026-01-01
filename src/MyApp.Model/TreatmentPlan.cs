@@ -23,4 +23,6 @@ public class TreatmentPlan
     public List<TreatmentPlanMedicine> Medicines { get; set; } = new();
 
     public TreatmentPlanAdvice? Advice { get; set; }
+
+    public TreatmentPlanReview? Review { get; set; }
 }

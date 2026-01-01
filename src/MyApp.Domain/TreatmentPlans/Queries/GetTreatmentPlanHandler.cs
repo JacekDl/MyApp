@@ -40,7 +40,19 @@ public class GetTreatmentPlanHandler : IRequestHandler<GetTreatmentPlanQuery, Ge
                x.IdPharmacist,
                x.IdPatient,
                x.AdviceFullText,
-               x.Status
+               x.Status,
+
+               ReviewEntries = x.Review == null
+                ? new List<TreatmentPlanReviewEntryDto>() 
+                : x.Review.ReviewEntries
+                    .OrderBy(e => e.DateCreated)
+                    .Select(e => new TreatmentPlanReviewEntryDto(
+                        e.Id,
+                        e.DateCreated,
+                        e.Author,
+                        e.Text
+                    ))
+                    .ToList()
            })
            .SingleOrDefaultAsync(ct);
 
@@ -58,7 +70,8 @@ public class GetTreatmentPlanHandler : IRequestHandler<GetTreatmentPlanQuery, Ge
             plan.IdPharmacist ?? "",
             plan.IdPatient ?? "",
             plan.AdviceFullText,
-            TreatmentPlanStatusMapper.ToPolish(plan.Status)
+            TreatmentPlanStatusMapper.ToPolish(plan.Status),
+            plan.ReviewEntries
             );
 
         return new() { Value = dto  };

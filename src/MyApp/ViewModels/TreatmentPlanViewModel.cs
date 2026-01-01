@@ -1,4 +1,5 @@
 ﻿using MyApp.Domain.TreatmentPlans;
+using MyApp.Model;
 using System.ComponentModel.DataAnnotations;
 
 namespace MyApp.Web.ViewModels
@@ -18,6 +19,9 @@ namespace MyApp.Web.ViewModels
         [Display(Name = "Długość leczenia (dni)")]
         [Range(1, 365, ErrorMessage = "Długość leczenia musi być w zakresie 1–365 dni.")]
         public int? TreatmentLengthDays { get; set; }
+
+        public List<ReviewEntryViewModel> ReviewEntries { get; set; } = new();
+
     }
 
 }
