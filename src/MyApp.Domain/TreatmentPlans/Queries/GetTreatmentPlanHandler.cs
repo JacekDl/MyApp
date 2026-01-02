@@ -7,7 +7,7 @@ using MyApp.Domain.TreatmentPlans.Mappers;
 
 namespace MyApp.Domain.TreatmentPlans.Queries;
 
-public record class GetTreatmentPlanQuery(string Number, string CurrentUserId) : IRequest<GetTreatmentPlanResult>;
+public record class GetTreatmentPlanQuery(string Number, string? CurrentUserId) : IRequest<GetTreatmentPlanResult>;
 
 public record class GetTreatmentPlanResult : Result<TreatmentPlanDto>;
 

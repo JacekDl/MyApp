@@ -34,7 +34,7 @@ namespace MyApp.Domain.TreatmentPlans.Commands
 
             if (plan is null)
             {
-                return new() { ErrorMessage = $"Nie znaleziono planu leczenia." };
+                return new() { ErrorMessage = "Nie znaleziono planu leczenia." };
 
             }
 

@@ -47,53 +47,59 @@ public class PatientController : Controller
 
     #region PublicReview
 
-    //[AllowAnonymous, HttpGet("/r/{number}/edit")]
-    //public async Task<IActionResult> PublicEdit(string number)
-    //{
-    //    var result = await _mediator.Send(new GetReviewQuery(number));
+    [AllowAnonymous, HttpGet("/r/{number}")]
+    public async Task<IActionResult> PublicEdit(string number)
+    {
+        var result = await _mediator.Send(new GetTreatmentPlanQuery(number, null));
 
-    //    if (!result.Succeeded)
-    //    {
-    //       var em = new ErrorViewModel();
-    //       em.Message = result.ErrorMessage;
-    //       return View("Error", em);
-    //    }
+        if (!result.Succeeded)
+        {
+            var em = new ErrorViewModel();
+            em.Message = result.ErrorMessage;
+            return View("Error", em);
+        }
 
-    //    var review = result.Value!;
-    //    var vm = new PublicReviewEditViewModel
-    //    {
-    //        Advice = review.Text,
-    //        Number = review.Number,
-    //        ReviewText = review.ReviewText ?? string.Empty
-    //    };
-    //    return View(vm);
-    //}
+        if (string.Equals(result.Value!.Status, "Zakończony", StringComparison.Ordinal))
+        {
+            var em = new ErrorViewModel();
+            em.Message = "Ten kod planu leczenia został już użyty.";
+            return View("Error", em);
+        }
 
-
-    //[AllowAnonymous, HttpPost("/r/{number}/edit"), ValidateAntiForgeryToken]
-    //public async Task<IActionResult> PublicEdit(string number, PublicReviewEditViewModel vm)
-    //{
-    //    if(!ModelState.IsValid)
-    //    {
-    //        return View(vm);
-    //    }
+        var plan = result.Value!;
+        var vm = new PublicReviewEditViewModel
+        {
+            AdviceFullText = plan.AdviceFullText,
+            Number = plan.Number,
+            ReviewText = string.Empty
+        };
+        return View(vm);
+    }
 
 
-    //    if (number != vm.Number)
-    //    {
-    //        return BadRequest(); //TODO: odesłać do strony z błędem
-    //    }
-        
-    //    var result = await _mediator.Send(new UpdateReviewCommand(number, vm.ReviewText));
+    [AllowAnonymous, HttpPost("/r/{number}"), ValidateAntiForgeryToken]
+    public async Task<IActionResult> PublicEdit(string number, PublicReviewEditViewModel vm)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(vm);
+        }
 
-    //    if (!result.Succeeded)
-    //    {
-    //        ModelState.AddModelError(nameof(vm.ReviewText), result.ErrorMessage!);
-    //        return View(vm);
-    //    }
-        
-    //    return RedirectToAction("CompleteEdit", new { number });
-    //}
+        if (number != vm.Number)
+        {
+            return BadRequest(); //TODO: odesłać do strony z błędem
+        }
+
+        var result = await _mediator.Send(new UpdateTreatmentPlanCommand(number, vm.ReviewText));
+
+        if (!result.Succeeded)
+        {
+            ModelState.AddModelError(nameof(vm.ReviewText), result.ErrorMessage!);
+            return View(vm);
+        }
+
+        return RedirectToAction("CompleteEdit", new { number });
+    }
 
     [AllowAnonymous, HttpGet("/r/complete")]
     public IActionResult CompleteEdit()

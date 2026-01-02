@@ -6,7 +6,7 @@ public class PublicReviewEditViewModel : ViewModelBase
 {
     public string Number { get; set; } = string.Empty;
     
-    public string Advice { get; set; } = string.Empty;
+    public string AdviceFullText { get; set; } = string.Empty;
 
     [Required(ErrorMessage="Treść opinii nie może być pusta.")]
     public string ReviewText { get; set; } = string.Empty;

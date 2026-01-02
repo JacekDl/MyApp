@@ -68,7 +68,7 @@ public class ReviewPdfService : IReviewPdfService
                                             footer.Spacing(12);
 
                                             footer.Item().AlignCenter().Text(t =>
-                                                t.Span("Zostaw swoją opinię lub zadaj pytanie kopiując poniższy link lub skanując kod QR:")
+                                                t.Span("Zostaw swoją opinię kopiując poniższy link lub skanując kod QR:")
                                                  .Bold());
 
                                             footer.Item().AlignCenter().Text(t =>
