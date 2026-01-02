@@ -87,7 +87,8 @@ public class PatientController : Controller
 
         if (number != vm.Number)
         {
-            return BadRequest(); //TODO: odesłać do strony z błędem
+            var em = new ErrorViewModel { Message = "Nieprawidłowy kod" };
+            return View("Error", em);
         }
 
         var result = await _mediator.Send(new UpdateTreatmentPlanCommand(number, vm.ReviewText));
