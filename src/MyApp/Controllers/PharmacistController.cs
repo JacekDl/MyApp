@@ -167,5 +167,41 @@ public class PharmacistController : Controller
     }
 
     #endregion
+
+    #region CheckCompliance
+
+    [HttpGet]
+    public async Task<IActionResult> CheckCompliance(string number)
+    {
+        var result = await _mediator.Send(new GetTreatmentPlanComplianceQuery(number));
+
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = result.ErrorMessage;
+            return RedirectToAction("GetPlan");
+        }
+
+        var dto = result.Value!;
+
+        var vm = new TreatmentPlanComplianceViewModel
+        {
+            TreatmentPlanId = dto.TreatmentPlanId,
+            Number = dto.Number,
+            DateStarted = dto.DateStarted,
+            Medicines = dto.Medicines
+            .Select(m => new MedicineComplianceViewModel
+            {
+                TreatmentPlanMedicineId = m.TreatmentPlanMedicineId,
+                MedicineName = m.MedicineName,
+                Percentage = m.Percentage
+            })
+            .ToList()
+        };
+
+        return View(vm);
+    }
+
+
+    #endregion
 }
 

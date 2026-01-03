@@ -1,0 +1,72 @@
+﻿@model MyApp.Web.ViewModels.TreatmentPlanComplianceViewModel
+
+@{
+    ViewData["Title"] = "Zgodność z planem leczenia";
+    Layout = "~/Views/Shared/_PharmacistLayout.cshtml";
+}
+
+<h3 class="mb-3">Zgodność terapii</h3>
+
+<div class="container py-3">
+
+    @if (Model.Medicines is null || !Model.Medicines.Any())
+    {
+        <div class="alert alert-info">
+            Brak leków do wyświetlenia w tym planie leczenia.
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Lek</th>
+                                <th style="width: 140px;">% przyjęć</th>
+                                <th style="width: 45%;">Postęp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var m in Model.Medicines)
+                            {
+                                var pct = m.Percentage;
+                                if (pct < 0) pct = 0;
+                                if (pct > 100) pct = 100;
+
+                                var barClass = pct < 50 ? "bg-danger"
+                                : pct < 80 ? "bg-warning"
+                                : "bg-success";
+
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">@m.MedicineName</div>
+                                    </td>
+
+                                    <td class="fw-semibold">
+                                        @pct.ToString("0.##")%
+                                    </td>
+
+                                    <td>
+                                        <div class="progress" role="progressbar" aria-label="Zgodność"
+                                             aria-valuenow="@pct" aria-valuemin="0" aria-valuemax="100"
+                                             style="height: 18px;">
+                                            <div class="progress-bar @barClass"
+                                                 style="width: @pct.ToString("0.##")%">
+                                                <span class="small">@pct.ToString("0.##")%</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    }
+
+</div>
