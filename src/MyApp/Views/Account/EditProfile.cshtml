@@ -3,6 +3,18 @@
 @{
     ViewData["Title"] = "Edytuj Profil";
     var name = Model.DisplayName;
+    if (User.IsInRole("Admin"))
+    {
+        Layout = "_AdminLayout";
+    }
+    else if (User.IsInRole("Pharmacist"))
+    {
+        Layout = "_PharmacistLayout";
+    }
+    else
+    {
+        Layout = "_PatientLayout";
+    }
 }
 
 <form asp-action="EditProfile" method="post">

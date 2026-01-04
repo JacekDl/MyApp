@@ -53,7 +53,8 @@ public class AccountController : Controller
         {
             return View(vm);
         }
-
+        
+        // domyslnie tworzone jest konto z rola Pacjent
         var result = await _mediator.Send(new CreateUserCommand(vm.Email, vm.Password, UserRoles.Patient));
 
         if (!result.Succeeded)
@@ -309,11 +310,11 @@ public class AccountController : Controller
         }
         else if (role == UserRoles.Pharmacist)
         {
-            vm.Breadcrumbs.AddRange(["Start|Reviews|Pharmacist", "Szczegóły konta|Details|Account", "Zmiana imienia||"]);
+            vm.Breadcrumbs.AddRange(["Start|Plans|Pharmacist", "Szczegóły konta|Details|Account", "Zmiana imienia||"]);
         }
         else
         {
-            vm.Breadcrumbs.AddRange(["Start|Tokens|Patient", "Szczegóły konta|Details|Account", "Zmiana imienia||"]);
+            vm.Breadcrumbs.AddRange(["Start|Schedule|Patient", "Szczegóły konta|Details|Account", "Zmiana imienia||"]);
         }
         return View(vm);
     }
@@ -375,11 +376,11 @@ public class AccountController : Controller
         }
         else if (role == UserRoles.Pharmacist)
         {
-            vm.Breadcrumbs.AddRange(["Start|Reviews|Pharmacist", "Szczegóły konta|Details|Account", "Zmiana email||"]);
+            vm.Breadcrumbs.AddRange(["Start|Plans|Pharmacist", "Szczegóły konta|Details|Account", "Zmiana email||"]);
         }
         else
         {
-            vm.Breadcrumbs.AddRange(["Start|Tokens|Patient", "Szczegóły konta|Details|Account", "Zmiana email||"]);
+            vm.Breadcrumbs.AddRange(["Start|Schedule|Patient", "Szczegóły konta|Details|Account", "Zmiana email||"]);
         }
         return View(vm);
     }
@@ -446,11 +447,11 @@ public class AccountController : Controller
         }
         else if (role == UserRoles.Pharmacist)
         {
-            vm.Breadcrumbs.AddRange(["Start|Reviews|Pharmacist", "Szczegóły konta|Details|Account", "Zmiana hasła||"]);
+            vm.Breadcrumbs.AddRange(["Start|Plans|Pharmacist", "Szczegóły konta|Details|Account", "Zmiana hasła||"]);
         }
         else
         {
-            vm.Breadcrumbs.AddRange(["Start|Tokens|Patient", "Szczegóły konta|Details|Account", "Zmiana hasła||"]);
+            vm.Breadcrumbs.AddRange(["Start|Schedule|Patient", "Szczegóły konta|Details|Account", "Zmiana hasła||"]);
         }
         return View(vm);
     }
@@ -475,6 +476,7 @@ public class AccountController : Controller
             return RedirectToAction(nameof(Details));
         }
 
+        //TODO: sprawdzac w handlerze czy haslo i jego potwierdzenie sa poprawne
         var result = await _mediator.Send(new UpdateUserPasswordCommand(currentUserId, vm.CurrentPassword, vm.NewPassword));
 
         if (!result.Succeeded)
@@ -585,7 +587,9 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult PromoteToPharmacist()
     {
-        return View();
+        var vm = new PromoteToPharmacistViewModel();
+        vm.Breadcrumbs.AddRange(["Start|Schedule|Patient", "Szczegóły konta|Details|Account", "Rejestracja jako farmaceuta||"]);
+        return View(vm);
     }
 
     [Authorize(Roles = UserRoles.Patient)]

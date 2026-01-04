@@ -10,6 +10,7 @@ using MyApp.Domain.Medicines.Commands;
 using MyApp.Domain.Medicines.Queries;
 using MyApp.Domain.Users;
 using MyApp.Web.ViewModels;
+using System.Data;
 
 namespace MyApp.Web.Controllers
 {
@@ -45,10 +46,17 @@ namespace MyApp.Web.Controllers
             }
 
             if (User.IsInRole(UserRoles.Admin))
+            {
+                vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Leki||"]);
                 return View("~/Views/Admin/Medicines.cshtml", vm);
+            }
 
             if (User.IsInRole(UserRoles.Pharmacist))
+            {
+                vm.Breadcrumbs.AddRange(["Start|Plans|Pharmacist", "Leki||"]);
                 return View("~/Views/Pharmacist/Medicines.cshtml", vm);
+            }
+                
 
             return Forbid(); //TODO: change that
         }
@@ -135,10 +143,17 @@ namespace MyApp.Web.Controllers
             }
 
             if (User.IsInRole(UserRoles.Admin))
+            {
+                vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Dawkowanie||"]);
                 return View("~/Views/Admin/Instructions.cshtml", vm);
+            }
+                
 
             if (User.IsInRole(UserRoles.Pharmacist))
+            {
+                vm.Breadcrumbs.AddRange(["Start|Plans|Pharmacist", "Dawkowanie||"]);
                 return View("~/Views/Pharmacist/Instructions.cshtml", vm);
+            }
 
             return Forbid(); //TODO :change that
         }

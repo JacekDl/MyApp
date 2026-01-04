@@ -51,6 +51,8 @@ public class AdminController : Controller
             vm.Page = result.Page;
             vm.PageSize = result.PageSize;
         }
+
+        vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Użytkownicy||"]);
         return View(vm);
     }
 
@@ -91,6 +93,7 @@ public class AdminController : Controller
             vm.Page = result.Page;
             vm.PageSize = result.PageSize;
         }
+        vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Plany leczenia||"]);
         return View(vm);
     }
 
@@ -154,6 +157,8 @@ public class AdminController : Controller
         {
             vm.Requests = result.Value;
         }
+
+        vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Promocje do roli farmaceuta||"]);
 
         return View(vm);
     }

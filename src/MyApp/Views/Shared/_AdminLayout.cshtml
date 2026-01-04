@@ -6,8 +6,16 @@
     <div class="admin-panel app-panel border rounded-3 p-4 d-flex flex-column flex-grow-1">
         <partial name="~/Views/Shared/_AdminNav.cshtml" />
 
+        <div>
+            <partial name="~/Views/Shared/_Breadcrumbs.cshtml" />
+        </div>
+
         <div class="admin-panel__content flex-grow-1 pt-3 d-flex flex-column">
             @RenderBody()
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}

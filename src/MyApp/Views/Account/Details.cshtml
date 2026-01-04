@@ -4,6 +4,18 @@
 @{
     ViewData["Title"] = "Szczegóły konta";
     var user = Model.User;
+    if (User.IsInRole("Admin"))
+    {
+        Layout = "_AdminLayout";
+    }
+    else if (User.IsInRole("Pharmacist"))
+    {
+        Layout = "_PharmacistLayout";
+    }
+    else
+    {
+        Layout = "_PatientLayout";
+    }
 }
 
 <div class="card mb-4">
@@ -23,7 +35,7 @@
     <a class="btn btn-secondary" asp-action="ChangeEmail">Zmień email</a>
     <a class="btn btn-secondary" asp-action="ChangePassword">Zmień hasło</a>
     <a class="btn btn-secondary" asp-action="EditProfile">Zmień dane konta</a>
-    @if(!User.IsInRole("Admin") && (!User.IsInRole("Pharmacist")))
+    @if ((!User.IsInRole("Admin")) && (!User.IsInRole("Pharmacist")))
     {
         <a class="btn btn-secondary" asp-action="PromoteToPharmacist">Zarejestruj jako Farmaceuta.</a>
     }

@@ -1,8 +1,19 @@
-﻿@using MyApp.Web.ViewModels
-@model ChangeEmailViewModel
+﻿@model MyApp.Web.ViewModels.ChangeEmailViewModel
 
 @{
     ViewData["Title"] = "Zmień Email";
+    if (User.IsInRole("Admin"))
+    {
+        Layout = "_AdminLayout";
+    }
+    else if (User.IsInRole("Pharmacist"))
+    {
+        Layout = "_PharmacistLayout";
+    }
+    else
+    {
+        Layout = "_PatientLayout";
+    }
 }
 
 <form asp-action="ChangeEmail" method="post">

@@ -34,7 +34,10 @@ public class PharmacistController : Controller
         ViewBag.InstructionMap = result.Value!.InstructionMap;
         ViewBag.MedicineMap = result.Value!.MedicineMap;
 
-        return View(new TreatmentPlanCreateViewModel());
+        var vm = new TreatmentPlanCreateViewModel();
+        vm.Breadcrumbs.AddRange(["Start|Plans|Pharmacist", "Nowy plan||"]);
+
+        return View(vm);
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -113,6 +116,7 @@ public class PharmacistController : Controller
             vm.Page = result.Page;
             vm.PageSize = result.PageSize;
         }
+        vm.Breadcrumbs.AddRange(["Start|Plans|Pharmacist", "Utworzone||"]);
         return View(vm);
     }
     #endregion

@@ -117,7 +117,9 @@ public class PatientController : Controller
     [HttpGet]
     public IActionResult ClaimPlan()
     {
-        return View(new ClaimPlanViewModel());
+        var vm = new ClaimPlanViewModel();
+        vm.Breadcrumbs.AddRange(["Start|Schedule|Patient", "Pobierz nowy||"]);
+        return View(vm);
     }
 
     [Authorize(Roles = UserRoles.Patient)]
@@ -173,6 +175,8 @@ public class PatientController : Controller
             vm.Page = result.Page;
             vm.PageSize = result.PageSize;
         }
+
+        vm.Breadcrumbs.AddRange(["Start|Schedule|Patient", "Pobrane plany||"]);
 
         return View(vm);
     }
@@ -290,7 +294,7 @@ public class PatientController : Controller
 
         var takenIdsResult = await _mediator.Send(new GetTakenMedicineIdsForDateQuery(currentUserId, selectedDate));
         vm.TakenMedicineIds = takenIdsResult.Value ?? new HashSet<int>();
-
+        vm.Breadcrumbs.AddRange(["Start|Schedule|Patient", "Kalendarz||"]);
         return View(vm);
     }
 

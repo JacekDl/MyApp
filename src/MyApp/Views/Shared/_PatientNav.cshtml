@@ -1,5 +1,6 @@
 ﻿@{
     var current = ViewContext.RouteData.Values["action"]?.ToString();
+    var konto = current == "Details" || current == "EditProfile" || current == "ChangeEmail" || current == "ChangePassword" || current == "PromoteToPharmacist"; ;
 }
 
 <ul class="nav nav-tabs mb-4">
@@ -12,5 +13,8 @@
             <a class="dropdown-item" asp-controller="Patient" asp-action="Plans">Pobrane</a>
             <a class="dropdown-item" asp-controller="Patient" asp-action="ClaimPlan">Pobierz nowy</a>
         </ul>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(konto ? "active" : "")" asp-controller="Account" asp-action="Details">Moje konto</a>
     </li>
 </ul>
