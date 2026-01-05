@@ -167,6 +167,8 @@ public class PharmacistController : Controller
                 .ToList()
         };
 
+        vm.Breadcrumbs.AddRange(["Start|Plans|Pharmacist", "Plany|Plans|Pharmacist", "Szczegóły planu||"]);
+
         return View(vm);
     }
 
@@ -201,6 +203,8 @@ public class PharmacistController : Controller
             })
             .ToList()
         };
+
+        vm.Breadcrumbs.AddRange(["Start|Plans|Pharmacist", "Plany|Plans|Pharmacist", "Zgodność||"]);
 
         return View(vm);
     }

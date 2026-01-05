@@ -20,31 +20,6 @@ public class PatientController : Controller
         _mediator = mediator;
     }
 
-    #region EditOrRegister
-
-    //[AllowAnonymous, HttpGet("/r/{number}")]
-    //public async Task<IActionResult> PublicAccess(string number)
-    //{
-    //    var result = await _mediator.Send(new GetReviewQuery(number));
-
-    //    if (!result.Succeeded)
-    //    {
-    //        var em = new ErrorViewModel();
-    //        em.Message = result.ErrorMessage;
-    //        return View("Error", em);
-    //    }
-
-    //    var review = result.Value!;
-    //    var vm = new PublicReviewAccessViewModel
-    //    {
-    //        Advice = review.Text,
-    //        Number = review.Number,
-    //    };
-    //    return View(vm);
-    //}
-
-    #endregion
-
     #region PublicReview
 
     [AllowAnonymous, HttpGet("/r/{number}")]
@@ -244,7 +219,8 @@ public class PatientController : Controller
 
         if (string.IsNullOrWhiteSpace(vm.Number))
         {
-            return BadRequest();
+            var error = new ErrorViewModel { Message = "Nie udało się zaktualizować planu leczenia." };
+            return View("Error", error);
         }
 
         if (!vm.DateStarted.HasValue || !vm.DateCompleted.HasValue)

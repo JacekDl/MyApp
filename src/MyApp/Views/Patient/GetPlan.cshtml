@@ -38,44 +38,55 @@
 
         <hr />
 
-        <form asp-action="UpdatePlanStart" asp-controller="Patient" method="post" class="row g-3">
-            @Html.AntiForgeryToken()
-
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="Number" />
-            <input type="hidden" asp-for="DateCompleted" id="DateCompleted" />
-
-            <div class="col-12 col-md-6">
-                <label asp-for="DateStarted" class="form-label">Kiedy chcesz rozpocząć plan leczenia?</label>
-                <input asp-for="DateStarted"
-                       type="date"
-                       class="form-control"
-                       id="DateStarted" />
-                <span asp-validation-for="DateStarted" class="text-danger"></span>
+        @if (Model.Status != "Pobrany")
+        {
+            <div class="alert" role="alert">
+                Ten plan leczenia został już rozpoczęty i nie można go zmienić.
             </div>
+        }
+        else
+        {
+            <form asp-action="UpdatePlanStart" asp-controller="Patient" method="post" class="row g-3">
+                @Html.AntiForgeryToken()
 
-            <div class="col-12 col-md-6">
-                <label asp-for="TreatmentLengthDays" class="form-label"></label>
-                <input asp-for="TreatmentLengthDays"
-                       id="TreatmentLengthDays"
-                       type="number"
-                       class="form-control"
-                       min="1" max="365" step="1" />
-                <span asp-validation-for="TreatmentLengthDays" class="text-danger"></span>
-            </div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="Number" />
+                <input type="hidden" asp-for="DateCompleted" id="DateCompleted" />
+                <input type="hidden" asp-for="DateCreated" />
 
-            <div class="col-12 d-flex justify-content-center gap-2">
-                <button type="button"
-                        class="btn btn-secondary"
-                        id="calculateEndDateBtn">
-                    Zmień
-                </button>
+                <div class="col-12 col-md-6">
+                    <label asp-for="DateStarted" class="form-label">Kiedy chcesz rozpocząć plan leczenia?</label>
+                    <input asp-for="DateStarted"
+                           type="date"
+                           class="form-control"
+                           id="DateStarted" />
+                    <span asp-validation-for="DateStarted" class="text-danger"></span>
+                </div>
 
-                <button type="submit" class="btn btn-secondary">
-                    Zapisz
-                </button>
-            </div>
-        </form>
+                <div class="col-12 col-md-6">
+                    <label asp-for="TreatmentLengthDays" class="form-label"></label>
+                    <input asp-for="TreatmentLengthDays"
+                           id="TreatmentLengthDays"
+                           type="number"
+                           class="form-control"
+                           min="1" max="365" step="1" />
+                    <span asp-validation-for="TreatmentLengthDays" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 d-flex justify-content-center gap-2">
+                
+                    <button type="button"
+                            class="btn btn-secondary"
+                            id="calculateEndDateBtn">
+                        Zmień
+                    </button>
+
+                    <button type="submit" class="btn btn-secondary">
+                        Rozpocznij
+                    </button>
+                </div>
+            </form>
+        }
 
         <hr />
 

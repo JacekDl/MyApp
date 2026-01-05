@@ -84,7 +84,8 @@ public class AccountController : Controller
     {
         if (string.IsNullOrWhiteSpace(token))
         {
-            return BadRequest(); //TODO: zmienić
+            var error = new ErrorViewModel() { Message = "Nie udało się potwierdzić adresu email." };
+            return View("Error", error);
         }
 
         var result = await _mediator.Send(new ConfirmEmailCommand(userId, token));
@@ -525,7 +526,8 @@ public class AccountController : Controller
     {
         if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(userId))
         {
-            return BadRequest();
+            var error = new ErrorViewModel() { Message = "Nie udało się zresetować hasła." };
+            return View("Error", error);
         }
 
         var vm = new ResetPasswordConfirmViewModel

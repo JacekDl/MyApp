@@ -44,8 +44,8 @@ else
                 <tr>
                     <th scope="col" class="col-2">Utworzono</th>
                     <th scope="col" class="col-7">Email</th>
-                    <th scope="col" class="col-2">Rola</th>
-                    <th scope="col" class="col-1"></th>
+                    <th scope="col" class="col-1">Rola</th>
+                    <th scope="col" class="col-2"></th>
                 </tr>
             </thead>
             <tbody>
@@ -60,22 +60,73 @@ else
                             <td class="col-1 text-end">
                                 <form asp-controller="Admin" asp-action="Plans" method="get" style="display:inline">
                                     <input type="hidden" name="userId" value="@user.Id" />
-                                    <button type="submit" class="btn btn-sm btn-secondary">Szczegóły</button>
+                                    <button type="submit" class="btn btn-sm btn-secondary">Plany</button>
                                 </form>
                             </td>
 
-                            @* TODO: implement User removal in 'Szczegóły' view *@
-                            @* <td class="col-1 text-start">
-                                <form asp-action="RemoveUser" method="post" asp-route-id="@user.Id" style="display:inline">
-                                    @Html.AntiForgeryToken()
-                                    <button 
-                                        type="submit" 
+                            <td class="col-1 text-start">
+                                <button type="button"
                                         class="btn btn-sm btn-secondary"
-                                        onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?');">
-                                        Usuń
-                                    </button>
-                                </form>
-                            </td> *@
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteUserModal-@user.Id">
+                                    Usuń
+                                </button>
+
+                                <div class="modal fade"
+                                     id="deleteUserModal-@user.Id"
+                                     tabindex="-1"
+                                     aria-labelledby="deleteUserModalLabel-@user.Id"
+                                     aria-hidden="true"
+                                     data-bs-backdrop="static"
+                                     data-bs-keyboard="false">
+
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteUserModalLabel-@user.Id">
+                                                    Potwierdzenie usunięcia użytkownika
+                                                </h5>
+                                                <button type="button"
+                                                        class="btn-close"
+                                                        data-bs-dismiss="modal"
+                                                        aria-label="Zamknij"></button>
+                                            </div>
+
+                                            <div class="modal-body">
+                                                <p class="mb-0">
+                                                    Czy na pewno chcesz <strong>trwale usunąć użytkownika</strong>?
+                                                    <br />
+                                                    <small class="text-muted">
+                                                        @user.Email
+                                                    </small>
+                                                    <br />
+                                                    Tej operacji nie można cofnąć.
+                                                </p>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="button"
+                                                        class="btn btn-outline-secondary"
+                                                        data-bs-dismiss="modal">
+                                                    Anuluj
+                                                </button>
+
+                                                <form asp-action="RemoveUser"
+                                                      asp-route-id="@user.Id"
+                                                      method="post"
+                                                      class="m-0">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-danger">
+                                                        Usuń użytkownika
+                                                    </button>
+                                                </form>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
                         }
                         else
                         {
