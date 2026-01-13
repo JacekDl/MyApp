@@ -75,7 +75,7 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
         public LoginValidator()
         {
             RuleFor(x => x.Email)
-                .NotEmpty()
+                .Must(e => !string.IsNullOrWhiteSpace(e))
                     .WithMessage("Adres e-mail jest wymagany.")
                 .MaximumLength(256)
                     .WithMessage("Adres e-mail nie może przekraczać 256 znaków.")
@@ -83,7 +83,7 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
                     .WithMessage("Nieprawidłowy adres e-mail.");
 
             RuleFor(x => x.Password)
-                .NotEmpty()
+                .Must(p => !string.IsNullOrWhiteSpace(p))
                     .WithMessage("Hasło jest wymagane.");
         }
     }

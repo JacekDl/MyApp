@@ -1,43 +1,74 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using MyApp.Domain.Abstractions;
+using MyApp.Domain.Common;
 using MyApp.Model;
 
-namespace MyApp.Domain.Users.Commands;
-
-public record SendEmailConfirmationCommand(string UserId, string CallbackUrl) : IRequest;
-
-public class SendEmailConfirmationHandler : IRequestHandler<SendEmailConfirmationCommand>
+namespace MyApp.Domain.Users.Commands
 {
-    private readonly IEmailSender _emailService;
-    private readonly UserManager<User> _userManager;
+    public record SendEmailConfirmationCommand(string UserId, string CallbackUrl) : IRequest<SendEmailConfirmationResult>;
 
-    public SendEmailConfirmationHandler(IEmailSender emailService, UserManager<User> userManager)
+    public record class SendEmailConfirmationResult : Result;
+
+    public class SendEmailConfirmationHandler : IRequestHandler<SendEmailConfirmationCommand, SendEmailConfirmationResult>
     {
-        _emailService = emailService;
-        _userManager = userManager;
-    }
+        private readonly IEmailSender _emailService;
+        private readonly UserManager<User> _userManager;
 
-    public async Task Handle(SendEmailConfirmationCommand request, CancellationToken ct)
-    {
-        var user = await _userManager.FindByIdAsync(request.UserId);
+        public SendEmailConfirmationHandler(IEmailSender emailService, UserManager<User> userManager)
+        {
+            _emailService = emailService;
+            _userManager = userManager;
+        }
 
-        if (user is null)
-            throw new KeyNotFoundException($"User {request.UserId} not found.");
+        public async Task<SendEmailConfirmationResult> Handle(SendEmailConfirmationCommand request, CancellationToken ct)
+        {
+            var validator = new SendEmailConfirmationValidator().Validate(request);
+            if (!validator.IsValid)
+            {
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
+            }
 
-        if (user.EmailConfirmed)
-            return;
+            var user = await _userManager.FindByIdAsync(request.UserId);
 
-        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            if (user is null)
+            {
+                return new() { ErrorMessage = "Nie znaleziono Id użytkownika." };
+            }
 
-        var url = $"{request.CallbackUrl}?userId={user.Id}&token={Uri.EscapeDataString(token)}";
+            if (user.EmailConfirmed)
+            {
+                return new();
+            }
 
-        var body = $"""
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            var url = $"{request.CallbackUrl}?userId={user.Id}&token={Uri.EscapeDataString(token)}";
+
+            var body = $"""
         <p>Potwierdź swój email klikając poniższy link:</p>
         <p><a href="{System.Net.WebUtility.HtmlEncode(url)}">Potwierdź swój email</a><p>
         <p>Link jest ważny przez 24 godziny.</p>
         """;
 
-        await _emailService.SendEmailAsync(user.Email!, "Potwierdź email", body, ct);
+            await _emailService.SendEmailAsync(user.Email!, "Potwierdź email", body, ct);
+
+            return new();
+        }
+    }
+
+    public class SendEmailConfirmationValidator : AbstractValidator<SendEmailConfirmationCommand>
+    {
+        public SendEmailConfirmationValidator()
+        {
+            RuleFor(x => x.UserId)
+                .Must(id => !string.IsNullOrWhiteSpace(id))
+                    .WithMessage("Id użytkownika nie może być puste.");
+
+            RuleFor(x => x.CallbackUrl)
+                .Must(url => !string.IsNullOrWhiteSpace(url))
+                    .WithMessage("Adres callback nie może być pusty.");
+        }
     }
 }

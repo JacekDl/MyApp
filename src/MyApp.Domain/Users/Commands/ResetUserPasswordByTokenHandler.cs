@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using MyApp.Domain.Common;
 using MyApp.Model;
@@ -26,6 +27,12 @@ namespace MyApp.Domain.Users.Commands
 
         public async Task<ResetUserPasswordByTokenResult> Handle(ResetUserPasswordByTokenCommand request, CancellationToken cancellationToken)
         {
+            var validator = new ResetUserPasswordByTokenValidator().Validate(request);
+            if (!validator.IsValid)
+            {
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
+            }
+
             var user = await _userManager.FindByIdAsync(request.UserId);
             if (user is null)
             {
@@ -41,6 +48,30 @@ namespace MyApp.Domain.Users.Commands
             }
 
             return new();
+        }
+    }
+
+    public class ResetUserPasswordByTokenValidator : AbstractValidator<ResetUserPasswordByTokenCommand>
+    {
+        public ResetUserPasswordByTokenValidator()
+        {
+            RuleFor(x => x.UserId)
+                .Must(id => !string.IsNullOrWhiteSpace(id))
+                    .WithMessage("Id użytkownika nie może być puste.");
+
+            RuleFor(x => x.Token)
+                .Must(t => !string.IsNullOrWhiteSpace(t))
+                    .WithMessage("Token resetu hasła nie może być pusty.")
+                .MaximumLength(2048)
+                    .WithMessage("Token resetu hasła jest nieprawidłowy.");
+
+            RuleFor(x => x.NewPassword)
+                .Must(p => !string.IsNullOrWhiteSpace(p))
+                    .WithMessage("Nowe hasło nie może być puste.")
+                .MinimumLength(6)
+                    .WithMessage("Nowe hasło musi mieć co najmniej 6 znaków.")
+                .MaximumLength(128)
+                    .WithMessage("Nowe hasło nie może mieć więcej niż 128 znaków.");
         }
     }
 }

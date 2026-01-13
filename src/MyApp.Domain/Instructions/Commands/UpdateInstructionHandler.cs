@@ -63,20 +63,19 @@ namespace MyApp.Domain.Instructions.Commands
         public UpdateInstructionValidator()
         {
             RuleFor(x => x.Id)
-                .GreaterThan(0)
-                .WithMessage("Id dawkowania musi być dodatnie.");
+                .GreaterThan(0).WithMessage("Id dawkowania musi być dodatnie.");
 
             RuleFor(x => x.Code)
-                .NotEmpty().WithMessage("Kod instrukcji jest wymagany.")
-                .MaximumLength(32).WithMessage("Kod instrukcji nie może być dłuższy niż 32 znaki.")
                 .Must(code => !string.IsNullOrWhiteSpace(code))
-                .WithMessage("Kod instrukcji nie może być pusty.");
+                    .WithMessage("Kod instrukcji nie może być pusty.")
+                .MaximumLength(32)
+                    .WithMessage("Kod instrukcji nie może być dłuższy niż 32 znaki.");
 
             RuleFor(x => x.Text)
-                .NotEmpty().WithMessage("Treść instrukcji jest wymagana.")
-                .MaximumLength(256).WithMessage("Treść instrukcji nie może być dłuższa niż 256 znaków.")
                 .Must(text => !string.IsNullOrWhiteSpace(text))
-                .WithMessage("Treść instrukcji nie może być pusta.");
+                    .WithMessage("Treść instrukcji nie może być pusta.")
+                .MaximumLength(256)
+                    .WithMessage("Treść instrukcji nie może być dłuższa niż 256 znaków.");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
@@ -23,6 +24,12 @@ namespace MyApp.Domain.TreatmentPlans.Commands
 
         public async Task<UpdateTreatmentPlanResult> Handle(UpdateTreatmentPlanCommand request, CancellationToken ct)
         {
+            var validator = new UpdateTreatmentPlanValidator().Validate(request);
+            if (!validator.IsValid)
+            {
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
+            }
+
             var plan = await _db.TreatmentPlans
                 .FirstOrDefaultAsync(tp => tp.Number == request.Number, ct);
 
@@ -62,6 +69,26 @@ namespace MyApp.Domain.TreatmentPlans.Commands
             await _db.SaveChangesAsync(ct);
 
             return new();
+        }
+    }
+
+    public class UpdateTreatmentPlanValidator : AbstractValidator<UpdateTreatmentPlanCommand>
+    {
+        public UpdateTreatmentPlanValidator()
+        {
+            RuleFor(x => x.Number)
+                .Must(n => !string.IsNullOrWhiteSpace(n))
+                    .WithMessage("Numer planu leczenia nie może być pusty.")
+                .Length(16)
+                    .WithMessage("Numer planu leczenia musi mieć dokładnie 16 znaków.")
+                .Matches("^[a-zA-Z0-9]+$")
+                    .WithMessage("Numer planu leczenia może zawierać tylko litery i cyfry.");
+
+            RuleFor(x => x.ReviewText)
+                .Must(t => !string.IsNullOrWhiteSpace(t))
+                    .WithMessage("Treść uwag nie może być pusta.")
+                .MaximumLength(500)
+                    .WithMessage("Treść uwag nie może przekraczać 500 znaków.");
         }
     }
 }

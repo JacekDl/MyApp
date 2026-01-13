@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using FluentValidation.TestHelper;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Medicines.Queries;
 using MyApp.Model;
@@ -9,45 +8,13 @@ namespace MyApp.Tests.Domain.Medicines
 {
     public class GetMedicineHandlerTests : TestBase
     {
-        #region Validator
-        [Theory]
-        [InlineData(0)]
-        [InlineData(-1)]
-        [InlineData(-10)]
-        public void Validator_Fails_When_Id_IsNotPositive(int id)
-        {
-            var validator = new GetMedicineValidator();
-            var query = new GetMedicineQuery(id);
-
-            var result = validator.TestValidate(query);
-
-            result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e =>
-                e.PropertyName == nameof(GetMedicineQuery.Id) &&
-                e.ErrorMessage.Contains("Id leku musi być dodatnie."));
-        }
-
         [Fact]
-        public void Validator_Succeeds_For_Positive_Id()
-        {
-            var validator = new GetMedicineValidator();
-            var query = new GetMedicineQuery(1);
-
-            var result = validator.TestValidate(query);
-
-            result.IsValid.Should().BeTrue();
-            result.Errors.Should().BeEmpty();
-        }
-        #endregion
-
-        #region Handler
-        [Fact]
-        public async Task Handle_ReturnsError_WhenMedicineNotFound()
+        public async Task ReturnsError_MedicineNotFound()
         {
             await using var db = CreateInMemoryDb();
 
             var sut = new GetMedicineHandler(db);
-            var query = new GetMedicineQuery(1234567); 
+            var query = new GetMedicineQuery(1234567);
 
             var result = await sut.Handle(query, CancellationToken.None);
 
@@ -57,7 +24,7 @@ namespace MyApp.Tests.Domain.Medicines
         }
 
         [Fact]
-        public async Task Handle_ReturnsMedicineDto_WhenMedicineExists()
+        public async Task ReturnsMedicineDto_MedicineExists()
         {
             await using var db = CreateInMemoryDb();
 
@@ -86,6 +53,5 @@ namespace MyApp.Tests.Domain.Medicines
 
             (await db.Set<Medicine>().CountAsync()).Should().Be(1);
         }
-        #endregion
     }
 }

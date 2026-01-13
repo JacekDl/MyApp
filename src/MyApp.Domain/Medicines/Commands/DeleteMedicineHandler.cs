@@ -47,7 +47,7 @@ namespace MyApp.Domain.Medicines.Commands
         {
             RuleFor(x => x.Id)
                 .GreaterThan(0)
-                .WithMessage("Id leku musi być dodatnie.");
+                    .WithMessage("Id leku musi być liczbą dodatnią.");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
@@ -21,6 +22,12 @@ namespace MyApp.Domain.TreatmentPlans.Queries
 
         public async Task<GetTreatmentPlanComplianceResult> Handle(GetTreatmentPlanComplianceQuery request, CancellationToken ct)
         {
+            var validator = new GetTreatmentPlanComplianceValidator().Validate(request);
+            if (!validator.IsValid)
+            {
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
+            }
+
             var now = DateTime.UtcNow;
 
             var plan = await _db.TreatmentPlans
@@ -33,10 +40,17 @@ namespace MyApp.Domain.TreatmentPlans.Queries
                 return new() { ErrorMessage = "Nie znaleziono planu leczenia." };
             }
 
+            if (plan.DateStarted is null && plan.Status == Model.enums.TreatmentPlanStatus.Completed)
+            {
+                return new() { ErrorMessage = "Pacjent nie pobrał planu leczenia w celu zapisu przyjmowanych dawek." };
+            }
+
             if (plan.DateStarted is null || plan.DateStarted > now)
             {
-                return new() { ErrorMessage = "Plan leczenia nie został jeszcze rozpoczęty" };
+                return new() { ErrorMessage = "Plan leczenia nie został jeszcze rozpoczęty." };
             }
+
+
 
             var start = plan.DateStarted.Value;
 
@@ -97,6 +111,20 @@ namespace MyApp.Domain.TreatmentPlans.Queries
             );
 
             return new() { Value = dto };
+        }
+    }
+
+    public class GetTreatmentPlanComplianceValidator : AbstractValidator<GetTreatmentPlanComplianceQuery>
+    {
+        public GetTreatmentPlanComplianceValidator()
+        {
+            RuleFor(x => x.Number)
+                .Must(n => !string.IsNullOrWhiteSpace(n))
+                    .WithMessage("Numer planu leczenia nie może być pusty.")
+                .Length(16)
+                    .WithMessage("Numer planu leczenia musi mieć dokładnie 16 znaków.")
+                .Matches("^[a-zA-Z0-9]+$")
+                    .WithMessage("Numer planu leczenia może zawierać tylko litery i cyfry.");
         }
     }
 }

@@ -1,44 +1,64 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using MyApp.Domain.Common;
-using MyApp.Model;
 using MyApp.Domain.Users;
+using MyApp.Domain.Users.Commands;
+using MyApp.Model;
 
 
-namespace MyApp.Domain.Users.Queries;
-
-public record class GetUserByIdQuery(string Id) : IRequest<GetUserByIdResult>;
-
-public record class GetUserByIdResult : Result<UserDto>;
-
-public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, GetUserByIdResult>
+namespace MyApp.Domain.Users.Queries
 {
-    private readonly UserManager<User> _userManager;
 
-    public GetUserByIdHandler(UserManager<User> userManager)
-    {
-        _userManager = userManager;
-    }
+    public record class GetUserByIdQuery(string Id) : IRequest<GetUserByIdResult>;
 
-    public async Task<GetUserByIdResult> Handle(GetUserByIdQuery request, CancellationToken ct)
+    public record class GetUserByIdResult : Result<UserDto>;
+
+    public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, GetUserByIdResult>
     {
-        var user = await _userManager.FindByIdAsync(request.Id);
-        if (user is null)
+        private readonly UserManager<User> _userManager;
+
+        public GetUserByIdHandler(UserManager<User> userManager)
         {
-            return new() { ErrorMessage = "Nie znaleziono użytkownika." };
+            _userManager = userManager;
         }
 
-        var roles = await _userManager.GetRolesAsync(user);
-        var primaryRole = roles.FirstOrDefault() ?? string.Empty;
+        public async Task<GetUserByIdResult> Handle(GetUserByIdQuery request, CancellationToken ct)
+        {
+            var validator = new GetUserByIdValidator().Validate(request);
+            if (!validator.IsValid)
+            {
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
+            }
 
-        var userDto = new UserDto(
-            user.Id,
-            user.Email ?? string.Empty,
-            primaryRole,
-            user.DisplayName ?? string.Empty,
-            user.CreatedUtc
-        );
+            var user = await _userManager.FindByIdAsync(request.Id);
+            if (user is null)
+            {
+                return new() { ErrorMessage = "Nie znaleziono użytkownika." };
+            }
 
-        return new() { Value = userDto };
+            var roles = await _userManager.GetRolesAsync(user);
+            var primaryRole = roles.FirstOrDefault() ?? string.Empty;
+
+            var userDto = new UserDto(
+                user.Id,
+                user.Email ?? string.Empty,
+                primaryRole,
+                user.DisplayName ?? string.Empty,
+                user.CreatedUtc
+            );
+
+            return new() { Value = userDto };
+        }
+    }
+
+    public class GetUserByIdValidator : AbstractValidator<GetUserByIdQuery>
+    {
+        public GetUserByIdValidator()
+        {
+            RuleFor(x => x.Id)
+                .Must(id => !string.IsNullOrWhiteSpace(id))
+                    .WithMessage("Id użytkownika nie może być puste.");
+        }
     }
 }

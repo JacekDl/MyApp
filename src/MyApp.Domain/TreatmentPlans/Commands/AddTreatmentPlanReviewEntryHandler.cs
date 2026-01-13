@@ -1,11 +1,11 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
 using MyApp.Model;
 using MyApp.Model.enums;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace MyApp.Domain.TreatmentPlans.Commands
 {
@@ -14,7 +14,8 @@ namespace MyApp.Domain.TreatmentPlans.Commands
 
     public record class AddTreatmentPlanReviewEntryResult : Result;
 
-    public class AddTreatmentPlanReviewEntryHandler : IRequestHandler<AddTreatmentPlanReviewEntryCommand, AddTreatmentPlanReviewEntryResult>
+    public class AddTreatmentPlanReviewEntryHandler 
+        : IRequestHandler<AddTreatmentPlanReviewEntryCommand, AddTreatmentPlanReviewEntryResult>
     {
 
         private readonly ApplicationDbContext _db;
@@ -27,10 +28,16 @@ namespace MyApp.Domain.TreatmentPlans.Commands
         }
         public async Task<AddTreatmentPlanReviewEntryResult> Handle(AddTreatmentPlanReviewEntryCommand request, CancellationToken ct)
         {
+            var validator = new AddTreatmentPlanReviewEntryValidator().Validate(request);
+            if (!validator.IsValid)
+            {
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
+            }
+
             var plan = await _db.TreatmentPlans
-            .Include(tp => tp.Review)
-                .ThenInclude(r => r.ReviewEntries)
-            .FirstOrDefaultAsync(tp => tp.Number == request.Number, ct);
+                .Include(tp => tp.Review)
+                    .ThenInclude(r => r.ReviewEntries)
+                .FirstOrDefaultAsync(tp => tp.Number == request.Number, ct);
 
             if (plan is null)
             {
@@ -80,6 +87,30 @@ namespace MyApp.Domain.TreatmentPlans.Commands
             await _db.SaveChangesAsync(ct);
 
             return new();
+        }
+    }
+
+    public class AddTreatmentPlanReviewEntryValidator : AbstractValidator<AddTreatmentPlanReviewEntryCommand>
+    {
+        public AddTreatmentPlanReviewEntryValidator()
+        {
+            RuleFor(x => x.Number)
+                .Must(n => !string.IsNullOrWhiteSpace(n))
+                    .WithMessage("Numer tokenu nie może być pusty.")
+                .Length(16)
+                    .WithMessage("Numer tokenu musi mieć dokładnie 16 znaków.")
+                .Matches("^[a-zA-Z0-9]+$")
+                    .WithMessage("Numer tokenu może zawierać tylko litery i cyfry.");
+
+            RuleFor(x => x.Text)
+                .Must(t => !string.IsNullOrWhiteSpace(t))
+                    .WithMessage("Treść wpisu nie może być pusta.")
+                .MaximumLength(500)
+                    .WithMessage("Treść wpisu nie może przekraczać 500 znaków.");
+
+            RuleFor(x => x.CurrentUserId)
+               .Must(id => !string.IsNullOrWhiteSpace(id))
+                   .WithMessage("Id użytkownika nie może być puste.");
         }
     }
 }

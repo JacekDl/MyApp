@@ -1,9 +1,11 @@
 ﻿
+using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
 using MyApp.Model;
+using static MyApp.Domain.TreatmentPlans.Queries.GetTreatmentPlanHandler;
 
 namespace MyApp.Domain.TreatmentPlans.Queries
 {
@@ -22,6 +24,12 @@ namespace MyApp.Domain.TreatmentPlans.Queries
 
         public async Task<GetTreatmentPlanMedicinesResult> Handle(GetTreatmentPlanMedicinesQuery request, CancellationToken ct)
         {
+            var validator = new GetTreatmentPlanMedicinesValidator().Validate(request);
+            if (!validator.IsValid)
+            {
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
+            }
+
             var dayStart = request.Date.Date;
             var nextDayStart = dayStart.AddDays(1);
 
@@ -46,6 +54,20 @@ namespace MyApp.Domain.TreatmentPlans.Queries
             var medicines = await query.ToListAsync(ct);
 
             return new() { Value = medicines };
+        }
+    }
+
+    public class GetTreatmentPlanMedicinesValidator : AbstractValidator<GetTreatmentPlanMedicinesQuery>
+    {
+        public GetTreatmentPlanMedicinesValidator()
+        {
+            RuleFor(x => x.PatientId)
+                .Must(id => !string.IsNullOrWhiteSpace(id))
+                    .WithMessage("Id pacjenta nie może być puste.");
+
+            RuleFor(x => x.Date)
+                .NotEmpty()
+                    .WithMessage("Data jest wymagana.");
         }
     }
 }

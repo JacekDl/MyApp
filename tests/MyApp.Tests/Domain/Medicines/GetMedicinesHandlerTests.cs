@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using FluentValidation.TestHelper;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Medicines.Queries;
 using MyApp.Model;
@@ -9,23 +8,8 @@ namespace MyApp.Tests.Domain.Medicines
 {
     public class GetMedicinesHandlerTests : TestBase
     {
-        #region Validator
         [Fact]
-        public void Validator_Succeeds_For_DefaultQuery()
-        {
-            var validator = new GetMedicinesValidator();
-            var query = new GetMedicinesQuery();
-
-            var result = validator.TestValidate(query);
-
-            result.IsValid.Should().BeTrue();
-            result.Errors.Should().BeEmpty();
-        }
-        #endregion
-
-        #region Handler
-        [Fact]
-        public async Task Handle_ReturnsEmptyList_WhenNoMedicinesExist()
+        public async Task ReturnsEmptyList_NoMedicinesExist()
         {
             await using var db = CreateInMemoryDb();
 
@@ -36,50 +20,46 @@ namespace MyApp.Tests.Domain.Medicines
 
             result.Succeeded.Should().BeTrue();
             result.ErrorMessage.Should().BeNullOrEmpty();
-            result.Value.Should().NotBeNull();
-            result.Value!.Should().BeEmpty();
+            result.Value.Should().NotBeNull().And.BeEmpty();
+
+            result.TotalCount.Should().Be(0);
+            result.Page.Should().Be(1);
+            result.PageSize.Should().Be(10);
         }
 
         [Fact]
-        public async Task Handle_ReturnsOrderedListOfMedicines_WhenTheyExist()
+        public async Task ReturnsMedicineList()
         {
             await using var db = CreateInMemoryDb();
 
-            var med1 = new Medicine { Code = "ZZZ", Name = "Ostatni" };
-            var med2 = new Medicine { Code = "AAA", Name = "Pierwszy" };
-            var med3 = new Medicine { Code = "KOD", Name = "Środkowy" };
+            var m1 = new Medicine { Code = "ZZZ", Name = "Ostatni" };
+            var m2 = new Medicine { Code = "AAA", Name = "Pierwszy" };
+            var m3 = new Medicine { Code = "KOD", Name = "Środkowy" };
+            var m4 = new Medicine { Code = "KOD", Name = "Środkowy 2" };
 
-            db.Medicines.AddRange(med1, med2, med3);
+            db.Medicines.AddRange(m1, m2, m3, m4);
             await db.SaveChangesAsync();
 
             var sut = new GetMedicinesQueryHandler(db);
-            var query = new GetMedicinesQuery();
+            var query = new GetMedicinesQuery(Page: 1, PageSize: 10);
 
             var result = await sut.Handle(query, CancellationToken.None);
 
             result.Succeeded.Should().BeTrue();
-            result.ErrorMessage.Should().BeNullOrEmpty();
-            result.Value.Should().NotBeNull();
-            result.Value!.Should().HaveCount(3);
+            result.Value.Should().HaveCount(4);
 
-            var list = result.Value!.ToList();
-
-            list[0].Code.Should().Be("AAA");
-            list[0].Name.Should().Be("Pierwszy");
-
-            list[1].Code.Should().Be("KOD");
-            list[1].Name.Should().Be("Środkowy");
-
-            list[2].Code.Should().Be("ZZZ");
-            list[2].Name.Should().Be("Ostatni");
-
-            var idsFromDb = await db.Medicines
+            var expectedIds = await db.Medicines
+                .AsNoTracking()
                 .OrderBy(m => m.Code)
+                .ThenBy(m => m.Id)
                 .Select(m => m.Id)
                 .ToListAsync();
 
-            list.Select(m => m.Id).Should().ContainInOrder(idsFromDb);
+            result.Value!.Select(m => m.Id).Should().ContainInOrder(expectedIds);
+
+            result.TotalCount.Should().Be(4);
+            result.Page.Should().Be(1);
+            result.PageSize.Should().Be(10);
         }
-        #endregion
     }
 }

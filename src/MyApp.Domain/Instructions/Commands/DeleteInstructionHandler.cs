@@ -27,7 +27,6 @@ namespace MyApp.Domain.Instructions.Commands
             {
                 return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
             }
-            ;
 
             var entity = await _db.Set<Instruction>().FirstOrDefaultAsync(i => i.Id == request.Id, ct);
             if (entity is null)
@@ -47,7 +46,7 @@ namespace MyApp.Domain.Instructions.Commands
         {
             RuleFor(x => x.Id)
                 .GreaterThan(0)
-                .WithMessage("Id dawkowania musi być dodatnie.");
+                    .WithMessage("Id dawkowania musi być liczbą dodatnią.");
         }
     }
 }

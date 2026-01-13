@@ -52,11 +52,16 @@ namespace MyApp.Domain.Medicines.Commands
         public AddMedicineValidator()
         {
             RuleFor(x => x.Code)
-                .NotEmpty().WithMessage("Kod leku jest wymagany.")
-                .MaximumLength(32).WithMessage("Kod leku nie może być dłuższy niż 32 znaków.");
+                .Must(code => !string.IsNullOrWhiteSpace(code))
+                    .WithMessage("Kod leku jest wymagany.")
+                .MaximumLength(32)
+                    .WithMessage("Kod leku nie może być dłuższy niż 32 znaków.");
+
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Nazwa leku jest wymagana.")
-                .MaximumLength(128).WithMessage("Nazwa leku nie może być dłuższa niż 128 znaków.");
+                .Must(name => !string.IsNullOrWhiteSpace(name))
+                    .WithMessage("Nazwa leku jest wymagana.")
+                .MaximumLength(128)
+                    .WithMessage("Nazwa leku nie może być dłuższa niż 128 znaków.");
         }
     }
 }

@@ -6,7 +6,6 @@ using MyApp.Domain.Data;
 using MyApp.Domain.TreatmentPlans.Mappers;
 using MyApp.Model;
 using MyApp.Model.enums;
-using System.Numerics;
 
 namespace MyApp.Domain.TreatmentPlans.Queries;
 
@@ -35,7 +34,7 @@ public class GetTreatmentPlansHandler : IRequestHandler<GetTreatmentPlansQuery, 
 
     public async Task<GetTreatmentPlansResult> Handle(GetTreatmentPlansQuery request, CancellationToken ct)
     {
-        //TODO: validation
+        //TODO: validation?
 
         string? effectiveUserId = request.CurrentUserId;
 

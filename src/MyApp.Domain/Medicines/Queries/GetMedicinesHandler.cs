@@ -19,12 +19,7 @@ namespace MyApp.Domain.Medicines.Queries
 
         public async Task<GetMedicinesResult> Handle(GetMedicinesQuery request, CancellationToken ct)
         {
-            var validator = new GetMedicinesValidator().Validate(request);
-            if (!validator.IsValid)
-            {
-                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
-            }
-
+            // zamiast walidacji i zwracania bledu: 
             var page = request.Page < 1 ? 1 : request.Page;
             var pageSize = request.PageSize is < 1 or > 100 ? 10 : request.PageSize;
 

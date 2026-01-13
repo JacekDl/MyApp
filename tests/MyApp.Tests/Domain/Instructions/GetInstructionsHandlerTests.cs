@@ -1,87 +1,67 @@
 ﻿using FluentAssertions;
-using FluentValidation.TestHelper;
 using Microsoft.EntityFrameworkCore;
-using MyApp.Domain.Common;
-using MyApp.Domain.Instructions.Commands;
 using MyApp.Domain.Instructions.Queries;
 using MyApp.Model;
 using MyApp.Tests.Common;
 
-namespace MyApp.Tests.Domain.Instructions
+namespace MyApp.Tests.Domain.Instructions;
+
+public class GetInstructionsHandlerTests : TestBase
 {
-    public class GetInstructionsHandlerTests : TestBase
+
+    [Fact]
+    public async Task ReturnsEmptyList_NoInstructions()
     {
-        #region Validator
-        [Fact]
-        public void Validator_Succeeds_For_DefaultQuery()
-        {
-            var validator = new GetInstructionsValidator();
-            var query = new GetInstructionsQuery();
+        await using var db = CreateInMemoryDb();
 
-            var result = validator.TestValidate(query);
+        var sut = new GetInstructionsHandler(db);
+        var query = new GetInstructionsQuery();
 
-            result.IsValid.Should().BeTrue();
-            result.Errors.Should().BeEmpty();
-        }
-        #endregion
+        var result = await sut.Handle(query, CancellationToken.None);
 
-        #region Handler
-        [Fact]
-        public async Task Handle_ReturnsEmptyList_WhenNoInstructions()
-        {
-            await using var db = CreateInMemoryDb();
+        result.Succeeded.Should().BeTrue();
+        result.ErrorMessage.Should().BeNullOrEmpty();
+        result.Value.Should().NotBeNull().And.BeEmpty();
 
-            var sut = new GetInstructionsHandler(db);
-            var query = new GetInstructionsQuery();
+        result.TotalCount.Should().Be(0);
+        result.Page.Should().Be(1);
+        result.PageSize.Should().Be(10);
+    }
 
-            var result = await sut.Handle(query, CancellationToken.None);
+    [Fact]
+    public async Task ReturnsInstructionList()
+    {
+        await using var db = CreateInMemoryDb();
 
-            result.Succeeded.Should().BeTrue();
-            result.ErrorMessage.Should().BeNullOrEmpty();
-            result.Value.Should().NotBeNull();
-            result.Value!.Should().BeEmpty();
-        }
+        var i1 = new Instruction { Code = "ZZZ", Text = "Ostatnia" };
+        var i2 = new Instruction { Code = "AAA", Text = "Pierwsza" };
+        var i3 = new Instruction { Code = "KOD", Text = "Środkowa" };
+        var i4 = new Instruction { Code = "KOD", Text = "Środkowa 2" };
 
-        [Fact]
-        public async Task Handle_ReturnsOrderedListOfInstructions_WhenTheyExist()
-        {
-            await using var db = CreateInMemoryDb();
+        db.Instructions.AddRange(i1, i2, i3, i4);
+        await db.SaveChangesAsync();
 
-            var i1 = new Instruction { Code = "ZZZ", Text = "Ostatnia" };
-            var i2 = new Instruction { Code = "AAA", Text = "Pierwsza" };
-            var i3 = new Instruction { Code = "KOD", Text = "Środkowa" };
+        var sut = new GetInstructionsHandler(db);
+        var query = new GetInstructionsQuery(Page: 1, PageSize: 10);
 
-            db.Instructions.AddRange(i1, i2, i3);
-            await db.SaveChangesAsync();
+        var result = await sut.Handle(query, CancellationToken.None);
 
-            var sut = new GetInstructionsHandler(db);
-            var query = new GetInstructionsQuery();
+        result.Succeeded.Should().BeTrue();
+        result.ErrorMessage.Should().BeNullOrEmpty();
+        result.Value.Should().NotBeNull();
+        result.Value!.Should().HaveCount(4);
 
-            var result = await sut.Handle(query, CancellationToken.None);
+        var expectedIds = await db.Instructions
+            .AsNoTracking()
+            .OrderBy(x => x.Code)
+            .ThenBy(x => x.Id)
+            .Select(x => x.Id)
+            .ToListAsync();
 
-            result.Succeeded.Should().BeTrue();
-            result.ErrorMessage.Should().BeNullOrEmpty();
-            result.Value.Should().NotBeNull();
-            result.Value!.Should().HaveCount(3);
+        result.Value.Select(x => x.Id).Should().ContainInOrder(expectedIds);
 
-            var list = result.Value!.ToList();
-
-            list[0].Code.Should().Be("AAA");
-            list[0].Text.Should().Be("Pierwsza");
-
-            list[1].Code.Should().Be("KOD");
-            list[1].Text.Should().Be("Środkowa");
-
-            list[2].Code.Should().Be("ZZZ");
-            list[2].Text.Should().Be("Ostatnia");
-
-            var idsFromDb = await db.Instructions
-                .OrderBy(i => i.Code)
-                .Select(i => i.Id)
-                .ToListAsync();
-
-            list.Select(d => d.Id).Should().ContainInOrder(idsFromDb);
-        }
-        #endregion
+        result.TotalCount.Should().Be(4);
+        result.Page.Should().Be(1);
+        result.PageSize.Should().Be(10);
     }
 }

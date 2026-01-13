@@ -49,7 +49,7 @@ namespace MyApp.Domain.Instructions.Queries
         {
             RuleFor(x => x.Id)
                 .GreaterThan(0)
-                .WithMessage("Id dawkowania musi być dodatnie.");
+                    .WithMessage("Id dawkowania musi być liczbą dodatnią.");
         }
     }
 }

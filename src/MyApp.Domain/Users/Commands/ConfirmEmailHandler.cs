@@ -15,7 +15,6 @@ namespace MyApp.Domain.Users.Commands
     {
         public async Task<ConfirmEmailResult> Handle(ConfirmEmailCommand request, CancellationToken ct)
         {
-
             var validator = new ConfirmEmailValidator().Validate(request);
             if (!validator.IsValid)
             {
@@ -44,12 +43,12 @@ namespace MyApp.Domain.Users.Commands
         public ConfirmEmailValidator()
         {
             RuleFor(x => x.UserId)
-                .NotEmpty()
-                .WithMessage("Id użytkownika jest wymagane.");
+                .Must(id => !string.IsNullOrWhiteSpace(id))
+                    .WithMessage("Id użytkownika jest wymagane.");
 
             RuleFor(x => x.Token)
-                .NotEmpty()
-                .WithMessage("Token jest wymagany.");
+                .Must(t => !string.IsNullOrWhiteSpace(t))
+                    .WithMessage("Token jest wymagany.");
         }
     }
 }

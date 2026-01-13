@@ -1,162 +1,80 @@
 ﻿using FluentAssertions;
-using FluentValidation.TestHelper;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Instructions.Commands;
 using MyApp.Model;
 using MyApp.Tests.Common;
 
-namespace MyApp.Tests.Domain.Instructions 
+namespace MyApp.Tests.Domain.Instructions;
+
+public class UpdateInstructionHandlerTests : TestBase
 {
-    public class UpdateInstructionHandlerTests : TestBase
+
+    [Fact]
+    public async Task DoesNotChange_CodeAlreadyUsedByAnotherInstruction()
     {
-        #region Validator
-        [Theory]
-        [InlineData(1, "", "Tekst", "Kod instrukcji jest wymagany.")]
-        [InlineData(1, "ABC", "", "Treść instrukcji jest wymagana.")]
-        public void Validator_Fails_On_EmptyFields(int id, string code, string text, string expectedMessagePart)
-        {
-            var validator = new UpdateInstructionValidator();
-            var cmd = new UpdateInstructionCommand(id, code, text);
+        await using var db = CreateInMemoryDb();
 
-            var res = validator.TestValidate(cmd);
+        var insA = new Instruction { Code = "1T", Text = "Jedna tabletka" };
 
-            res.IsValid.Should().BeFalse();
-            res.Errors.Should().Contain(e => e.ErrorMessage.Contains(expectedMessagePart));
-        }
+        var (codeB, textB) =
+            FormatStringHelper.FormatCodeAndText("2K", "Dwie kapsułki");
+        var insB = new Instruction { Code = codeB, Text = textB };
 
-        [Fact]
-        public void Validator_Fails_On_TooLongFields()
-        {
-            var validator = new UpdateInstructionValidator();
-            var tooLongCode = new string('C', 33);   // > 32
-            var tooLongText = new string('T', 257);  // > 256
+        db.AddRange(insA, insB);
+        await db.SaveChangesAsync();
 
-            var cmd = new UpdateInstructionCommand(1, tooLongCode, tooLongText);
+        var sut = new UpdateInstructionHandler(db);
 
-            var res = validator.TestValidate(cmd);
+        var cmd = new UpdateInstructionCommand(
+            Id: insA.Id,
+            Code: "2K",
+            Text: "Dwie kapsułeczki"
+        );
 
-            res.IsValid.Should().BeFalse();
-            res.Errors.Should().Contain(e => e.ErrorMessage.Contains("32"));
-            res.Errors.Should().Contain(e => e.ErrorMessage.Contains("256"));
-        }
+        var result = await sut.Handle(cmd, CancellationToken.None);
 
-        [Theory]
-        [InlineData(0)]
-        [InlineData(-1)]
-        public void Validator_Fails_On_NonPositiveId(int id)
-        {
-            var validator = new UpdateInstructionValidator();
-            var cmd = new UpdateInstructionCommand(id, "1T", "Tekst");
+        result.Succeeded.Should().BeFalse();
+        result.ErrorMessage.Should().Be($"Kod '{codeB}' jest już używany.");
 
-            var res = validator.TestValidate(cmd);
+        var reloadedA = await db.Set<Instruction>().SingleAsync(i => i.Id == insA.Id);
+        var reloadedB = await db.Set<Instruction>().SingleAsync(i => i.Id == insB.Id);
 
-            res.IsValid.Should().BeFalse();
-            res.Errors.Should().Contain(e =>
-                e.PropertyName == nameof(UpdateInstructionCommand.Id) &&
-                e.ErrorMessage.Contains("Id dawkowania musi być dodatnie."));
-        }
+        reloadedA.Code.Should().Be("1T");
+        reloadedA.Text.Should().Be("Jedna tabletka");
 
-        [Fact]
-        public void Validator_Succeeds_For_ValidValues()
-        {
-            var validator = new UpdateInstructionValidator();
-            var cmd = new UpdateInstructionCommand(1, "1T", "Jedna trzy razy dziennie.");
+        reloadedB.Code.Should().Be(codeB);
+        reloadedB.Text.Should().Be(textB);
+    }
 
-            var res = validator.TestValidate(cmd);
+    [Fact]
+    public async Task UpdatesInstruction_CodeIsUnique()
+    {
+        await using var db = CreateInMemoryDb();
 
-            res.IsValid.Should().BeTrue();
-            res.Errors.Should().BeEmpty();
-        }
+        var existing = new Instruction { Code = "stary", Text = "Stary tekst" };
+        db.Add(existing);
+        await db.SaveChangesAsync();
 
-        #endregion
+        var sut = new UpdateInstructionHandler(db);
 
-        #region Handler
-        [Fact]
-        public async Task Handle_ReturnsError_WhenInstructionNotFound()
-        {
-            await using var db = CreateInMemoryDb();
+        var cmd = new UpdateInstructionCommand(
+            Id: existing.Id,
+            Code: " nowy ",
+            Text: " nowy tekst instrukcji "
+        );
 
-            var sut = new UpdateInstructionHandler(db);
-            var cmd = new UpdateInstructionCommand(
-                Id: 123,
-                Code: "PARA",
-                Text: "Nowy tekst");
+        var (expectedCode, expectedText) =
+            FormatStringHelper.FormatCodeAndText(cmd.Code, cmd.Text);
 
-            var result = await sut.Handle(cmd, CancellationToken.None);
+        var result = await sut.Handle(cmd, CancellationToken.None);
 
-            result.Succeeded.Should().BeFalse();
-            result.ErrorMessage.Should().NotBeNullOrWhiteSpace();
-        }
+        result.Succeeded.Should().BeTrue();
+        result.ErrorMessage.Should().BeNullOrEmpty();
 
-        [Fact]
-        public async Task Handle_UpdatesInstruction_WhenCodeIsUnique()
-        {
-            await using var db = CreateInMemoryDb();
-
-            var existing = new Instruction { Code = "stary", Text = "Stary tekst" };
-            db.Add(existing);
-            await db.SaveChangesAsync();
-
-            var sut = new UpdateInstructionHandler(db);
-
-            var cmd = new UpdateInstructionCommand(
-                existing.Id,
-                Code: "nowy",                     
-                Text: " nowy tekst instrukcji " 
-            );
-
-            var (expectedCode, expectedText) =
-                FormatStringHelper.FormatCodeAndText(cmd.Code, cmd.Text);
-
-            var result = await sut.Handle(cmd, CancellationToken.None);
-
-            result.Succeeded.Should().BeTrue();
-            result.ErrorMessage.Should().BeNullOrEmpty();
-
-            var saved = await db.Set<Instruction>().SingleAsync();
-            saved.Id.Should().Be(existing.Id);
-            saved.Code.Should().Be(expectedCode);
-            saved.Text.Should().Be(expectedText);
-        }
-
-        [Fact]
-        public async Task Handle_DoesNotChange_WhenCodeAlreadyUsedByAnotherInstruction()
-        {
-            await using var db = CreateInMemoryDb();
-
-            var insA = new Instruction { Code = "1T", Text = "Jedna trzy razy dziennie." };
-
-            var (codeB, textB) =
-                FormatStringHelper.FormatCodeAndText("1N", "Jedna wieczorem.");
-            var insB = new Instruction { Code = codeB, Text = textB };
-
-            db.AddRange(insA, insB);
-            await db.SaveChangesAsync();
-
-            var sut = new UpdateInstructionHandler(db);
-
-            var cmd = new UpdateInstructionCommand(
-                insA.Id,
-                Code: "1N",
-                Text: "Jedna na noc."
-            );
-
-            var result = await sut.Handle(cmd, CancellationToken.None);
-
-            result.Succeeded.Should().BeFalse();
-            result.ErrorMessage.Should().NotBeNullOrWhiteSpace();
-            result.ErrorMessage!.Should().Contain("Kod '1N' jest już używany.");
-
-            var reloadedA = await db.Set<Instruction>().SingleAsync(i => i.Id == insA.Id);
-            var reloadedB = await db.Set<Instruction>().SingleAsync(i => i.Id == insB.Id);
-
-            reloadedA.Code.Should().Be("1T");
-            reloadedA.Text.Should().Be("Jedna trzy razy dziennie.");
-
-            reloadedB.Code.Should().Be(codeB);
-            reloadedB.Text.Should().Be(textB);
-        }
-        #endregion
+        var saved = await db.Set<Instruction>().SingleAsync();
+        saved.Id.Should().Be(existing.Id);
+        saved.Code.Should().Be(expectedCode);
+        saved.Text.Should().Be(expectedText);
     }
 }

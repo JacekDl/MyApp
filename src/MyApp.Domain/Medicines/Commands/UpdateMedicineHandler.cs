@@ -28,6 +28,7 @@ namespace MyApp.Domain.Medicines.Commands
             {
                 return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
             }
+
             var entity = await _db.Set<Medicine>().FirstOrDefaultAsync(m => m.Id == request.Id, ct);
             if (entity is null)
             {
@@ -58,19 +59,20 @@ namespace MyApp.Domain.Medicines.Commands
         {
             RuleFor(x => x.Id)
                 .GreaterThan(0)
-                .WithMessage("Id leku musi być dodatnie.");
+                    .WithMessage("Id leku musi być liczbą dodatnią.");
 
             RuleFor(x => x.Code)
-                .NotEmpty().WithMessage("Kod leku jest wymagany.")
-                .MaximumLength(32).WithMessage("Kod leku nie może być dłuższy niż 32 znaki.")
                 .Must(code => !string.IsNullOrWhiteSpace(code))
-                .WithMessage("Kod leku nie może być pusty.");
+                    .WithMessage("Kod leku nie może być pusty.")
+                .MaximumLength(32)
+                    .WithMessage("Kod leku nie może być dłuższy niż 32 znaki.");
+
 
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Nazwa leku jest wymagana.")
-                .MaximumLength(128).WithMessage("Nazwa leku nie może być dłuższa niż 128 znaków.")
                 .Must(name => !string.IsNullOrWhiteSpace(name))
-                .WithMessage("Nazwa leku nie może być pusta.");
+                    .WithMessage("Nazwa leku nie może być pusta.")
+                .MaximumLength(128)
+                    .WithMessage("Nazwa leku nie może być dłuższa niż 128 znaków.");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
@@ -10,7 +11,8 @@ namespace MyApp.Domain.TreatmentPlans.Commands
         string IdPatient,
         int TreatmentPlanMedicineId,
         DateTime Date,
-        bool IsTaken) : IRequest<ToggleMedicineTakenResult>;
+        bool IsTaken) 
+        : IRequest<ToggleMedicineTakenResult>;
 
     public record class ToggleMedicineTakenResult : Result;
 
@@ -25,11 +27,13 @@ namespace MyApp.Domain.TreatmentPlans.Commands
 
         public async Task<ToggleMedicineTakenResult> Handle(ToggleMedicineTakenCommand request, CancellationToken ct)
         {
-            var day = request.Date.Date;
-            if (day > DateTime.Today)
+            var validator = new ToggleMedicineTakenValidator().Validate(request);
+            if (!validator.IsValid)
             {
-                return new() { ErrorMessage = "Nie można potwierdzić przyjęcia leku w przyszłości." };
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
             }
+
+            var day = request.Date.Date;
             var nextDay = day.AddDays(1);
 
             var belongsToPatient = await (
@@ -74,7 +78,26 @@ namespace MyApp.Domain.TreatmentPlans.Commands
             }
 
             return new();
-                
+        }
+    }
+
+    public class ToggleMedicineTakenValidator : AbstractValidator<ToggleMedicineTakenCommand>
+    {
+        public ToggleMedicineTakenValidator()
+        {
+            RuleFor(x => x.IdPatient)
+                .Must(id => !string.IsNullOrWhiteSpace(id))
+                    .WithMessage("Id pacjenta nie może być puste.");
+
+            RuleFor(x => x.TreatmentPlanMedicineId)
+                .GreaterThan(0)
+                    .WithMessage("Id leku w planie leczenia musi być dodatnie.");
+
+            RuleFor(x => x.Date)
+                .NotEmpty()
+                    .WithMessage("Data jest wymagana.")
+                .Must(d => d.Date <= DateTime.Today)
+                    .WithMessage("Nie można potwierdzić przyjęcia leku w przyszłości.");
         }
     }
 }

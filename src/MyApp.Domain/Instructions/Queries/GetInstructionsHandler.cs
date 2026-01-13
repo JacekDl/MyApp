@@ -3,8 +3,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
-using MyApp.Domain.Instructions.Commands;
-using MyApp.Model;
 
 namespace MyApp.Domain.Instructions.Queries
 {
@@ -22,12 +20,7 @@ namespace MyApp.Domain.Instructions.Queries
         }
         public async Task<GetInstructionsResult> Handle(GetInstructionsQuery request, CancellationToken ct)
         {
-            var validator = new GetInstructionsValidator().Validate(request);
-            if (!validator.IsValid)
-            {
-                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
-            }
-
+            // zamiast validacji i zwracania bledu zmien Page i PageSize
             var page = request.Page < 1 ? 1 : request.Page;
             var pageSize = request.PageSize is < 1 or > 100 ? 10 : request.PageSize;
 

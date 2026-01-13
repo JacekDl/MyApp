@@ -1,8 +1,10 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
+using MyApp.Domain.TreatmentPlans.Queries;
 using MyApp.Model;
 
 namespace MyApp.Domain.Users.Commands
@@ -22,6 +24,12 @@ namespace MyApp.Domain.Users.Commands
         }
         public async Task<ApprovePharmacistPromotionResult> Handle(ApprovePharmacistPromotionCommand request, CancellationToken ct)
         {
+            var validator = new ApprovePharmacistPromotionValidator().Validate(request);
+            if (!validator.IsValid)
+            {
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
+            }
+
             var promo = await _db.PharmacistPromotionRequests
                 .FirstOrDefaultAsync(x => x.Id == request.RequestId, ct);
 
@@ -59,6 +67,16 @@ namespace MyApp.Domain.Users.Commands
             promo.Status = "Approved";
             await _db.SaveChangesAsync(ct);
             return new();
+        }
+    }
+
+    public class ApprovePharmacistPromotionValidator : AbstractValidator<ApprovePharmacistPromotionCommand>
+    {
+        public ApprovePharmacistPromotionValidator()
+        {
+            RuleFor(x => x.RequestId)
+                .GreaterThan(0)
+                .WithMessage("Id zgłoszenia musi być dodatnie.");
         }
     }
 }

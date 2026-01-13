@@ -34,13 +34,16 @@ public class ClaimTreatmentPlanHandler : IRequestHandler<ClaimTreatmentPlanComma
             return new() { ErrorMessage = "Nie znaleziono planu leczenia." };
         }
 
-        if (plan.Status >= Model.enums.TreatmentPlanStatus.Claimed) //plan pobrany i potencjalnie wykorzystany
+        //plan pobrany i potencjalnie wykorzystany
+        if (plan.Status >= Model.enums.TreatmentPlanStatus.Claimed) 
         {
             return new() { ErrorMessage = "Plan lecznia został już pobrany." };
         }
 
         if (plan.DateCreated.AddDays(30) < DateTime.UtcNow)
         {
+            plan.Status = Model.enums.TreatmentPlanStatus.Expired;
+            await _db.SaveChangesAsync(ct);
             return new() { ErrorMessage = "Upłynął termin ważności planu lecznia." };
         }
 
@@ -58,16 +61,18 @@ public class ClaimTreatmentPlanHandler : IRequestHandler<ClaimTreatmentPlanComma
 
 public class ClaimTreatmentPlanValidator : AbstractValidator<ClaimTreatmentPlanCommand>
 {
-    private const int ReviewNumberLen = 16;
-
     public ClaimTreatmentPlanValidator()
     {
         RuleFor(x => x.Number)
-            .NotEmpty().WithMessage("Numer jest wymagany.")
-            .Length(ReviewNumberLen).WithMessage($"Numer musi mieć {ReviewNumberLen} znaków.")
-            .Matches("^[A-Za-z0-9]+$").WithMessage("Numer musi się składać z liter i cyfr.");
+            .Must(t => !string.IsNullOrWhiteSpace(t))
+                .WithMessage("Numer jest wymagany.")
+            .Length(16)
+                .WithMessage($"Numer musi mieć dokładnie 16 znaków.")
+            .Matches("^[A-Za-z0-9]+$")
+                .WithMessage("Numer musi się składać z liter i cyfr.");
 
         RuleFor(x => x.PatientId)
-            .NotEmpty().WithMessage("Id użytkownika jest wymagane.");
+            .Must(p => !string.IsNullOrWhiteSpace(p))
+                .WithMessage("Id użytkownika jest wymagane.");
     }
 }

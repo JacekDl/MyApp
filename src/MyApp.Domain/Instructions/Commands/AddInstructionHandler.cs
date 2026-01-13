@@ -23,6 +23,7 @@ namespace MyApp.Domain.Instructions.Commands
         public async Task<AddInstructionResult> Handle(AddInstructionCommand request, CancellationToken ct)
         {
             var validator = new AddInstructionValidator().Validate(request);
+
             if(!validator.IsValid)
             {
                 var errors = string.Join(";", validator.Errors.Select(e => e.ErrorMessage));
@@ -35,7 +36,9 @@ namespace MyApp.Domain.Instructions.Commands
                 .AnyAsync(i => i.Code == code, ct);
 
             if (exists)
+            {
                 return new() { ErrorMessage = $"Kod '{code}' jest już używany." };
+            }
 
             _db.Add(new Instruction { Code = code, Text = text });
             await _db.SaveChangesAsync(ct);
@@ -48,12 +51,16 @@ namespace MyApp.Domain.Instructions.Commands
         public AddInstructionValidator()
         {
             RuleFor(x => x.Code)
-                .NotEmpty().WithMessage("Kod instrukcji jest wymagany.")
-                .MaximumLength(32).WithMessage("Kod instrukcji nie może być dłuższy niż 32 znaki.");
+                .Must(code => !string.IsNullOrWhiteSpace(code))
+                    .WithMessage("Kod instrukcji jest wymagany.")
+                .MaximumLength(32)
+                    .WithMessage("Kod instrukcji nie może być dłuższy niż 32 znaki.");
 
             RuleFor(x => x.Text)
-                .NotEmpty().WithMessage("Treść instrukcji jest wymagana.")
-                .MaximumLength(256).WithMessage("Treść instrukcji nie może być dłuższa niż 256 znaków.");
+                .Must(text => !string.IsNullOrWhiteSpace(text))
+                    .WithMessage("Treść instrukcji jest wymagana.")
+                .MaximumLength(256)
+                    .WithMessage("Treść instrukcji nie może być dłuższa niż 256 znaków.");
         }
     }
 

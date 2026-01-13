@@ -84,7 +84,7 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserRe
         public CreateUserValidator()
         {
             RuleFor(x => x.Email)
-                .NotEmpty()
+                .Must(e => !string.IsNullOrWhiteSpace(e))
                     .WithMessage("Adres e-mail jest wymagany.")
                 .MaximumLength(256)
                     .WithMessage("Adres e-mail nie może przekraczać 256 znaków.")
@@ -92,13 +92,13 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserRe
                     .WithMessage("Nieprawidłowy adres e-mail.");
 
             RuleFor(x => x.Password)
-                .NotEmpty()
+                .Must(p => !string.IsNullOrWhiteSpace(p))
                     .WithMessage("Hasło jest wymagane.")
                 .MinimumLength(6)
                     .WithMessage("Hasło musi zawierać co najmniej 6 znaków.");
 
             RuleFor(x => x.Role)
-                .NotEmpty()
+                .Must(r => !string.IsNullOrWhiteSpace(r))
                     .WithMessage("Rola użytkownika jest wymagana.")
                 .Must(role =>
                     AllowedRoles.Any(r =>

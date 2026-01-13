@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using MyApp.Domain.Abstractions;
 using MyApp.Domain.Common;
@@ -26,11 +27,15 @@ namespace MyApp.Domain.Users.Commands
             _userManager = userManager;
         }
 
-
-
         public async Task<SendPasswordResetEmailResult> Handle(SendPasswordResetEmailCommand request, CancellationToken ct)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
+            var validator = new SendPasswordResetEmailValidator().Validate(request);
+            if (!validator.IsValid)
+            {
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
+            }
+
+            var user = await _userManager.FindByEmailAsync(request.Email.Trim());
 
             if (user is null)
             {
@@ -55,6 +60,24 @@ namespace MyApp.Domain.Users.Commands
             await _emailService.SendEmailAsync(user.Email!, "Reset hasła", body, ct);
 
             return new();
+        }
+    }
+
+    public class SendPasswordResetEmailValidator : AbstractValidator<SendPasswordResetEmailCommand>
+    {
+        public SendPasswordResetEmailValidator()
+        {
+            RuleFor(x => x.Email)
+                .Must(e => !string.IsNullOrWhiteSpace(e))
+                    .WithMessage("Adres e-mail nie może być pusty.")
+                .EmailAddress()
+                    .WithMessage("Nieprawidłowy adres e-mail.")
+                .MaximumLength(256)
+                    .WithMessage("Adres e-mail nie może być dłuższy niż 256 znaków.");
+
+            RuleFor(x => x.CallbackUrl)
+                .Must(url => !string.IsNullOrWhiteSpace(url))
+                    .WithMessage("Adres callback nie może być pusty.");
         }
     }
 }

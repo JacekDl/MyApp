@@ -29,6 +29,7 @@ namespace MyApp.Domain.Medicines.Queries
             {
                 return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
             }
+
             var result = await _db.Set<Medicine>()
                 .Where(m => m.Id == request.Id)
                 .Select(m => new MedicineDto(m.Id, m.Code, m.Name))
@@ -49,7 +50,7 @@ namespace MyApp.Domain.Medicines.Queries
         {
             RuleFor(x => x.Id)
                 .GreaterThan(0)
-                .WithMessage("Id leku musi być dodatnie.");
+                    .WithMessage("Id leku musi być liczbą dodatnią.");
         }
     }
 }

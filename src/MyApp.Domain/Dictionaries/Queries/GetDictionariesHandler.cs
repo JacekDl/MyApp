@@ -41,12 +41,4 @@ namespace MyApp.Domain.Dictionaries.Queries
             return new() { Value = dictionary };
         }
     }
-
-    public class GetDictionariesValidator : AbstractValidator<GetDictionariesQuery>
-    {
-        public GetDictionariesValidator()
-        {
-
-        }
-    }
 }

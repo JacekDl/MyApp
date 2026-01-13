@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
@@ -26,6 +27,12 @@ namespace MyApp.Domain.Users.Commands
 
         public async Task<RejectPharmacistPromotionResult> Handle(RejectPharmacistPromotionCommand request, CancellationToken ct)
         {
+            var validator = new RejectPharmacistPromotionValidator().Validate(request);
+            if (!validator.IsValid)
+            {
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
+            }
+
             var promo = await _db.PharmacistPromotionRequests
                 .FirstOrDefaultAsync(x => x.Id == request.RequestId, ct);
 
@@ -46,4 +53,13 @@ namespace MyApp.Domain.Users.Commands
         }
     }
 
+    public class RejectPharmacistPromotionValidator : AbstractValidator<RejectPharmacistPromotionCommand>
+    {
+        public RejectPharmacistPromotionValidator()
+        {
+            RuleFor(x => x.RequestId)
+                .GreaterThan(0)
+                    .WithMessage("Id zgłoszenia musi być liczbą dodatnią.");
+        }
+    }
 }

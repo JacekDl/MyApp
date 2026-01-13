@@ -29,6 +29,12 @@ namespace MyApp.Domain.Users.Commands
 
         public async Task<RequestPharmacistPromotionResult> Handle(RequestPharmacistPromotionCommand request, CancellationToken ct)
         {
+            var validator = new RequestPharmacistPromotionValidator().Validate(request);
+            if (!validator.IsValid)
+            {
+                return new() { ErrorMessage = string.Join(";", validator.Errors.Select(e => e.ErrorMessage)) };
+            }
+
             var userExists = await _db.Users
                 .AnyAsync(u => u.Id == request.UserId, ct);
             if (!userExists)
@@ -67,21 +73,26 @@ namespace MyApp.Domain.Users.Commands
         public RequestPharmacistPromotionValidator()
         {
             RuleFor(x => x.UserId)
-                .NotEmpty();
+                .Must(id => !string.IsNullOrWhiteSpace(id))
+                    .WithMessage("Id użytkownika nie może być puste.");
 
             RuleFor(x => x.FirstName)
-                .NotEmpty()
-                .MaximumLength(50);
+                .Must(s => !string.IsNullOrWhiteSpace(s))
+                    .WithMessage("Imię nie może być puste.")
+                .MaximumLength(50)
+                    .WithMessage("Imię nie może mieć więcej niż 50 znaków.");
 
             RuleFor(x => x.LastName)
-                .NotEmpty()
-                .MaximumLength(80);
+                .Must(s => !string.IsNullOrWhiteSpace(s))
+                    .WithMessage("Nazwisko nie może być puste.")
+                .MaximumLength(80)
+                    .WithMessage("Nazwisko nie może mieć więcej niż 80 znaków.");
 
             RuleFor(x => x.NumerPWZF)
-                .NotEmpty()
-                .Length(8)                 
-                .Matches("^[0-9]{8}$")     
-                .WithMessage("Numer PWZF musi składać się dokładnie z 8 cyfr.");
+                .Must(s => !string.IsNullOrWhiteSpace(s))
+                    .WithMessage("Numer PWZF nie może być pusty.")
+                .Matches("^[0-9]{8}$")
+                    .WithMessage("Numer PWZF musi składać się dokładnie z 8 cyfr.");
         }
     }
 }
