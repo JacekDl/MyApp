@@ -9,15 +9,4 @@ public class User : IdentityUser
 
     [MaxLength(32)]
     public string? DisplayName { get; set; }
-
-    public static User Create(string email, string? displayName = null)
-    {
-        return new User
-        {
-            UserName = email,
-            Email = email,
-            DisplayName = displayName,
-            CreatedUtc = DateTime.UtcNow
-        };
-    }
 }

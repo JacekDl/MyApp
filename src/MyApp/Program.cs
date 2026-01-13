@@ -53,10 +53,11 @@ builder.Services.AddAuthorizationBuilder()
         .RequireAuthenticatedUser()
         .Build());
 
-
 var app = builder.Build();
-
-await app.SeedDataAsync();
+if (app.Environment.IsDevelopment())
+{
+    await app.SeedDataAsync();
+}
 
 if (!app.Environment.IsDevelopment())
 {
