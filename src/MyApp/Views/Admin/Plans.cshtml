@@ -68,8 +68,8 @@ else
                 <tr>
                     <th scope="col" class="col-2">Utworzono</th>
                     <th scope="col" class="col-7">Treść</th>
-                    <th scope="col" class="col-2 text-nowrap">Status</th>
-                    <th scope="col" class="col-1"></th>
+                    <th scope="col" class="col-1 text-nowrap">Status</th>
+                    <th scope="col" class="col-2"></th>
                 </tr>
             </thead>
             <tbody>
@@ -79,28 +79,80 @@ else
                         <td class="col-1">@plan.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
                         <td class="col-8 text-break" style="white-space: pre-wrap;">@plan.AdviceFullText</td>
                         <td class="col-1">@plan.Status</td>
-                        <td class="col-1">
-                            <div class="d-grid gap-2 d-md-inline">
-                                <a asp-action="GetPlan"
-                                   asp-controller="Admin"
-                                   asp-route-number="@plan.Number"
-                                   class="btn btn-sm btn-secondary w-100 w-md-auto text-nowrap">
-                                    Szczegóły
-                                </a>
+
+                        <td class="col-1 text-end">
+                            <form 
+                                asp-controller="Admin" 
+                                asp-action="GetPlan" 
+                                asp-route-number="@plan.Number"
+                                style="display:inline">
+                                <button type="submit" class="btn btn-sm btn-secondary">Szczegóły</button>
+                            </form>
+                        </td>
+
+                        <td class="col-1 text-start">
+                            <button type="button"
+                                    class="btn btn-sm btn-secondary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deletePlanModal-@plan.Number">
+                                Usuń
+                            </button>
+
+                            <div class="modal fade"
+                                 id="deletePlanModal-@plan.Number"
+                                 tabindex="-1"
+                                 aria-labelledby="deleteUserModalLabel-@plan.Number"
+                                 aria-hidden="true"
+                                 data-bs-backdrop="static"
+                                 data-bs-keyboard="false">
+
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteUserModalLabel-@plan.Number">
+                                                Potwierdzenie usunięcia planu leczenia
+                                            </h5>
+                                            <button type="button"
+                                                    class="btn-close"
+                                                    data-bs-dismiss="modal"
+                                                    aria-label="Zamknij"></button>
+                                        </div>
+
+                                        <div class="modal-body">
+                                            <p class="mb-0">
+                                                Czy na pewno chcesz <strong>trwale usunąć plan leczenia?</strong>?
+                                                <br />
+                                                <small class="text-muted">
+                                                    @plan.Number
+                                                </small>
+                                                <br />
+                                                Tej operacji nie można cofnąć.
+                                            </p>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary"
+                                                    data-bs-dismiss="modal">
+                                                Anuluj
+                                            </button>
+
+                                            <form asp-action="RemovePlan"
+                                                  asp-route-number="@plan.Number"
+                                                  method="post"
+                                                  class="m-0">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-danger">
+                                                    Usuń plan leczenia
+                                                </button>
+                                            </form>
+                                        </div>
+
+                                    </div>
+                                </div>
                             </div>
                         </td>
-                        @* TODO: implement in Szczegóły *@
-                        @* <td class="col-1">
-                            <form asp-action="DeleteReview" asp-controller="Admin" method="post" class="d-inline">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@plan.Id" />
-                                <button type="submit"
-                                        class="btn btn-sm btn-secondary w-100 w-md-auto text-nowrap"
-                                        onclick="return confirm('Czy na pewno chcesz usunąć ten wpis?');">
-                                    Usuń
-                                </button>
-                            </form>
-                        </td> *@
                     </tr>
                 }
             </tbody>

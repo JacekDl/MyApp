@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyApp.Domain.TreatmentPlans.Commands;
 using MyApp.Domain.TreatmentPlans.Queries;
 using MyApp.Domain.Users;
 using MyApp.Domain.Users.Commands;
@@ -65,7 +66,7 @@ public class AdminController : Controller
     }
     #endregion
 
-    #region GetTreatmentPlans
+    #region TreatmentPlans
     public async Task<IActionResult> Plans(string? searchTxt, string? userId, TreatmentPlanStatus? status, int page = 1, int pageSize = 10)
     {
         var result = await _mediator.Send(new GetTreatmentPlansQuery(
@@ -97,16 +98,15 @@ public class AdminController : Controller
         return View(vm);
     }
 
-    //[HttpPost, ValidateAntiForgeryToken]
-    //public async Task<IActionResult> DeleteReview(int id)
-    //{
-    //    var result = await _mediator.Send(new DeleteReviewCommand(id));
-    //    TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Usunięto zalecenia." : result.ErrorMessage;
-    //    return RedirectToAction(nameof(Plans));
-    //}
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemovePlan(string number)
+    {
+        var result = await _mediator.Send(new RemoveTreatmentPlanCommand(number));
+        TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Usunięto plan lecznia." : result.ErrorMessage;
+        return RedirectToAction(nameof(Plans));
+    }
     #endregion
 
-    #region GetPlan
     public async Task<IActionResult> GetPlan(string number)
     {
         if (string.IsNullOrWhiteSpace(number))
@@ -138,8 +138,6 @@ public class AdminController : Controller
 
         return View(vm);
     }
-
-    #endregion
 
     #region Promotions
     public async Task<IActionResult> Promotions()
