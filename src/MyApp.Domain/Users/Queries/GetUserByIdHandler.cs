@@ -2,8 +2,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using MyApp.Domain.Common;
-using MyApp.Domain.Users;
-using MyApp.Domain.Users.Commands;
 using MyApp.Model;
 
 

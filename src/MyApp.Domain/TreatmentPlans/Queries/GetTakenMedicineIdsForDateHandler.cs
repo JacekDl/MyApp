@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
+using MyApp.Model;
 
 namespace MyApp.Domain.TreatmentPlans.Queries
 {
@@ -33,10 +34,10 @@ namespace MyApp.Domain.TreatmentPlans.Queries
             var nextDay = day.AddDays(1);
 
             var ids = await(
-                from c in _db.Set<MyApp.Model.MedicineTakenConfirmation>().AsNoTracking()
-                join m in _db.Set<MyApp.Model.TreatmentPlanMedicine>().AsNoTracking()
+                from c in _db.Set<MedicineTakenConfirmation>().AsNoTracking()
+                join m in _db.Set<TreatmentPlanMedicine>().AsNoTracking()
                     on c.IdTreatmentPlanMedicine equals m.Id
-                join tp in _db.Set<MyApp.Model.TreatmentPlan>().AsNoTracking()
+                join tp in _db.Set<TreatmentPlan>().AsNoTracking()
                     on m.IdTreatmentPlan equals tp.Id
                 where tp.IdPatient == request.IdPatient
                 where c.DateTimeTaken >= day && c.DateTimeTaken < nextDay

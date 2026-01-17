@@ -6,7 +6,6 @@ using MyApp.Model;
 
 namespace MyApp.Domain.Users.Commands
 {
-
     public record class RemoveUserCommand(string Id) : IRequest<RemoveUserResult>;
 
     public record class RemoveUserResult : Result;

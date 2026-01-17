@@ -1,11 +1,9 @@
-﻿
-using FluentValidation;
+﻿using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
 using MyApp.Model;
-using static MyApp.Domain.TreatmentPlans.Queries.GetTreatmentPlanHandler;
 
 namespace MyApp.Domain.TreatmentPlans.Queries
 {

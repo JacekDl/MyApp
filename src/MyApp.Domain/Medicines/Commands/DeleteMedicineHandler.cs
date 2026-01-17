@@ -3,7 +3,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
-using MyApp.Domain.Instructions.Commands;
 using MyApp.Model;
 
 namespace MyApp.Domain.Medicines.Commands

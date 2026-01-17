@@ -87,8 +87,8 @@ namespace MyApp.Domain.TreatmentPlans.Commands
             RuleFor(x => x.ReviewText)
                 .Must(t => !string.IsNullOrWhiteSpace(t))
                     .WithMessage("Treść uwag nie może być pusta.")
-                .MaximumLength(500)
-                    .WithMessage("Treść uwag nie może przekraczać 500 znaków.");
+                .MaximumLength(ReviewEntry.TextMaxLength)
+                    .WithMessage($"Treść uwag nie może przekraczać {ReviewEntry.TextMaxLength} znaków.");
         }
     }
 }

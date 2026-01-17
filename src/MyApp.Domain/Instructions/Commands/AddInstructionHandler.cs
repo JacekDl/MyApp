@@ -53,14 +53,14 @@ namespace MyApp.Domain.Instructions.Commands
             RuleFor(x => x.Code)
                 .Must(code => !string.IsNullOrWhiteSpace(code))
                     .WithMessage("Kod instrukcji jest wymagany.")
-                .MaximumLength(32)
-                    .WithMessage("Kod instrukcji nie może być dłuższy niż 32 znaki.");
+                .MaximumLength(Instruction.CodeMaxLength)
+                    .WithMessage($"Kod instrukcji nie może być dłuższy niż {Instruction.CodeMaxLength} znaki.");
 
             RuleFor(x => x.Text)
                 .Must(text => !string.IsNullOrWhiteSpace(text))
                     .WithMessage("Treść instrukcji jest wymagana.")
-                .MaximumLength(256)
-                    .WithMessage("Treść instrukcji nie może być dłuższa niż 256 znaków.");
+                .MaximumLength(Instruction.TextMaxLength)
+                    .WithMessage($"Treść instrukcji nie może być dłuższa niż {Instruction.TextMaxLength} znaków.");
         }
     }
 

@@ -54,14 +54,14 @@ namespace MyApp.Domain.Medicines.Commands
             RuleFor(x => x.Code)
                 .Must(code => !string.IsNullOrWhiteSpace(code))
                     .WithMessage("Kod leku jest wymagany.")
-                .MaximumLength(32)
-                    .WithMessage("Kod leku nie może być dłuższy niż 32 znaków.");
+                .MaximumLength(Medicine.CodeMaxLength)
+                    .WithMessage($"Kod leku nie może być dłuższy niż {Medicine.CodeMaxLength} znaków.");
 
             RuleFor(x => x.Name)
                 .Must(name => !string.IsNullOrWhiteSpace(name))
                     .WithMessage("Nazwa leku jest wymagana.")
-                .MaximumLength(128)
-                    .WithMessage("Nazwa leku nie może być dłuższa niż 128 znaków.");
+                .MaximumLength(Medicine.NameMaxLength)
+                    .WithMessage($"Nazwa leku nie może być dłuższa niż {Medicine.NameMaxLength} znaków.");
         }
     }
 }

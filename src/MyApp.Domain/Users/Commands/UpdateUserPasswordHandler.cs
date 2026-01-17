@@ -64,15 +64,15 @@ namespace MyApp.Domain.Users.Commands
             RuleFor(x => x.CurrentPassword)
                 .Must(p => !string.IsNullOrWhiteSpace(p))
                     .WithMessage("Podane hasło nie może być puste.")
-                .MaximumLength(256)
+                .MaximumLength(User.PasswordMaxLength)
                     .WithMessage("Podane hasło jest zbyt długie.");
 
             RuleFor(x => x.NewPassword)
                 .Must(p => !string.IsNullOrWhiteSpace(p))
                     .WithMessage("Nowe hasło nie może być puste.")
-                .MinimumLength(6)
-                    .WithMessage("Nowe hasło musi mieć co najmniej 6 znaków.")
-                .MaximumLength(256)
+                .MinimumLength(User.PasswordMinLength)
+                    .WithMessage($"Nowe hasło musi mieć co najmniej {User.PasswordMinLength} znaków.")
+                .MaximumLength(User.PasswordMaxLength)
                     .WithMessage("Nowe hasło jest zbyt długie.");
         }
     }

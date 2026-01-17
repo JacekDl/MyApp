@@ -15,5 +15,9 @@ namespace MyApp.Model
         [Required]
         [MaxLength(500)]
         public string Text { get; set; } = default!;
+
+        #region Constants
+        public const int TextMaxLength = 500;
+        #endregion
     }
 }

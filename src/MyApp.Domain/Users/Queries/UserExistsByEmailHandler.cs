@@ -46,8 +46,8 @@ namespace MyApp.Domain.Users.Queries
                     .WithMessage("Adres e-mail nie może być pusty.")
                 .EmailAddress()
                     .WithMessage("Nieprawidłowy adres e-mail.")
-                .MaximumLength(256)
-                    .WithMessage("Adres e-mail nie może być dłuższy niż 256 znaków.");
+                .MaximumLength(User.EmailMaxLength)
+                    .WithMessage($"Adres e-mail nie może być dłuższy niż {User.EmailMaxLength} znaków.");
         }
     }
 }

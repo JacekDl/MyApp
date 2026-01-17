@@ -9,4 +9,11 @@ public class User : IdentityUser
 
     [MaxLength(32)]
     public string? DisplayName { get; set; }
+
+    #region Constanst
+    public const int PasswordMinLength = 6;
+    public const int PasswordMaxLength = 128;
+    public const int EmailMaxLength = 256;
+    public const int DisplayNameMaxLength = 100;
+    #endregion
 }

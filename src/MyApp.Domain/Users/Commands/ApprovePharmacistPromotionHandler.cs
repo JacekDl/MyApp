@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
-using MyApp.Domain.TreatmentPlans.Queries;
 using MyApp.Model;
 
 namespace MyApp.Domain.Users.Commands

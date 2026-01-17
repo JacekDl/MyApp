@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
 using MyApp.Domain.TreatmentPlans.Mappers;
+using MyApp.Model;
 
 namespace MyApp.Domain.TreatmentPlans.Queries;
 
@@ -115,8 +116,8 @@ public class GetTreatmentPlanHandler : IRequestHandler<GetTreatmentPlanQuery, Ge
             RuleFor(x => x.Number)
                 .NotEmpty()
                     .WithMessage("Numer tokenu jest wymagany.")
-                .Length(16)
-                    .WithMessage("Numer tokenu musi mieć dokładnie 16 znaków.")
+                .Length(TreatmentPlan.NumberLength)
+                    .WithMessage($"Numer tokenu musi mieć dokładnie {TreatmentPlan.NumberLength} znaków.")
                 .Matches("^[a-zA-Z0-9]+$")
                     .WithMessage("Numer tokenu może zawierać tylko litery i cyfry.");
         }

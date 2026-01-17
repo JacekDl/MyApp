@@ -155,8 +155,8 @@ namespace MyApp.Domain.TreatmentPlans.Commands
                 .SetValidator(new CreateTreatmentPlanMedicineDtoValidator());
 
             RuleFor(x => x.Advice)
-                .MaximumLength(2000)
-                    .WithMessage("Dodatkowa porada nie może przekraczać 2000 znaków.")
+                .MaximumLength(TreatmentPlanAdvice.AdviceTextMaxLength)
+                    .WithMessage($"Dodatkowa porada nie może przekraczać {TreatmentPlanAdvice.AdviceTextMaxLength} znaków.")
                     .When(x => x.Advice is not null);
         }
 
@@ -167,14 +167,14 @@ namespace MyApp.Domain.TreatmentPlans.Commands
                 RuleFor(x => x.MedicineName)
                     .Must(v => !string.IsNullOrWhiteSpace(v))
                         .WithMessage("Nazwa leku nie może być pusta.")
-                    .MaximumLength(128)
-                        .WithMessage("Nazwa leku nie może być dłuższa niż 128 znaków.");
+                    .MaximumLength(TreatmentPlanMedicine.MedicineNameMaxLength)
+                        .WithMessage($"Nazwa leku nie może być dłuższa niż {TreatmentPlanMedicine.MedicineNameMaxLength} znaków.");
 
                 RuleFor(x => x.MedicineDosage)
                     .Must(v => !string.IsNullOrWhiteSpace(v))
                         .WithMessage("Dawkowanie leku nie może być puste.")
-                    .MaximumLength(128)
-                        .WithMessage("Dawkowanie leku nie może być dłuższe niż 128 znaków.");
+                    .MaximumLength(TreatmentPlanMedicine.DosageMaxLength)
+                        .WithMessage($"Dawkowanie leku nie może być dłuższe niż {TreatmentPlanMedicine.DosageMaxLength} znaków.");
 
                 RuleFor(x => x.MedicineFrequency)
                     .Must(v => !string.IsNullOrWhiteSpace(v))

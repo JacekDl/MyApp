@@ -79,20 +79,20 @@ namespace MyApp.Domain.Users.Commands
             RuleFor(x => x.FirstName)
                 .Must(s => !string.IsNullOrWhiteSpace(s))
                     .WithMessage("Imię nie może być puste.")
-                .MaximumLength(50)
-                    .WithMessage("Imię nie może mieć więcej niż 50 znaków.");
+                .MaximumLength(PharmacistPromotionRequest.FirstNameMaxLength)
+                    .WithMessage($"Imię nie może mieć więcej niż {PharmacistPromotionRequest.FirstNameMaxLength} znaków.");
 
             RuleFor(x => x.LastName)
                 .Must(s => !string.IsNullOrWhiteSpace(s))
                     .WithMessage("Nazwisko nie może być puste.")
-                .MaximumLength(80)
-                    .WithMessage("Nazwisko nie może mieć więcej niż 80 znaków.");
+                .MaximumLength(PharmacistPromotionRequest.LastNameMaxLength)
+                    .WithMessage($"Nazwisko nie może mieć więcej niż {PharmacistPromotionRequest.LastNameMaxLength} znaków.");
 
             RuleFor(x => x.NumerPWZF)
                 .Must(s => !string.IsNullOrWhiteSpace(s))
                     .WithMessage("Numer PWZF nie może być pusty.")
                 .Matches("^[0-9]{8}$")
-                    .WithMessage("Numer PWZF musi składać się dokładnie z 8 cyfr.");
+                    .WithMessage($"Numer PWZF musi składać się dokładnie z {PharmacistPromotionRequest.NumerPWZFLength} cyfr.");
         }
     }
 }

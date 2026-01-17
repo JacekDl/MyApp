@@ -1,14 +1,13 @@
-﻿
-using FluentValidation;
+﻿using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
+using MyApp.Model;
 using MyApp.Model.enums;
 
 namespace MyApp.Domain.TreatmentPlans.Commands
 {
-
     public record class UpdateTreatmentPlanStartCommand(
         string Number, 
         string IdPatient,
@@ -67,8 +66,8 @@ namespace MyApp.Domain.TreatmentPlans.Commands
             RuleFor(x => x.Number)
                 .Must(n => !string.IsNullOrWhiteSpace(n))
                     .WithMessage("Numer planu leczenia nie może być pusty.")
-                .Length(16)
-                    .WithMessage("Numer planu leczenia musi mieć dokładnie 16 znaków.")
+                .Length(TreatmentPlan.NumberLength)
+                    .WithMessage($"Numer planu leczenia musi mieć dokładnie {TreatmentPlan.NumberLength} znaków.")
                 .Matches("^[a-zA-Z0-9]+$")
                     .WithMessage("Numer planu leczenia może zawierać tylko litery i cyfry.");
 

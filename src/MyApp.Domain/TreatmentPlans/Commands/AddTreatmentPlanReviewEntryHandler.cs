@@ -97,16 +97,16 @@ namespace MyApp.Domain.TreatmentPlans.Commands
             RuleFor(x => x.Number)
                 .Must(n => !string.IsNullOrWhiteSpace(n))
                     .WithMessage("Numer tokenu nie może być pusty.")
-                .Length(16)
-                    .WithMessage("Numer tokenu musi mieć dokładnie 16 znaków.")
+                .Length(TreatmentPlan.NumberLength)
+                    .WithMessage($"Numer tokenu musi mieć dokładnie {TreatmentPlan.NumberLength} znaków.")
                 .Matches("^[a-zA-Z0-9]+$")
                     .WithMessage("Numer tokenu może zawierać tylko litery i cyfry.");
 
             RuleFor(x => x.Text)
                 .Must(t => !string.IsNullOrWhiteSpace(t))
                     .WithMessage("Treść wpisu nie może być pusta.")
-                .MaximumLength(500)
-                    .WithMessage("Treść wpisu nie może przekraczać 500 znaków.");
+                .MaximumLength(ReviewEntry.TextMaxLength)
+                    .WithMessage($"Treść wpisu nie może przekraczać {ReviewEntry.TextMaxLength} znaków.");
 
             RuleFor(x => x.CurrentUserId)
                .Must(id => !string.IsNullOrWhiteSpace(id))

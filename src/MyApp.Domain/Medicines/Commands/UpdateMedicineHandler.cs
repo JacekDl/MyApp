@@ -1,10 +1,8 @@
 ﻿using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
-using MyApp.Domain.Instructions.Commands;
 using MyApp.Model;
 
 namespace MyApp.Domain.Medicines.Commands
@@ -64,15 +62,15 @@ namespace MyApp.Domain.Medicines.Commands
             RuleFor(x => x.Code)
                 .Must(code => !string.IsNullOrWhiteSpace(code))
                     .WithMessage("Kod leku nie może być pusty.")
-                .MaximumLength(32)
-                    .WithMessage("Kod leku nie może być dłuższy niż 32 znaki.");
+                .MaximumLength(Medicine.CodeMaxLength)
+                    .WithMessage($"Kod leku nie może być dłuższy niż {Medicine.CodeMaxLength} znaki.");
 
 
             RuleFor(x => x.Name)
                 .Must(name => !string.IsNullOrWhiteSpace(name))
                     .WithMessage("Nazwa leku nie może być pusta.")
-                .MaximumLength(128)
-                    .WithMessage("Nazwa leku nie może być dłuższa niż 128 znaków.");
+                .MaximumLength(Medicine.NameMaxLength)
+                    .WithMessage($"Nazwa leku nie może być dłuższa niż {Medicine.NameMaxLength} znaków.");
         }
     }
 }

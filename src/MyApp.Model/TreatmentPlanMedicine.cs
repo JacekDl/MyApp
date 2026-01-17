@@ -13,4 +13,9 @@ public class TreatmentPlanMedicine
     public string Dosage { get; set; } = default!;
     public TimeOfDay TimeOfDay { get; set; } = default!;
 
+    #region Constants
+    public const int MedicineNameMaxLength = 100;
+    public const int DosageMaxLength = 100;
+    #endregion
+
 }

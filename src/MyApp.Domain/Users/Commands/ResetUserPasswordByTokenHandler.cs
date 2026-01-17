@@ -3,11 +3,6 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using MyApp.Domain.Common;
 using MyApp.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyApp.Domain.Users.Commands
 {
@@ -68,10 +63,10 @@ namespace MyApp.Domain.Users.Commands
             RuleFor(x => x.NewPassword)
                 .Must(p => !string.IsNullOrWhiteSpace(p))
                     .WithMessage("Nowe hasło nie może być puste.")
-                .MinimumLength(6)
-                    .WithMessage("Nowe hasło musi mieć co najmniej 6 znaków.")
-                .MaximumLength(128)
-                    .WithMessage("Nowe hasło nie może mieć więcej niż 128 znaków.");
+                .MinimumLength(User.PasswordMinLength)
+                    .WithMessage($"Nowe hasło musi mieć co najmniej {User.PasswordMinLength} znaków.")
+                .MaximumLength(User.PasswordMaxLength)
+                    .WithMessage($"Nowe hasło nie może mieć więcej niż {User.PasswordMaxLength} znaków.");
         }
     }
 }

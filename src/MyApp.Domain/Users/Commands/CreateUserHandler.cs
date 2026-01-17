@@ -2,7 +2,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using MyApp.Domain.Common;
-using MyApp.Domain.Instructions.Commands;
 using MyApp.Model;
 
 namespace MyApp.Domain.Users.Commands;
@@ -86,16 +85,16 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserRe
             RuleFor(x => x.Email)
                 .Must(e => !string.IsNullOrWhiteSpace(e))
                     .WithMessage("Adres e-mail jest wymagany.")
-                .MaximumLength(256)
-                    .WithMessage("Adres e-mail nie może przekraczać 256 znaków.")
+                .MaximumLength(User.EmailMaxLength)
+                    .WithMessage($"Adres e-mail nie może przekraczać {User.EmailMaxLength} znaków.")
                 .EmailAddress()
                     .WithMessage("Nieprawidłowy adres e-mail.");
 
             RuleFor(x => x.Password)
                 .Must(p => !string.IsNullOrWhiteSpace(p))
                     .WithMessage("Hasło jest wymagane.")
-                .MinimumLength(6)
-                    .WithMessage("Hasło musi zawierać co najmniej 6 znaków.");
+                .MinimumLength(User.PasswordMinLength)
+                    .WithMessage($"Hasło musi zawierać co najmniej {User.PasswordMinLength} znaków.");
 
             RuleFor(x => x.Role)
                 .Must(r => !string.IsNullOrWhiteSpace(r))

@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using MyApp.Model;
 using MyApp.Model.enums;
-using System.Security.Cryptography.X509Certificates;
 
 namespace MyApp.Domain.Data;
 
@@ -30,8 +29,8 @@ public class ApplicationDbContext : IdentityDbContext<User>
         {
             e.ToTable("Instructions");
             e.HasKey(x => x.Id);
-            e.Property(x => x.Code).HasMaxLength(32).IsRequired();
-            e.Property(x => x.Text).HasMaxLength(256).IsRequired();
+            e.Property(x => x.Code).HasMaxLength(Instruction.CodeMaxLength).IsRequired();
+            e.Property(x => x.Text).HasMaxLength(Instruction.TextMaxLength).IsRequired();
             e.HasIndex(x => x.Code).IsUnique();
         });
 
@@ -39,15 +38,15 @@ public class ApplicationDbContext : IdentityDbContext<User>
         {
             e.ToTable("Medicines");
             e.HasKey(x => x.Id);
-            e.Property(x => x.Code).HasMaxLength(32).IsRequired();
-            e.Property(x => x.Name).HasMaxLength(128).IsRequired();
+            e.Property(x => x.Code).HasMaxLength(Medicine.CodeMaxLength).IsRequired();
+            e.Property(x => x.Name).HasMaxLength(Medicine.NameMaxLength).IsRequired();
             e.HasIndex(x => x.Code).IsUnique();
         });
 
         modelBuilder.Entity<PharmacistPromotionRequest>(e =>
         {
             e.Property(x => x.NumerPWZF)
-                .HasMaxLength(8)
+                .HasMaxLength(PharmacistPromotionRequest.NumerPWZFLength)
                 .IsRequired();
         });
 
@@ -96,11 +95,11 @@ public class ApplicationDbContext : IdentityDbContext<User>
 
             e.Property(x => x.MedicineName)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(TreatmentPlanMedicine.MedicineNameMaxLength);
 
             e.Property(x => x.Dosage)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(TreatmentPlanMedicine.MedicineNameMaxLength);
 
             e.Property(x => x.TimeOfDay)
                 .IsRequired();
@@ -111,7 +110,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
             e.HasKey(x => x.Id);
 
             e.Property(x => x.AdviceText)
-                .HasMaxLength(2000);
+                .HasMaxLength(TreatmentPlanAdvice.AdviceTextMaxLength);
         });
 
         modelBuilder.Entity<MedicineTakenConfirmation>(e =>

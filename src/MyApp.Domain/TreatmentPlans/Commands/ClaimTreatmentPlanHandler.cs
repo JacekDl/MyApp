@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Domain.Common;
 using MyApp.Domain.Data;
+using MyApp.Model;
 
 namespace MyApp.Domain.TreatmentPlans.Commands;
 
@@ -66,8 +67,8 @@ public class ClaimTreatmentPlanValidator : AbstractValidator<ClaimTreatmentPlanC
         RuleFor(x => x.Number)
             .Must(t => !string.IsNullOrWhiteSpace(t))
                 .WithMessage("Numer jest wymagany.")
-            .Length(16)
-                .WithMessage($"Numer musi mieć dokładnie 16 znaków.")
+            .Length(TreatmentPlan.NumberLength)
+                .WithMessage($"Numer musi mieć dokładnie {TreatmentPlan.NumberLength} znaków.")
             .Matches("^[A-Za-z0-9]+$")
                 .WithMessage("Numer musi się składać z liter i cyfr.");
 

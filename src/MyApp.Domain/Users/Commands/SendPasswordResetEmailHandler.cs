@@ -4,11 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using MyApp.Domain.Abstractions;
 using MyApp.Domain.Common;
 using MyApp.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyApp.Domain.Users.Commands
 {
@@ -72,8 +67,8 @@ namespace MyApp.Domain.Users.Commands
                     .WithMessage("Adres e-mail nie może być pusty.")
                 .EmailAddress()
                     .WithMessage("Nieprawidłowy adres e-mail.")
-                .MaximumLength(256)
-                    .WithMessage("Adres e-mail nie może być dłuższy niż 256 znaków.");
+                .MaximumLength(User.EmailMaxLength)
+                    .WithMessage($"Adres e-mail nie może być dłuższy niż {User.EmailMaxLength} znaków.");
 
             RuleFor(x => x.CallbackUrl)
                 .Must(url => !string.IsNullOrWhiteSpace(url))

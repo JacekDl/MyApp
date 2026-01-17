@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using MyApp.Domain.Abstractions;
 using MyApp.Domain.Common;
 using MyApp.Model;
 
@@ -64,8 +63,8 @@ namespace MyApp.Domain.Users.Commands
                     .WithMessage("Id użytkownika nie może być puste.");
 
             RuleFor(x => x.Name)
-                .MaximumLength(100)
-                    .WithMessage("Nazwa wyświetlana nie może być dłuższa niż 100 znaków.")
+                .MaximumLength(User.DisplayNameMaxLength)
+                    .WithMessage($"Nazwa wyświetlana nie może być dłuższa niż {User.DisplayNameMaxLength} znaków.")
                 .When(x => x.Name is not null);
         }
     }

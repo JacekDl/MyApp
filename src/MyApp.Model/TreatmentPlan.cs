@@ -25,4 +25,8 @@ public class TreatmentPlan
     public TreatmentPlanAdvice? Advice { get; set; }
 
     public TreatmentPlanReview? Review { get; set; }
+
+    #region Constants
+    public const int NumberLength = 16;
+    #endregion
 }

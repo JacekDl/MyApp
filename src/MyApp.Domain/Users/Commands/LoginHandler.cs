@@ -2,7 +2,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using MyApp.Domain.Common;
-using MyApp.Domain.Instructions.Commands;
 using MyApp.Model;
 
 namespace MyApp.Domain.Users.Commands;
@@ -57,10 +56,6 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
             );
             return new() { Value = userDto };
         }
-        if (result.IsLockedOut)
-        {
-            return new() { ErrorMessage = "Konto zablokowane. Spróbuj ponownie później." };
-        }
 
         if (result.IsNotAllowed)
         {
@@ -77,8 +72,8 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
             RuleFor(x => x.Email)
                 .Must(e => !string.IsNullOrWhiteSpace(e))
                     .WithMessage("Adres e-mail jest wymagany.")
-                .MaximumLength(256)
-                    .WithMessage("Adres e-mail nie może przekraczać 256 znaków.")
+                .MaximumLength(User.EmailMaxLength)
+                    .WithMessage($"Adres e-mail nie może przekraczać {User.EmailMaxLength} znaków.")
                 .EmailAddress()
                     .WithMessage("Nieprawidłowy adres e-mail.");
 

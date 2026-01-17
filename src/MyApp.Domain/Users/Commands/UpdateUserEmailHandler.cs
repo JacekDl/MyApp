@@ -3,7 +3,6 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using MyApp.Domain.Common;
 using MyApp.Model;
-using System.ComponentModel.DataAnnotations;
 
 namespace MyApp.Domain.Users.Commands
 {
@@ -88,13 +87,13 @@ namespace MyApp.Domain.Users.Commands
                     .WithMessage("Adres e-mail nie może być pusty.")
                 .EmailAddress()
                     .WithMessage("Proszę wprowadzić prawidłowy adres e-mail.")
-                .MaximumLength(256)
-                    .WithMessage("Adres e-mail nie może być dłuższy niż 256 znaków.");
+                .MaximumLength(User.EmailMaxLength)
+                    .WithMessage($"Adres e-mail nie może być dłuższy niż {User.EmailMaxLength} znaków.");
 
             RuleFor(x => x.Password)
                 .Must(p => !string.IsNullOrWhiteSpace(p))
                     .WithMessage("Hasło nie może być puste.")
-                .MaximumLength(256)
+                .MaximumLength(User.PasswordMaxLength)
                     .WithMessage("Hasło jest zbyt długie.");
         }
     }
