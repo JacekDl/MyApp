@@ -34,7 +34,7 @@ public class PatientController : Controller
             return View("Error", em);
         }
 
-        if (string.Equals(result.Value!.Status, "Zakończony", StringComparison.Ordinal))
+        if (!string.Equals(result.Value!.Status, "Utworzony", StringComparison.Ordinal))
         {
             var em = new ErrorViewModel();
             em.Message = "Ten kod planu leczenia został już użyty.";
