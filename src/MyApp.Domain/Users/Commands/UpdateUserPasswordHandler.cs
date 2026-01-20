@@ -44,7 +44,7 @@ namespace MyApp.Domain.Users.Commands
             var change = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
             if (!change.Succeeded)
             {
-                var message = string.Join(";", change.Errors.Select(e => $"{e.Code}: {e.Description}"));
+                var message = "Nie udało się zmienić hasła. ";
                 return new() { ErrorMessage = message };
             }
 

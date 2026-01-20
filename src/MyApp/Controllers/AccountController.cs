@@ -10,7 +10,6 @@ using MyApp.Model;
 using MyApp.Web.ViewModels;
 using MyApp.Web.ViewModels.Common;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace MyApp.Web.Controllers;
 
@@ -75,7 +74,9 @@ public class AccountController : Controller
     {
         var vm = new InfoViewModel();
         vm.Message = "Na podany adres email został wysłany link potwierdzający. " +
-            "Kliknij w niego, aby aktywować konto.";
+            "Kliknij w niego, aby aktywować konto.\n" +
+            "(Na potrzeby pracy licencjackiej link aktywacyjny znajduje się w folderze " +
+            "src/MyApp/App_Data/Email)";
         return View("Info", vm);
     }
 

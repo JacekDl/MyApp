@@ -14,6 +14,6 @@ public class User : IdentityUser
     public const int PasswordMinLength = 6;
     public const int PasswordMaxLength = 128;
     public const int EmailMaxLength = 256;
-    public const int DisplayNameMaxLength = 100;
+    public const int DisplayNameMaxLength = 32;
     #endregion
 }

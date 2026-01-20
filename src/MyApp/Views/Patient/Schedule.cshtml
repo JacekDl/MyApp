@@ -8,6 +8,11 @@
     Leki do przyjęcia: @d.ToString("dd.MM.yyyy - dddd ", new System.Globalization.CultureInfo("pl-PL"))
 </h3>
 
+@if (!Model.Morning.Any() && !Model.Noon.Any() && !Model.Afternoon.Any() && !Model.Evening.Any())
+{
+    <div class="alert alert-light">Brak leków do przyjęcia w tym dniu.</div>
+}
+
 @if (Model.Morning.Any())
 {
     <div class="card mb-3">
