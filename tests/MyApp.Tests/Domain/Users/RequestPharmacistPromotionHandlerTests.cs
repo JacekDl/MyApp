@@ -18,8 +18,6 @@ public class RequestPharmacistPromotionHandlerTests : TestBase
         db.PharmacistPromotionRequests.Add(new PharmacistPromotionRequest
         {
             UserId = "u1",
-            FirstName = "Jan",
-            LastName = "Kowalski",
             NumerPWZF = "12345678",
             Status = "Pending",
             CreatedUtc = DateTime.UtcNow.AddDays(-1)
@@ -31,8 +29,6 @@ public class RequestPharmacistPromotionHandlerTests : TestBase
 
         var cmd = new RequestPharmacistPromotionCommand(
             UserId: "u1",
-            FirstName: "Jan",
-            LastName: "Kowalski",
             NumerPWZF: "12345678"
         );
 
@@ -56,8 +52,6 @@ public class RequestPharmacistPromotionHandlerTests : TestBase
 
         var cmd = new RequestPharmacistPromotionCommand(
             UserId: "u1",
-            FirstName: "  Jan  ",
-            LastName: "  Kowalski ",
             NumerPWZF: "12345678"
         );
 
@@ -74,8 +68,6 @@ public class RequestPharmacistPromotionHandlerTests : TestBase
 
         req.UserId.Should().Be("u1");
         req.Status.Should().Be("Pending");
-        req.FirstName.Should().Be("Jan");
-        req.LastName.Should().Be("Kowalski");
         req.NumerPWZF.Should().Be("12345678");
 
         req.CreatedUtc.Should().BeOnOrAfter(before);

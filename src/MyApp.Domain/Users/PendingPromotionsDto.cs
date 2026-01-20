@@ -6,8 +6,6 @@
         string UserId,
         string Email,
         string? DisplayName,
-        string FirstName,
-        string LastName,
         string NumerPWZF,
         string Status,
         DateTime CreatedUtc

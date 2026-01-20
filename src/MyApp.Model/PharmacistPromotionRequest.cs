@@ -5,8 +5,6 @@
         public int Id { get; set; }
 
         public string UserId { get; set; } = default!;
-        public string FirstName { get; set; } = default!;
-        public string LastName { get; set; } = default!;
         public string NumerPWZF { get; set; } = default!;
 
         public string Status { get; set; } = "Pending";
@@ -18,8 +16,6 @@
         }
 
         #region Constants
-        public const int FirstNameMaxLength = 50;
-        public const int LastNameMaxLength = 80;
         public const int NumerPWZFLength = 8;
         #endregion
     }

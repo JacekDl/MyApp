@@ -21,9 +21,6 @@ public class GetPendingPromotionsHandlerTests : TestBase
             UserId = userId,
             Status = status,
             CreatedUtc = createdUtc,
-
-            FirstName = firstName,
-            LastName = lastName,
             NumerPWZF = numerPwzf
         };
 
@@ -87,8 +84,6 @@ public class GetPendingPromotionsHandlerTests : TestBase
             userId: "u1",
             status: "Pending",
             createdUtc: created,
-            firstName: "Adam",
-            lastName: "Nowak",
             numerPwzf: "87654321"
         ));
 
@@ -106,8 +101,6 @@ public class GetPendingPromotionsHandlerTests : TestBase
         dto.UserId.Should().Be("u1");
         dto.Email.Should().Be("u1@test.com");
         dto.DisplayName.Should().Be("Janek");
-        dto.FirstName.Should().Be("Adam");
-        dto.LastName.Should().Be("Nowak");
         dto.NumerPWZF.Should().Be("87654321");
         dto.Status.Should().Be("Pending");
         dto.CreatedUtc.Should().Be(created);

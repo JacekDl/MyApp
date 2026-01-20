@@ -17,8 +17,6 @@ public class RejectPharmacistPromotionHandlerTests : TestBase
             UserId = userId,
             Status = status,
 
-            FirstName = "Jan",
-            LastName = "Kowalski",
             NumerPWZF = "1234567"
         };
 

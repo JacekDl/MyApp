@@ -37,8 +37,6 @@ namespace MyApp.Domain.Users.Queries
                     x.pr.UserId,
                     x.user != null ? x.user.Email! : "(brak)",
                     x.user != null ? x.user.DisplayName : null,
-                    x.pr.FirstName,
-                    x.pr.LastName,
                     x.pr.NumerPWZF,
                     x.pr.Status,
                     x.pr.CreatedUtc

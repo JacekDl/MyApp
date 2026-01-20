@@ -608,8 +608,6 @@ public class AccountController : Controller
 
         var result = await _mediator.Send(new RequestPharmacistPromotionCommand(
             UserId: currentUserId,
-            FirstName: vm.FirstName,
-            LastName: vm.LastName,
             NumerPWZF: vm.NumerPWZF
         ));
 

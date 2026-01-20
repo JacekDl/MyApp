@@ -22,9 +22,6 @@ public class ApprovePharmacistPromotionHandlerTests : TestBase
             Id = id,
             UserId = userId,
             Status = status,
-
-            FirstName = "Jan",
-            LastName = "Kowalski",
             NumerPWZF = "1234567"
         };
 

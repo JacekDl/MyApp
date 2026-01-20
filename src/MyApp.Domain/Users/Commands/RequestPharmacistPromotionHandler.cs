@@ -10,8 +10,8 @@ namespace MyApp.Domain.Users.Commands
 {
     public record class RequestPharmacistPromotionCommand (
         string UserId, 
-        string FirstName, 
-        string LastName, 
+        //string FirstName, 
+        //string LastName, 
         string NumerPWZF) : IRequest<RequestPharmacistPromotionResult>;
 
     public record class RequestPharmacistPromotionResult : Result;
@@ -54,8 +54,8 @@ namespace MyApp.Domain.Users.Commands
             var entity = new PharmacistPromotionRequest
             {
                 UserId = request.UserId,
-                FirstName = request.FirstName.Trim(),
-                LastName = request.LastName.Trim(),
+                //FirstName = request.FirstName.Trim(),
+                //LastName = request.LastName.Trim(),
                 NumerPWZF = request.NumerPWZF.Trim(),
                 Status = "Pending",
                 CreatedUtc = DateTime.UtcNow
@@ -75,18 +75,6 @@ namespace MyApp.Domain.Users.Commands
             RuleFor(x => x.UserId)
                 .Must(id => !string.IsNullOrWhiteSpace(id))
                     .WithMessage("Id użytkownika nie może być puste.");
-
-            RuleFor(x => x.FirstName)
-                .Must(s => !string.IsNullOrWhiteSpace(s))
-                    .WithMessage("Imię nie może być puste.")
-                .MaximumLength(PharmacistPromotionRequest.FirstNameMaxLength)
-                    .WithMessage($"Imię nie może mieć więcej niż {PharmacistPromotionRequest.FirstNameMaxLength} znaków.");
-
-            RuleFor(x => x.LastName)
-                .Must(s => !string.IsNullOrWhiteSpace(s))
-                    .WithMessage("Nazwisko nie może być puste.")
-                .MaximumLength(PharmacistPromotionRequest.LastNameMaxLength)
-                    .WithMessage($"Nazwisko nie może mieć więcej niż {PharmacistPromotionRequest.LastNameMaxLength} znaków.");
 
             RuleFor(x => x.NumerPWZF)
                 .Must(s => !string.IsNullOrWhiteSpace(s))
