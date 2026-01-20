@@ -33,8 +33,8 @@
             <option value="Completed" selected=@(status == "completed" ? "selected" : null)>Zakończone</option>
             <option value="Expired" selected=@(status == "expired" ? "selected" : null)>Niewykorzystane</option>
         </select>
-        <button type="submit" class="btn btn-secondary">Filtruj</button>
-        <a asp-action="Plans" class="btn btn-secondary">Wyczyść</a>
+        <button type="submit" class="btn btn-success">Filtruj</button>
+        <a asp-action="Plans" class="btn btn-outline-success">Wyczyść</a>
     </form>
 </div>
 
@@ -86,13 +86,13 @@ else
                                 asp-action="GetPlan" 
                                 asp-route-number="@plan.Number"
                                 style="display:inline">
-                                <button type="submit" class="btn btn-sm btn-secondary">Szczegóły</button>
+                                <button type="submit" class="btn btn-sm btn-success">Szczegóły</button>
                             </form>
                         </td>
 
                         <td class="col-1 text-start">
                             <button type="button"
-                                    class="btn btn-sm btn-secondary"
+                                    class="btn btn-sm btn-outline-success"
                                     data-bs-toggle="modal"
                                     data-bs-target="#deletePlanModal-@plan.Number">
                                 Usuń

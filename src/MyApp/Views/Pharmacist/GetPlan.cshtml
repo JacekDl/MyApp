@@ -83,18 +83,18 @@
             </form>
 
             <div class="d-flex justify-content-center gap-2">
+                <button type="submit"
+                        form="sendForm"
+                        class="btn btn-success">
+                    Dodaj wiadomość
+                </button>
+
                 <a asp-controller="Pharmacist"
                    asp-action="CheckCompliance"
                    asp-route-number="@Model.Number"
-                   class="btn btn-secondary">
+                   class="btn btn-outline-success">
                     Zgodność terapii
                 </a>
-
-                <button type="submit"
-                        form="sendForm"
-                        class="btn btn-secondary">
-                    Dodaj wiadomość
-                </button>
             </div>
         </div>
     </div>

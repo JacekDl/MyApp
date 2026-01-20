@@ -32,17 +32,17 @@
 </div>
 
 <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-3">
-    <a class="btn btn-secondary" asp-action="ChangeEmail">Zmień email</a>
-    <a class="btn btn-secondary" asp-action="ChangePassword">Zmień hasło</a>
-    <a class="btn btn-secondary" asp-action="EditProfile">Zmień dane konta</a>
+    <a class="btn btn-success" asp-action="ChangeEmail">Zmień email</a>
+    <a class="btn btn-success" asp-action="ChangePassword">Zmień hasło</a>
+    <a class="btn btn-success" asp-action="EditProfile">Zmień dane konta</a>
     @if ((!User.IsInRole("Admin")) && (!User.IsInRole("Pharmacist")))
     {
-        <a class="btn btn-secondary" asp-action="PromoteToPharmacist">Zarejestruj jako Farmaceuta.</a>
+        <a class="btn btn-success" asp-action="PromoteToPharmacist">Zarejestruj jako Farmaceuta.</a>
     }
     @if(!User.IsInRole("Admin"))
     {
         <button type="button"
-                class="btn btn-secondary"
+                class="btn btn-outline-success"
                 data-bs-toggle="modal"
                 data-bs-target="#deleteAccountModal">
             Usuń konto

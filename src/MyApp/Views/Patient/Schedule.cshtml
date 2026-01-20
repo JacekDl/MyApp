@@ -152,18 +152,18 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <a class="btn btn-secondary"
+    <a class="btn btn-outline-success"
        asp-action="Schedule"
        asp-route-date="@d.AddDays(-1).ToString("yyyy-MM-dd")">
         ← Poprzedni dzień
     </a>
 
-    <a class="btn btn-secondary"
+    <a class="btn btn-success"
        asp-action="Schedule">
         Leki na dzisiaj
     </a>
 
-    <a class="btn btn-secondary"
+    <a class="btn btn-outline-success"
        asp-action="Schedule"
        asp-route-date="@d.AddDays(1).ToString("yyyy-MM-dd")">
         Następny dzień →

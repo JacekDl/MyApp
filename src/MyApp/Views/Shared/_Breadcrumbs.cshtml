@@ -15,7 +15,13 @@
                         var pair = crumb.Split('|');
                         if (crumb != Model.Breadcrumbs.Last())
                         {
-                            <li class="breadcrumb-item"><a asp-action="@pair[1]" asp-controller="@pair[2]">@pair[0]</a></li>
+                            <li class="breadcrumb-item">
+                                <a class="text-success"
+                                asp-action="@pair[1]" 
+                                asp-controller="@pair[2]">
+                                @pair[0]
+                                </a>
+                            </li>
                         }
                         else
                         {

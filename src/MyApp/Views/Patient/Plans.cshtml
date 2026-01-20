@@ -25,8 +25,8 @@
             <option value="Completed" selected=@(status == "completed" ? "selected" : null)>Zakończone</option>
             <option value="Expired" selected=@(status == "expired" ? "selected" : null)>Niewykorzystane</option>
         </select>
-        <button type="submit" class="btn btn-secondary">Filtruj</button>
-        <a asp-action="Plans" class="btn btn-secondary">Wyczyść</a>
+        <button type="submit" class="btn btn-success">Filtruj</button>
+        <a asp-action="Plans" class="btn btn-outline-success">Wyczyść</a>
     </form>
 </div>
 
@@ -77,7 +77,7 @@ else
                         <a asp-action="GetPlan" 
                             asp-controller="Patient" 
                             asp-route-number="@plan.Number"
-                            class="btn btn-sm btn-secondary">
+                            class="btn btn-sm btn-success">
                             Szczegóły
                         </a>
                     </td>

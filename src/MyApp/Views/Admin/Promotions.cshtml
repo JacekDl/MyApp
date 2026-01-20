@@ -44,7 +44,7 @@ else
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="requestId" value="@r.Id" />
                                     <button type="submit"
-                                            class="btn btn-sm btn-secondary"
+                                            class="btn btn-sm btn-success"
                                             onclick="return confirm('Zatwierdzić i nadać rolę Farmaceuta?');">
                                         Zatwierdź
                                     </button>
@@ -54,7 +54,7 @@ else
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="requestId" value="@r.Id" />
                                     <button type="submit"
-                                            class="btn btn-sm btn-secondary"
+                                            class="btn btn-sm btn-outline-success"
                                             onclick="return confirm('Anulować (odrzucić) zgłoszenie?');">
                                         Odrzuć
                                     </button>

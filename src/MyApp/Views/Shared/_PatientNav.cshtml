@@ -5,16 +5,16 @@
 
 <ul class="nav nav-tabs mb-4">
     <li class="nav-item">
-        <a class="nav-link @(current == "Schedule" ? "active" : "")" asp-controller="Patient" asp-action="Schedule">Kalendarz</a>
+        <a class="nav-link @(current == "Schedule" ? "active fw-bold" : "text-success")" asp-controller="Patient" asp-action="Schedule">Kalendarz</a>
     </li>
     <li class="nav-item dropdown">
-        <a class="nav-link @((current == "Plans") || (current == "ClaimPlan") || (current == "GetPlan") ? "active" : "")" dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Plany leczenia</a>
+        <a class="nav-link @((current == "Plans") || (current == "ClaimPlan") || (current == "GetPlan") ? "active fw-bold" : "text-success")" dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Plany leczenia</a>
         <ul class="dropdown-menu">
             <a class="dropdown-item" asp-controller="Patient" asp-action="Plans">Pobrane</a>
             <a class="dropdown-item" asp-controller="Patient" asp-action="ClaimPlan">Pobierz nowy</a>
         </ul>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(konto ? "active" : "")" asp-controller="Account" asp-action="Details">Moje konto</a>
+        <a class="nav-link @(konto ? "active fw-bold" : "text-success")" asp-controller="Account" asp-action="Details">Moje konto</a>
     </li>
 </ul>

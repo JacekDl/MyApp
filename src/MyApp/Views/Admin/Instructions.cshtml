@@ -43,7 +43,7 @@
                 <input name="Text" class="form-control" placeholder="Dawkowanie" maxlength="1024" />
             </div>
             <div class="col-sm-2 d-grid">
-                <button type="submit" class="btn btn-secondary">Dodaj dawkowanie</button>
+                <button type="submit" class="btn btn-success">Dodaj dawkowanie</button>
             </div>
         </form>
     </div>
@@ -67,14 +67,14 @@
                             <form asp-action="ModifyInstruction" asp-controller="Medicine" method="get" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@item.Id" />
-                                <button type="submit" class="btn btn-sm btn-secondary">
+                                <button type="submit" class="btn btn-sm btn-success">
                                     Zmień
                                 </button>
                             </form>
                         </td>
                         <td class="col-1 text-start">
                             <button type="button"
-                                    class="btn btn-sm btn-secondary"
+                                    class="btn btn-sm btn-outline-success"
                                     data-bs-toggle="modal"
                                     data-bs-target="#deleteInstructionModal-@item.Id">
                                 Usuń

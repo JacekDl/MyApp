@@ -35,7 +35,7 @@
                 </div>
 
                 <div class="d-grid d-sm-flex justify-content-sm-center">
-                    <button type="submit" class="btn btn-secondary">Zaloguj</button>
+                    <button type="submit" class="btn btn-success">Zaloguj</button>
                 </div>
             </form>
 
@@ -71,7 +71,7 @@
                 <span>Nie masz jeszcze konta?</span>
                 <a asp-controller="Account"
                    asp-action="Register"
-                   class="ms-1">
+                   class="ms-1 text-success">
                     Zarejestruj się
                 </a>
             </div>
@@ -81,7 +81,7 @@
                 <a asp-controller="Account"
                    asp-action="ResetPassword"
                    asp-route-returnUrl="@ViewData["ReturnUrl"]"
-                   class="ms-1">
+                   class="ms-1 text-success">
                     Zresetuj hasło
                 </a>
             </div>

@@ -5,23 +5,23 @@
 
 <ul class="nav nav-tabs mb-4">
     <li class="nav-item">
-        <a class="nav-link @(current == "Users" ? "active" : "")" asp-controller="Admin" asp-action="Users">Użytkownicy</a>
+        <a class="nav-link @(current == "Users" ? "active fw-bold" : "text-success")" asp-controller="Admin" asp-action="Users">Użytkownicy</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(current == "Plans" ? "active" : "")" asp-controller="Admin" asp-action="Plans">Plany leczenia</a>
+        <a class="nav-link @(current == "Plans" ? "active fw-bold" : "text-success")" asp-controller="Admin" asp-action="Plans">Plany leczenia</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(current == "Promotions" ? "active" : "")" asp-controller="Admin" asp-action="Promotions">Rejestracja farmaceutów</a>
+        <a class="nav-link @(current == "Promotions" ? "active fw-bold" : "text-success")" asp-controller="Admin" asp-action="Promotions">Rejestracja farmaceutów</a>
     </li>
     <li class="nav-item dropdown">
-        <a class="nav-link @((current == "Medicines") || (current == "Instructions") ? "active" : "")" dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Słowniki</a>
+        <a class="nav-link @((current == "Medicines") || (current == "Instructions") ? "active fw-bold" : "text-success")" dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Słowniki</a>
         <ul class="dropdown-menu">
             <li><a class="dropdown-item" asp-controller="Medicine" asp-action="Medicines">Leki</a></li>
             <li><a class="dropdown-item" asp-controller="Medicine" asp-action="Instructions">Dawkowanie</a></li>
         </ul>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(konto ? "active" : "")" asp-controller="Account" asp-action="Details">Moje konto</a>
+        <a class="nav-link @(konto ? "active fw-bold" : "text-success")" asp-controller="Account" asp-action="Details">Moje konto</a>
     </li>
 
 </ul>

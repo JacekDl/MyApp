@@ -60,13 +60,13 @@ else
                             <td class="col-1 text-end">
                                 <form asp-controller="Admin" asp-action="Plans" method="get" style="display:inline">
                                     <input type="hidden" name="userId" value="@user.Id" />
-                                    <button type="submit" class="btn btn-sm btn-secondary">Plany</button>
+                                    <button type="submit" class="btn btn-sm btn-success">Plany</button>
                                 </form>
                             </td>
 
                             <td class="col-1 text-start">
                                 <button type="button"
-                                        class="btn btn-sm btn-secondary"
+                                        class="btn btn-sm btn-outline-success"
                                         data-bs-toggle="modal"
                                         data-bs-target="#deleteUserModal-@user.Id">
                                     Usuń

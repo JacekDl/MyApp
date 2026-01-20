@@ -34,7 +34,7 @@
                 </select>
             </div>
             <div class="col-md-2 d-grid">
-                <button type="button" id="addMedAdviceBtn" class="btn btn-secondary">Dodaj do wydruku</button>
+                <button type="button" id="addMedAdviceBtn" class="btn btn-outline-success">Dodaj do wydruku</button>
             </div>
         </div>
 
@@ -44,9 +44,11 @@
                 <input type="text" id="generalAdvice" class="form-control" placeholder="Wpisz ogólne zalecenia" />
             </div>
             <div class="col-md-2 d-grid">
-                <button type="button" id="addGenAdviceBtn" class="btn btn-secondary">Dodaj do wydruku</button>
+                <button type="button" id="addGenAdviceBtn" class="btn btn-outline-success">Dodaj do wydruku</button>
             </div>
         </div>
+
+        <hr />
 
         <div>
             <div class="d-flex justify-content-center gap-2 mt-3">
@@ -69,8 +71,8 @@
     </div>
 
     <div class="text-center mt-3">
-        <button type="submit" class="btn btn-secondary me-2">Utwórz PDF</button>
-        <button type="button" class="btn btn-secondary" id="clearBtn">Usuń wszystkie</button>
+        <button type="submit" class="btn btn-success me-2">Utwórz PDF</button>
+        <button type="button" class="btn btn-outline-success" id="clearBtn">Usuń wszystkie</button>
         <p class="text-muted mt-2">
             PDF z zaleceniami otworzy się w nowej karcie.
         </p>
@@ -198,7 +200,7 @@
                     });
 
                     buttonGroup.append(
-                        makeBtn('Zmień', 'btn-secondary', () => {
+                        makeBtn('Zmień', 'btn-success', () => {
                             nameInput.value = p.name;
                             dosageInput.value = p.dosage;
                             frequencyInput.value = p.frequency;
@@ -206,7 +208,7 @@
                             nameInput.focus();
                             render();
                         }),
-                        makeBtn('Usuń', 'btn-secondary', () => {
+                        makeBtn('Usuń', 'btn-outline-success', () => {
                             pairs.splice(idx, 1);
                             render();
                         })
@@ -232,13 +234,13 @@
                     const buttonGroup = el(
                         'div',
                         { className: 'd-flex flex-column flex-md-row gap-2 justify-content-md-end' },
-                        makeBtn('Zmień', 'btn-secondary', () => {
+                        makeBtn('Zmień', 'btn-success', () => {
                             genAdviceInput.value = advice;
                             genAdvice.splice(idx, 1);
                             genAdviceInput?.focus();
                             render();
                         }),
-                        makeBtn('Usuń', 'btn-secondary', () => {
+                        makeBtn('Usuń', 'btn-outline-success', () => {
                             genAdvice.splice(idx, 1);
                             render();
                         })

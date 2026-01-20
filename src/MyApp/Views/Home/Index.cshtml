@@ -1,27 +1,91 @@
 ﻿@{
-    ViewData["Title"] = "Strona Domowa";
+    ViewData["Title"] = "Strona główna";
 }
 
-<div class="text-center">
-    <h1 class="display-4">MyApp</h1>
-    <p>
-        Najlepsza aplikacja do zarządzania zdrowiem!
-    </p>
-</div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-xl-8">
 
+            <div class="card border-0 mb-5">
+                <div class="card-body p-4 p-md-5">
+                    <div class="row align-items-center">
 
-<div class="d-flex justify-content-center gap-3 mt-4">
-    <a asp-controller="Account"
-       asp-action="Register"
-       class="btn btn-outline-secondary flex-fill text-center"
-       style="max-width:220px;">
-        Rejestracja
-    </a>
+                        <div class="col-md-6">
+                            <h1 class="fw-bold mb-3">
+                                Witaj w MyApp
+                            </h1>
 
-    <a asp-controller="Account"
-       asp-action="Login"
-       class="btn btn-outline-secondary flex-fill text-center"
-       style="max-width:220px;">
-        Logowanie
-    </a>
+                            <p class="text-muted mb-4">
+                                Zarządzaj leczeniem, lekami i zaleceniami w jednym miejscu.
+                            </p>
+
+                            <div class="d-grid gap-2">
+                                <a asp-controller="Account"
+                                   asp-action="Register"
+                                   class="btn btn-success btn-lg">
+                                    Rejestracja
+                                </a>
+
+                                <a asp-controller="Account"
+                                   asp-action="Login"
+                                   class="btn btn-outline-success btn-lg">
+                                    Logowanie
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 text-center mt-4 mt-md-0">
+                            <img src="~/images/picture.png"
+                                 class="img-fluid rounded shadow-sm"
+                                 style="max-width: 280px;"
+                                 alt="Zdjęcie użytkownika" />
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0">
+                <div class="card-body p-4 p-md-5">
+                    <div class="row align-items-center">
+
+                        <div class="col-md-6 text-center mb-4 mb-md-0">
+                            <img src="~/images/farmaceuta.png"
+                                 class="img-fluid rounded shadow-sm"
+                                 style="max-width: 280px;"
+                                 alt="Farmaceuta" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <h2 class="fw-bold mb-3">
+                                Dla farmaceutów
+                            </h2>
+
+                            <p class="text-muted mb-4">
+                                Dołącz do platformy stworzonej z myślą o farmaceutach.
+                                Wspieraj pacjentów, zarządzaj terapiami i komunikuj się
+                                w nowoczesny oraz bezpieczny sposób.
+                            </p>
+
+                            <div class="d-grid gap-2">
+                                <a asp-controller="Account"
+                                   asp-action="Register"
+                                   class="btn btn-success btn-lg">
+                                    Rejestracja
+                                </a>
+
+                                <a asp-controller="Account"
+                                   asp-action="Login"
+                                   class="btn btn-outline-success btn-lg">
+                                    Logowanie
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>

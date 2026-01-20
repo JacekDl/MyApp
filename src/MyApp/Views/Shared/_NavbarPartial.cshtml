@@ -7,7 +7,7 @@
 
             <button id="themeToggle"
                     type="button"
-                    class="btn btn-outline-secondary d-flex align-items-center gap-1"
+                    class="btn btn-outline-success d-flex align-items-center gap-1"
                     aria-pressed="false"
                     aria-label="Przełącz tryb motywu"
                     title="Przełącz tryb motywu">
@@ -46,7 +46,7 @@
                         var displayName = User.FindFirst("DisplayName")?.Value;
                         var nameToShow = string.IsNullOrWhiteSpace(displayName) ? User.Identity?.Name : displayName;
                     }
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Witaj @nameToShow!
                     </button>
                     <ul class="dropdown-menu">
@@ -63,7 +63,7 @@
             else
             {
                 <div class="dropdown">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Twoje konto
                     </button>
                     <ul class="dropdown-menu">
