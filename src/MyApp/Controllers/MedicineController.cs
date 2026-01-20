@@ -92,7 +92,7 @@ namespace MyApp.Web.Controllers
 
             var vm = new ModifyMedicineViewModel();
             vm.Medicine = result.Value!;
-            vm.Breadcrumbs.AddRange(["Leki|Medicines|Medicine", "Modyfikuj lek|"]);
+            vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Leki|Medicines|Medicine", "Modyfikuj lek||"]);
             return View("~/Views/Admin/ModifyMedicine.cshtml", vm);
         }
 
@@ -188,7 +188,7 @@ namespace MyApp.Web.Controllers
             }
             var vm = new ModifyInstructionViewModel();
             vm.Instruction = result.Value!;
-            vm.Breadcrumbs.AddRange(["Dawkowanie|Instructions|Medicine", "Modyfikuj dawkowanie|"]);
+            vm.Breadcrumbs.AddRange(["Start|Users|Admin", "Dawkowanie|Instructions|Medicine", "Modyfikuj dawkowanie|"]);
             return View("~/Views/Admin/ModifyInstruction.cshtml", vm);
         }
 

@@ -33,14 +33,6 @@
                         <input type="hidden" name="date" value="@Model.Date.ToString("yyyy-MM-dd")" />
                         <input type="hidden" name="treatmentPlanMedicineId" value="@m.IdMedicine" />
 
-                        <input class="form-check-input ms-2"
-                               type="checkbox"
-                               id="med-@m.IdMedicine"
-                               name="isTaken"
-                               value="true"
-                               checked="@(Model.TakenMedicineIds.Contains(m.IdMedicine))"
-                               onchange="this.form.submit();"
-                               disabled="@(isFutureDay ? "disabled" : null)" />
                     </form>
                 </li>
             }

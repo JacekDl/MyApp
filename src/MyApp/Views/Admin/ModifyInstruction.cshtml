@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Zmiena dawkowania";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var instruction = Model.Instruction;
 }
 
@@ -23,7 +24,7 @@
             <span asp-validation-for="@instruction.Text" class="text-danger"></span>
         </div>
 
-        <div class="col-12 d-flex gap-2">
+        <div class="col-12 d-flex justify-content-center gap-2">
             <button type="submit" class="btn btn-success">Zapisz</button>
         </div>
     </form>
