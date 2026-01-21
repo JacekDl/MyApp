@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MyApp.Domain.Abstractions;
 using MyApp.Domain.Data;
 using MyApp.Domain.Extensions;
 using MyApp.Domain.Users.Queries;
 using MyApp.Model;
-using MyApp.Web.Services;
 using QuestPDF.Infrastructure;
 
 
@@ -22,8 +20,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         b => b.MigrationsAssembly("MyApp.Domain")
         ));
 
-builder.Services.AddSingleton<IReviewPdfService, ReviewPdfService>();
-builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
+//builder.Services.AddSingleton<IReviewPdfService, ReviewPdfService>();
+//builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
+
+//builder.Services.AddInfrastructure(builder.Configuration);
 
 
 builder.Services.AddMediatR(cfg =>
@@ -45,8 +45,6 @@ builder.Services
         options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
         options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
     });
-
-builder.Services.AddScoped<IUserClaimsPrincipalFactory<User>, AppClaimsPrincipalFactory>();
 
 builder.Services.AddAuthorizationBuilder()
     .SetFallbackPolicy(new AuthorizationPolicyBuilder()

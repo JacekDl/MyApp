@@ -1,11 +1,12 @@
-﻿using MyApp.Domain.Abstractions;
+﻿using Microsoft.Extensions.Hosting;
+using MyApp.Domain.Abstractions;
 
-namespace MyApp.Web.Services;
+namespace MyApp.Infrastructure;
 
 public class FileEmailSender : IEmailSender
 {
     private readonly string _root;
-    public FileEmailSender(IWebHostEnvironment env)
+    public FileEmailSender(IHostEnvironment env)
     {
         _root = Path.Combine(env.ContentRootPath, "App_Data", "Email");
         Directory.CreateDirectory(_root);

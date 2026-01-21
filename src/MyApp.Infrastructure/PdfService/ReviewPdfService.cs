@@ -6,7 +6,7 @@ using QRCoder;
 using MyApp.Domain.Medicines;
 using MyApp.Domain.Instructions;
 
-namespace MyApp.Web.Services;
+namespace MyApp.Infrastructure;
 
 public class ReviewPdfService : IReviewPdfService
 {
