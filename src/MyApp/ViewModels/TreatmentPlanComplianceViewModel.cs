@@ -4,7 +4,7 @@
     {
         public int TreatmentPlanId { get; set; }
 
-        public string Number {  get; set; }
+        public required string Number {  get; set; }
 
         public DateTime? DateStarted { get; set; }
 

@@ -36,7 +36,7 @@ namespace MyApp.Domain.TreatmentPlans.Commands
 
             var plan = await _db.TreatmentPlans
                 .Include(tp => tp.Review)
-                    .ThenInclude(r => r.ReviewEntries)
+                    .ThenInclude(r => r!.ReviewEntries)
                 .FirstOrDefaultAsync(tp => tp.Number == request.Number, ct);
 
             if (plan is null)

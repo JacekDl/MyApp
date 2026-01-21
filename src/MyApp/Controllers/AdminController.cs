@@ -126,7 +126,7 @@ public class AdminController : Controller
         var tp = result.Value;
 
         var vm = new TreatmentPlanViewModel();
-        vm.Id = tp.Id;
+        vm.Id = tp!.Id;
         vm.Number = tp.Number;
         vm.DateCreated = tp.DateCreated;
         vm.DateStarted = tp.DateStarted;

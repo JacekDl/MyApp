@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MyApp.Domain.Abstractions;
 using MyApp.Domain.Data;
 using MyApp.Domain.Extensions;
 using MyApp.Domain.Users.Queries;
+using MyApp.Infrastructure;
 using MyApp.Model;
 using QuestPDF.Infrastructure;
 
@@ -20,11 +22,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         b => b.MigrationsAssembly("MyApp.Domain")
         ));
 
-//builder.Services.AddSingleton<IReviewPdfService, ReviewPdfService>();
-//builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
-
-//builder.Services.AddInfrastructure(builder.Configuration);
-
+builder.Services.AddSingleton<IReviewPdfService, ReviewPdfService>();
+builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
 
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblyContaining<GetAllUsersHandler>()); //mozna wybrac dowolna klase z assembly (Architecting ASP.NET Core Applications p.575)

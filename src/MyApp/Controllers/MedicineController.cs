@@ -57,13 +57,12 @@ namespace MyApp.Web.Controllers
                 return View("~/Views/Pharmacist/Medicines.cshtml", vm);
             }
                 
-
             return Forbid(); //TODO: change that
         }
 
         [Authorize(Roles = UserRoles.Admin)]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddMedicine(MedicineDto item, CancellationToken ct)
+        public async Task<IActionResult> AddMedicine(MedicineDto item)
         {
             var result = await _mediator.Send(new AddMedicineCommand(item.Code, item.Name));
             TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Dodano lek." : result.ErrorMessage;
