@@ -36,18 +36,8 @@ public class AdminController : Controller
         {
             foreach (var user in result.Value)
             {
-                var role = user.Role switch
-                {
-                    UserRoles.Admin => "Admin",
-                    UserRoles.Pharmacist => "Farmaceuta",
-                    UserRoles.Patient => "Pacjent",
-                    _ => "Nieznana rola"
-                };
-
-                var updatedUser = user with { Role = role };
-                vm.Users.Add(updatedUser);
+                vm.Users.Add(user);
             }
-
             vm.TotalCount = result.TotalCount;
             vm.Page = result.Page;
             vm.PageSize = result.PageSize;
@@ -105,7 +95,6 @@ public class AdminController : Controller
         TempData[result.Succeeded ? "Info" : "Error"] = result.Succeeded ? "Usunięto plan lecznia." : result.ErrorMessage;
         return RedirectToAction(nameof(Plans));
     }
-    #endregion
 
     public async Task<IActionResult> GetPlan(string number)
     {
@@ -138,6 +127,7 @@ public class AdminController : Controller
 
         return View(vm);
     }
+    #endregion
 
     #region Promotions
     public async Task<IActionResult> Promotions()

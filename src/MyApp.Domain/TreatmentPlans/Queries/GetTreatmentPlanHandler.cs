@@ -31,7 +31,7 @@ public class GetTreatmentPlanHandler : IRequestHandler<GetTreatmentPlanQuery, Ge
 
         var treatmentPlan = await _db.TreatmentPlans
             .Include(p => p.Review)
-                .ThenInclude(r => r.ReviewEntries)
+                .ThenInclude(r => r!.ReviewEntries)
             .SingleOrDefaultAsync(p => p.Number == request.Number, ct);
 
         if (treatmentPlan is null)

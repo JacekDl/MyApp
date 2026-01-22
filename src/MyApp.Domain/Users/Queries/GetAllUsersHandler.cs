@@ -29,7 +29,7 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, GetAllUsersR
             .AsNoTracking()
             .OrderByDescending(u => u.CreatedUtc);
 
-        var totalCount = await query.CountAsync(cancellationToken: ct);
+        var totalCount = await query.CountAsync(ct);
 
         var users = await query
             .Skip((page - 1) * pageSize)
@@ -43,10 +43,18 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, GetAllUsersR
             var roles = await _userManager.GetRolesAsync(user);
             var primaryRole = roles.FirstOrDefault() ?? string.Empty;
 
+            var role = primaryRole switch
+            {
+                UserRoles.Admin => "Admin",
+                UserRoles.Pharmacist => "Farmaceuta",
+                UserRoles.Patient => "Pacjent",
+                _ => "Nieznana rola"
+            };
+
             list.Add(new UserDto(
                 user.Id,
                 user.Email ?? string.Empty,
-                primaryRole,
+                role,
                 user.DisplayName ?? string.Empty,
                 user.CreatedUtc
             ));

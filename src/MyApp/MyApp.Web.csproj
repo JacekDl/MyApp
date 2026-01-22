@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\**" />
+    <Content Remove="Services\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\css\_Layout.cshtml.css" />
   </ItemGroup>
 
@@ -29,10 +36,6 @@
   <ItemGroup>
     <ProjectReference Include="..\MyApp.Domain\MyApp.Domain.csproj" />
     <ProjectReference Include="..\MyApp.Infrastructure\MyApp.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>
