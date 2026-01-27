@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MyApp.Model;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyApp.Web.ViewModels;
 
 public class ClaimPlanViewModel : ViewModelBase
 {
-    [Required, MaxLength(128)]
+    [Required, MaxLength(TreatmentPlan.NumberLength)]
     public string Number { get; set; } = string.Empty;
 }

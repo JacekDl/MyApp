@@ -159,6 +159,7 @@ public class PatientController : Controller
 
     #region GetPlan
 
+    [Authorize(Roles = UserRoles.Patient)]
     public async Task<IActionResult> GetPlan(string number)
     {
         if (string.IsNullOrWhiteSpace(number))
@@ -177,7 +178,8 @@ public class PatientController : Controller
 
         if (!string.Equals(result.Value.IdPatient, currentUserId, StringComparison.OrdinalIgnoreCase))
         {
-            return Forbid();
+            var em = new ErrorViewModel { Message = "Nieprawidłowy kod" };
+            return View("Error", em);
         }
 
         var tp = result.Value;
